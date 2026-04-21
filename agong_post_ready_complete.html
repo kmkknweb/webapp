@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>อากงอาม่าออนไลน์</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<style>
+:root{
+  --bg:#0d0b10; --panel:#17131d; --panel2:#1e1827; --text:#fff6eb; --muted:#d7c8bc;
+  --gold:#f2c46b; --gold2:#ffe5b1; --red:#c91f3d; --pink:#ff5fa3; --purple:#7d4cff;
+  --line:rgba(255,255,255,.09); --shadow:0 18px 40px rgba(0,0,0,.38);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:radial-gradient(circle at top,#44101f 0%,#1a1020 34%,#0d0b10 100%);color:var(--text);font-family:'Kanit',sans-serif;min-height:100%}
+body{overflow-x:hidden}
+.app{max-width:460px;margin:0 auto;padding:18px 14px 46px;position:relative;z-index:2}
+.bg-orb{position:fixed;border-radius:999px;filter:blur(70px);pointer-events:none;opacity:.2;z-index:0;animation:floatOrb 10s ease-in-out infinite}
+.orb1{width:200px;height:200px;left:-60px;top:80px;background:var(--red)}
+.orb2{width:230px;height:230px;right:-80px;top:180px;background:var(--purple);animation-delay:1.6s}
+.orb3{width:170px;height:170px;left:40%;bottom:100px;background:var(--gold);animation-delay:3s}
+.hero{text-align:center;padding:8px 6px 20px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--gold2);font-size:11px;letter-spacing:.8px;backdrop-filter:blur(10px);box-shadow:0 0 0 1px rgba(242,196,107,.08),0 0 30px rgba(201,31,61,.08)}
+.hero-photo-wrap{width:220px;height:220px;margin:20px auto 10px;position:relative;display:grid;place-items:center}
+.hero-ring{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle, rgba(255,229,177,.32) 0%, rgba(201,31,61,.18) 34%, rgba(125,76,255,.18) 58%, transparent 74%);animation:pulse 4s ease-in-out infinite}
+.hero-photo{position:relative;width:184px;height:184px;border-radius:50%;object-fit:cover;display:block;border:3px solid rgba(255,255,255,.13);box-shadow:0 20px 44px rgba(0,0,0,.36),0 0 38px rgba(242,196,107,.16);animation:floatHero 4.5s ease-in-out infinite}
+.hero-title{margin:8px 0 6px;font-size:32px;line-height:1.08;font-weight:800;letter-spacing:-.02em}
+.hero-sub{margin:0 auto;max-width:320px;color:var(--muted);font-size:14px;line-height:1.75}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px}
+.menu-btn{background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));border:1px solid var(--line);border-radius:20px;padding:14px 10px;color:var(--text);font-family:'Kanit',sans-serif;box-shadow:var(--shadow)}
+.menu-btn strong{display:block;font-size:15px}
+.menu-btn span{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));border:1px solid var(--line);border-radius:24px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow);backdrop-filter:blur(12px)}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.section-head h2{margin:0;font-size:19px;font-weight:700}
+.mini-btn,.primary-btn,.secondary-btn,.amount-btn,.wish-btn{font-family:'Kanit',sans-serif;border:none;cursor:pointer}
+.mini-btn{padding:9px 12px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--gold2);font-size:12px}
+.daily-date{font-size:12px;color:var(--gold2);margin-bottom:6px}
+.daily-text{margin:0 0 10px;font-size:18px;line-height:1.9;font-weight:300}
+.wish-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wish-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:15px 10px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));color:var(--text);border:1px solid var(--line)}
+.wish-icon{font-size:24px}
+.wish-label{font-size:13px;line-height:1.4}
+.fortune-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tag{padding:7px 12px;border-radius:999px;font-size:12px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.tag.gold{color:var(--gold2)}
+.fortune-text{margin:0 0 12px;font-size:15px;line-height:1.8}
+.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.score-box{background:rgba(0,0,0,.18);border:1px solid var(--line);border-radius:14px;padding:10px 6px;text-align:center}
+.score-box span{display:block;font-size:10px;color:var(--muted);margin-bottom:4px}
+.score-box strong{font-size:15px;color:var(--gold2)}
+.amount-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.amount-btn{padding:12px;border-radius:14px;background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--line)}
+.amount-btn.active{background:linear-gradient(135deg,rgba(242,196,107,.24),rgba(201,31,61,.16))}
+.text-input{width:100%;padding:13px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);margin-bottom:10px;font:inherit}
+.text-input::placeholder{color:#baa896}
+.text-area{min-height:92px;resize:vertical}
+.upload-box{display:block;border:1px dashed rgba(255,255,255,.18);border-radius:18px;padding:16px;background:rgba(255,255,255,.03);margin-bottom:12px;cursor:pointer}
+.upload-placeholder{text-align:center;color:var(--muted)}
+.upload-placeholder span{display:block;font-size:14px;margin-bottom:3px}
+.upload-placeholder small{font-size:11px}
+.slip-preview{width:100%;max-height:230px;object-fit:cover;border-radius:14px;display:block}
+.hidden{display:none !important}
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.primary-btn{padding:14px;border-radius:16px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#23160d;font-size:15px;font-weight:700}
+.secondary-btn{padding:14px;border-radius:16px;background:linear-gradient(135deg,var(--red),var(--pink));color:#fff;font-size:15px;font-weight:700}
+.notice-inline{margin:0;color:var(--muted);line-height:1.75}
+.bottom-btn{width:100%;margin-top:10px;padding:14px;border-radius:16px;background:linear-gradient(135deg,#35204a,#6d45df);color:#fff;font-size:15px;font-weight:700;border:none;font-family:'Kanit',sans-serif}
+.modal.hidden{display:none}
+.modal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center}
+.modal-backdrop{position:absolute;inset:0;background:rgba(5,5,9,.72);backdrop-filter:blur(6px)}
+.modal-panel{position:relative;z-index:2;width:min(92vw,420px);max-height:88vh;overflow:auto;background:linear-gradient(180deg,#1a1221,#130f18);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:0 22px 60px rgba(0,0,0,.45)}
+.modal-panel h3{margin:0 0 10px;font-size:24px}
+.modal-panel p{margin:0;color:var(--muted);line-height:1.8}
+.close-btn{position:absolute;right:10px;top:10px;width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,.08);color:#fff;font-size:22px;cursor:pointer}
+.modal-actions{display:flex;gap:10px;margin-top:14px}
+.modal-actions.stacked{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.notice-panel{text-align:center}
+.notice-image{width:126px;height:126px;border-radius:50%;object-fit:cover;margin-bottom:10px;box-shadow:0 0 32px rgba(242,196,107,.16)}
+.output-panel{width:min(96vw,460px)}
+#renderTargetWrapper{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:18px;padding:10px}
+#renderTarget{display:flex;justify-content:center}
+.output-card,.certificate-card,.fortune-card-post{width:100%;max-width:390px;border-radius:24px;overflow:hidden;position:relative}
+.output-card,.fortune-card-post{background:
+radial-gradient(circle at 12% 8%, rgba(242,196,107,.28), transparent 22%),
+radial-gradient(circle at 82% 14%, rgba(201,31,61,.24), transparent 18%),
+radial-gradient(circle at 50% 100%, rgba(125,76,255,.20), transparent 20%),
+linear-gradient(145deg,#2a1116,#3c1421 36%,#171220 100%);
+border:1px solid rgba(255,255,255,.10);padding:18px;color:#fff}
+.certificate-card{background:linear-gradient(180deg, rgba(255,244,230,.98), rgba(255,249,239,.98));border:4px solid #d7b168;padding:22px;color:#4b2d18}
+.output-top{display:flex;gap:12px;align-items:center;margin-bottom:16px}
+.output-avatar,.cert-avatar{width:78px;height:78px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.14)}
+.output-kicker{font-size:11px;letter-spacing:1px;color:#ffe2bf}
+.output-title{font-size:28px;line-height:1.1;margin:3px 0 4px}
+.output-sub{font-size:12px;color:#f3d6c3}
+.output-message{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px;font-size:17px;line-height:1.8;text-align:center}
+.output-footer{margin-top:16px;display:grid;grid-template-columns:1fr;gap:10px;align-items:end}
+.output-sign{font-size:13px;line-height:1.8;color:#ffe6d3}
+.output-sign strong{font-size:18px;color:#ffde9b}
+.output-url{font-size:11px;word-break:break-all;color:#f3d8c5;margin-top:8px;text-align:center}
+.cert-header{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px}
+.cert-avatar{border:3px solid #d7b168}
+.cert-title{text-align:center;font-size:26px;margin:0;color:#8a5315}
+.cert-sub{text-align:center;margin:0 0 12px;color:#77502d;font-size:13px}
+.cert-body{text-align:center;border:1px solid #e7d1a1;border-radius:18px;padding:18px;background:rgba(255,252,246,.85)}
+.cert-name{font-size:24px;font-weight:700;margin:6px 0;color:#6c3b12}
+.cert-amount{font-size:18px;color:#8a5315;margin:10px 0}
+.cert-message{font-size:16px;line-height:1.9;color:#6b4d35}
+.cert-date{margin-top:14px;font-size:13px;color:#8a6d4f}
+.cert-footer{margin-top:14px;text-align:center;font-size:14px;color:#7d5632}
+.payment-hero{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+.payment-qr{width:156px;height:156px;border-radius:18px;background:#fff;padding:10px;flex:0 0 auto;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.payment-qr img{width:100%;height:100%;object-fit:contain;display:block;border-radius:10px}
+.payment-meta{flex:1}
+.payment-kicker{font-size:11px;letter-spacing:1px;color:var(--gold2);margin-bottom:6px}
+.payment-bank{font-size:18px;font-weight:700;margin-bottom:4px}
+.payment-name{font-size:13px;color:var(--muted);line-height:1.7}
+.payment-account{margin-top:12px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.payment-account-label{font-size:11px;color:var(--gold2);margin-bottom:4px}
+.payment-account-value{font-size:20px;font-weight:700;letter-spacing:.5px}
+.payment-tips{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.8}
+.payment-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+@keyframes floatHero{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.88}50%{transform:scale(1.05);opacity:1}}
+@keyframes floatOrb{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+@media (max-width:380px){.menu-grid,.action-grid,.modal-actions.stacked,.payment-actions{grid-template-columns:1fr}.hero-title{font-size:28px}}
+</style>
+</head>
+<body>
+<div class="bg-orb orb1"></div><div class="bg-orb orb2"></div><div class="bg-orb orb3"></div>
+<div class="app">
+  <section class="hero">
+    <div class="hero-badge">ศรัทธายุคใหม่ • ขอพร • ทำบุญ • ดูดวง</div>
+    <div class="hero-photo-wrap"><div class="hero-ring"></div><img class="hero-photo" src="agong.png" alt="อากงอาม่า"></div>
+    <h1 class="hero-title">อากงอาม่าออนไลน์</h1>
+    <p class="hero-sub">ดูดวง ขอพร และร่วมบุญ ได้ในหน้าเดียว พร้อมออกเอกสารและการ์ดเป็นภาพสวยพร้อมแชร์</p>
+    <div class="menu-grid">
+      <button class="menu-btn" onclick="scrollToSection('fortuneSection')"><strong>🔮 ดูดวงวันนี้</strong><span>วันละ 1 ใบ</span></button>
+      <button class="menu-btn" onclick="scrollToSection('blessSection')"><strong>🙏 อธิษฐานขอพร</strong><span>หมวดละ 1 พร</span></button>
+      <button class="menu-btn" onclick="scrollToSection('donateSection')"><strong>🧧 ร่วมบริจาค</strong><span>ออกใบอนุโมทนา</span></button>
+    </div>
+  </section>
+
+  <section class="card" id="fortuneSection">
+    <div class="section-head"><h2>ดูดวงวันนี้</h2></div>
+    <div class="daily-date" id="todayDate"></div>
+    <div class="fortune-tags">
+      <span class="tag gold" id="fortuneColor"></span>
+      <span class="tag" id="fortuneNumber"></span>
+      <span class="tag" id="fortuneDirection"></span>
+    </div>
+    <p class="fortune-text" id="fortuneText"></p>
+    <div class="score-grid">
+      <div class="score-box"><span>โชคลาภ</span><strong id="scoreLuck"></strong></div>
+      <div class="score-box"><span>ความรัก</span><strong id="scoreLove"></strong></div>
+      <div class="score-box"><span>การงาน</span><strong id="scoreWork"></strong></div>
+    </div>
+    <button class="primary-btn" id="makeFortuneCardBtn">ออกใบดูดวงเป็นภาพ</button>
+  </section>
+
+  <section class="card" id="blessSection">
+    <div class="section-head"><h2>อธิษฐานขอพร</h2></div>
+    <div class="wish-grid" id="wishGrid"></div>
+    <textarea class="text-input text-area" id="customBlessName" placeholder="พิมพ์ชื่อผู้รับพร (ถ้ามี)"></textarea>
+  </section>
+
+  <section class="card" id="donateSection">
+    <div class="section-head"><h2>ร่วมบริจาค</h2></div>
+    <div class="amount-grid">
+      <button class="amount-btn active" data-amount="99">99 บาท</button>
+      <button class="amount-btn" data-amount="199">199 บาท</button>
+      <button class="amount-btn" data-amount="399">399 บาท</button>
+      <button class="amount-btn" data-amount="0">กำหนดเอง</button>
+    </div>
+    <input class="text-input" id="donorName" type="text" placeholder="ชื่อผู้บริจาค">
+    <input class="text-input" id="donationAmount" type="number" inputmode="numeric" value="99" placeholder="จำนวนเงิน">
+    <textarea class="text-input text-area" id="customPrayer" placeholder="คำอธิษฐานเพิ่มเติม (ถ้ามี)"></textarea>
+    <label class="upload-box">
+      <input type="file" id="slipInput" accept="image/*" hidden>
+      <img id="slipPreview" class="slip-preview hidden" alt="สลิป">
+      <div class="upload-placeholder" id="slipPlaceholder"><span>＋ แนบสลิปโอนเงิน</span><small>กดเพื่อเลือกรูปจากเครื่อง</small></div>
+    </label>
+    <div class="action-grid">
+      <button class="primary-btn" id="generateCertificateBtn">ออกใบอนุโมทนา</button>
+      <button class="secondary-btn" id="generateBlessingCardBtn">ออกการ์ดอวยพร</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="section-head"><h2>ประกาศจากอากงอาม่า</h2></div>
+    <p class="notice-inline">วันนี้เหมาะกับการเริ่มต้นสิ่งใหม่ ทำสิ่งที่ตั้งใจด้วยใจนิ่ง แล้วความร่มเย็นจะตามมา</p>
+    <button class="bottom-btn" onclick="openModal('installModal')">เพิ่มไปหน้าจอหลัก</button>
+  </section>
+</div>
+
+<div class="modal hidden" id="wishModal">
+  <div class="modal-backdrop" onclick="closeModal('wishModal')"></div>
+  <div class="modal-panel">
+    <button class="close-btn" onclick="closeModal('wishModal')">×</button>
+    <h3 id="wishModalTitle"></h3>
+    <p id="wishModalText"></p>
+    <div class="modal-actions">
+      <button class="secondary-btn" id="useWishForCardBtn">ออกการ์ดอวยพร</button>
+      <button class="primary-btn" onclick="closeModal('wishModal')">รับพร</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal hidden" id="installModal">
+  <div class="modal-backdrop" onclick="closeModal('installModal')"></div>
+  <div class="modal-panel">
+    <button class="close-btn" onclick="closeModal('installModal')">×</button>
+    <h3>เพิ่มไปหน้าจอหลัก</h3>
+    <p>Android: กดเมนู ⋮ แล้วเลือก เพิ่มไปหน้าจอหลัก</p>
+    <p>iPhone/iPad: กด Share แล้วเลือก Add to Home Screen</p>
+  </div>
+</div>
+
+<div class="modal hidden" id="paymentModal">
+  <div class="modal-backdrop" onclick="closeModal('paymentModal')"></div>
+  <div class="modal-panel">
+    <button class="close-btn" onclick="closeModal('paymentModal')">×</button>
+    <h3>ชำระเงินทำบุญ</h3>
+    <div class="payment-hero">
+      <div class="payment-qr"><img id="paymentQrImage" alt="QR ชำระเงิน"></div>
+      <div class="payment-meta">
+        <div class="payment-kicker">SCAN TO PAY</div>
+        <div class="payment-bank" id="paymentBankName"></div>
+        <div class="payment-name" id="paymentAccountName"></div>
+      </div>
+    </div>
+    <div class="payment-account">
+      <div class="payment-account-label">เลขที่บัญชี / PromptPay</div>
+      <div class="payment-account-value" id="paymentAccountNumber"></div>
+    </div>
+    <div class="payment-tips">คัดลอกเลขบัญชีหรือบันทึก QR ไปเปิดในแอปธนาคาร แล้วโอนเสร็จค่อยดำเนินการต่อ</div>
+    <div class="payment-actions">
+      <button class="primary-btn" id="copyAccountBtn">คัดลอกเลขบัญชี</button>
+      <button class="secondary-btn" id="saveQrBtn">บันทึก QR</button>
+    </div>
+    <div class="modal-actions"><button class="primary-btn" id="confirmPaymentBtn">โอนแล้ว ดำเนินการต่อ</button></div>
+  </div>
+</div>
+
+<div class="modal hidden" id="outputModal">
+  <div class="modal-backdrop" onclick="closeModal('outputModal')"></div>
+  <div class="modal-panel output-panel">
+    <button class="close-btn" onclick="closeModal('outputModal')">×</button>
+    <h3 id="outputTitle"></h3>
+    <div id="renderTargetWrapper"><div id="renderTarget"></div></div>
+    <div class="modal-actions stacked">
+      <button class="primary-btn" id="downloadOutputBtn">ดาวน์โหลดภาพ</button>
+      <button class="secondary-btn" id="shareLineBtn">แชร์ LINE</button>
+      <button class="secondary-btn" id="shareGeneralBtn">แชร์ภาพ</button>
+      <button class="secondary-btn" id="saveForFbBtn">บันทึกไว้ลง Facebook</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const fortunes = [
+  {color:"สีมงคล: ทองประกายชมพู",number:"เลขมงคล: 6, 9",direction:"ทิศมงคล: เหนือ",text:"วันนี้เป็นวันที่เหมาะกับการเริ่มต้นสิ่งใหม่ ความคิดสร้างสรรค์โดดเด่น มีคนมองเห็นคุณค่าในสิ่งที่คุณตั้งใจทำ",score:["★★★★☆","★★★☆☆","★★★★★"]},
+  {color:"สีมงคล: ขาวมุก",number:"เลขมงคล: 1, 8",direction:"ทิศมงคล: ตะวันออก",text:"ดวงการเงินค่อย ๆ เปิด มีโอกาสรับข่าวดีจากงานเสริมหรือช่องทางใหม่ ควรเปิดใจรับความร่วมมือจากคนรอบตัว",score:["★★★★★","★★★★☆","★★★☆☆"]},
+  {color:"สีมงคล: เขียวมรกต",number:"เลขมงคล: 3, 7",direction:"ทิศมงคล: ตะวันตก",text:"วันนี้จิตใจนิ่ง เหมาะกับการอธิษฐาน ทบทวนเป้าหมาย และเริ่มลงมือในสิ่งที่เคยลังเล",score:["★★★☆☆","★★★★★","★★★★☆"]},
+  {color:"สีมงคล: แดงมงคล",number:"เลขมงคล: 2, 5",direction:"ทิศมงคล: ใต้",text:"พลังงานมาเต็ม เหมาะกับงานเจรจาและตัดสินใจเรื่องสำคัญ แต่ควรเว้นจังหวะก่อนตอบโต้เพื่อให้ผลลัพธ์ออกมาสวยที่สุด",score:["★★★★☆","★★☆☆☆","★★★★★"]},
+  {color:"สีมงคล: ม่วงประกายทอง",number:"เลขมงคล: 4, 11",direction:"ทิศมงคล: ตะวันตกเฉียงเหนือ",text:"เรื่องที่รอคอยเริ่มมีสัญญาณที่ดี ขอเพียงไม่เร่งเกินไป ความสำเร็จจะเข้ามาในเวลาที่เหมาะสม",score:["★★★☆☆","★★★★☆","★★★☆☆"]},
+  {color:"สีมงคล: เงินประกายทอง",number:"เลขมงคล: 5, 8",direction:"ทิศมงคล: ตะวันออกเฉียงใต้",text:"เหมาะกับการวางแผนการเงินและปิดงานค้าง เรื่องที่กังวลจะค่อย ๆ คลี่คลายเมื่อคุณจัดลำดับดี",score:["★★★★☆","★★★☆☆","★★★★☆"]},
+  {color:"สีมงคล: ชมพูอ่อน",number:"เลขมงคล: 2, 7",direction:"ทิศมงคล: ตะวันตกเฉียงใต้",text:"ความสัมพันธ์รอบตัวดีขึ้น พูดจาอะไรก็มีคนรับฟัง เหมาะกับการขอความร่วมมือและทำสิ่งดี ๆ ร่วมกัน",score:["★★★☆☆","★★★★★","★★★☆☆"]},
+  {color:"สีมงคล: น้ำเงินมงคล",number:"เลขมงคล: 4, 6",direction:"ทิศมงคล: เหนือ",text:"วันนี้เหมาะกับการใช้สมาธิและตัดสินใจด้วยเหตุผล งานเอกสารหรือเรื่องที่ต้องใช้ความละเอียดจะออกมาดี",score:["★★★☆☆","★★★☆☆","★★★★★"]},
+  {color:"สีมงคล: เขียวหยก",number:"เลขมงคล: 1, 3",direction:"ทิศมงคล: ตะวันออก",text:"มีโอกาสได้เริ่มต้นสิ่งที่ค้างคาไว้และเห็นผลไวเกินคาด สุขภาพใจดีขึ้นเมื่อได้ทำสิ่งที่รัก",score:["★★★★☆","★★★★☆","★★★★☆"]},
+  {color:"สีมงคล: ทองแดง",number:"เลขมงคล: 8, 9",direction:"ทิศมงคล: ใต้",text:"เป็นวันของการลงมือจริง สิ่งที่คิดไว้ถ้าทำวันนี้จะมีแรงส่งจากคนรอบตัวและจังหวะจะดีเป็นพิเศษ",score:["★★★★★","★★★☆☆","★★★★☆"]}
+];
+const blessings = {
+  money:["ขอให้การเงินคล่องตัว เงินเข้าไม่ขาดมือ","ขอให้ค้าขายดี ลูกค้าเมตตา ซื้อซ้ำไม่ขาด","ขอให้มีรายได้ใหม่เพิ่มขึ้นอย่างมั่นคง","ขอให้โชคลาภมาในทางที่ดีและถูกที่ถูกเวลา","ขอให้เก็บเงินอยู่ มีทรัพย์สินเพิ่มพูน","ขอให้ปัญหาการเงินคลี่คลายอย่างราบรื่น","ขอให้กิจการรุ่งเรือง มีกำไรต่อเนื่อง","ขอให้คู่ค้าไว้ใจ เจรจาอะไรก็สำเร็จ","ขอให้มีเงินหมุนสบาย ไม่ติดขัดฉุกเฉิน","ขอให้ทรัพย์ดีไหลมา พร้อมปัญญารักษาเงิน"],
+  love:["ขอให้พบความรักที่จริงใจและอ่อนโยน","ขอให้คนรักเข้าใจกันมากขึ้นทุกวัน","ขอให้ความสัมพันธ์มั่นคงและร่มเย็น","ขอให้คนที่ใช่เข้ามาในเวลาที่เหมาะสม","ขอให้พูดคุยกันด้วยความเมตตาและเปิดใจ","ขอให้รักครั้งนี้พาไปสู่ความสุขที่ยั่งยืน","ขอให้ครอบครัวและคู่ครองเกื้อหนุนกัน","ขอให้ทุกความไม่เข้าใจค่อย ๆ คลี่คลาย","ขอให้หัวใจเข้มแข็งและไม่หวั่นไหวง่าย","ขอให้พบรักที่ดีต่อใจและดีต่อชีวิต"],
+  work:["ขอให้การงานก้าวหน้า ผู้ใหญ่เมตตา","ขอให้โปรเจกต์สำเร็จตามเป้าหมาย","ขอให้ทีมงานร่วมมือกันอย่างราบรื่น","ขอให้คำพูดและความสามารถเป็นที่ยอมรับ","ขอให้มีโอกาสดีในงานและตำแหน่งที่สูงขึ้น","ขอให้ตัดสินใจเรื่องงานได้อย่างแม่นยำ","ขอให้งานที่รับผิดชอบออกมาดีกว่าที่คาด","ขอให้พบลูกค้า คู่ค้า และเพื่อนร่วมงานที่ดี","ขอให้ทุกอุปสรรคในงานผ่านพ้นอย่างสงบ","ขอให้ความขยันของคุณส่งผลเป็นความสำเร็จชัดเจน"],
+  health:["ขอให้สุขภาพแข็งแรงทั้งกายและใจ","ขอให้พักผ่อนได้เต็มที่ หลับสบายทุกคืน","ขอให้โรคภัยเบาบางและฟื้นตัวไว","ขอให้จิตใจสงบ ไม่ฟุ้งซ่าน ไม่กังวล","ขอให้มีแรงทำสิ่งสำคัญได้อย่างเต็มที่","ขอให้พลังงานดี สดชื่น และกระปรี้กระเปร่า","ขอให้ใจเบา ปล่อยวางเรื่องหนักได้ง่ายขึ้น","ขอให้มีวินัยดูแลตัวเองอย่างต่อเนื่อง","ขอให้ร่างกายตอบสนองดี แข็งแรงขึ้นทุกวัน","ขอให้หายเหนื่อย หายเครียด และกลับมาสมดุล"]
+};
+const wishItems = [
+  {key:"money", icon:"💰", label:"การเงิน · โชคลาภ"},
+  {key:"love", icon:"🌸", label:"ความรัก · คู่ครอง"},
+  {key:"work", icon:"⚡", label:"หน้าที่การงาน"},
+  {key:"health", icon:"🌿", label:"สุขภาพ · จิตใจ"}
+];
+const paymentInfo = {
+  bankName: "ธนาคารกสิกรไทย",
+  accountName: "ศาลเจ้าอากงอาม่า",
+  accountNumber: "012-3-45678-9",
+  qrValue: "KBank 012-3-45678-9 | ศาลเจ้าอากงอาม่า"
+};
+let currentOutputText = "";
+let currentDownloadName = "gongma-post.png";
+let pendingAction = null;
+let currentWishType = "money";
+const appUrl = location.href;
+
+function $(id){return document.getElementById(id);}
+function scrollToSection(id){$(id).scrollIntoView({behavior:'smooth', block:'start'});}
+function openModal(id){$(id).classList.remove('hidden');}
+function closeModal(id){$(id).classList.add('hidden');}
+function thaiDate(date){
+  const days=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
+  const months=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+  return `วัน${days[date.getDay()]}ที่ ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()+543}`;
+}
+function todayKey(){const d=new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;}
+function getOrCreate(key, generator){
+  const old = localStorage.getItem(key);
+  if(old) return JSON.parse(old);
+  const value = generator();
+  localStorage.setItem(key, JSON.stringify(value));
+  return value;
+}
+function randomFrom(arr){return arr[Math.floor(Math.random()*arr.length)];}
+function escapeHtml(text){return String(text).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));}
+function buildPaymentQrUrl(){return `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(paymentInfo.qrValue)}`;}
+
+function getTodayFortune(){
+  return getOrCreate("fortune_"+todayKey(), ()=> fortunes[Math.floor(Math.random()*fortunes.length)]);
+}
+function getBlessing(type){
+  return getOrCreate("blessing_"+type, ()=> randomFrom(blessings[type]));
+}
+function donorData(){
+  return {
+    name: $("donorName").value.trim() || "ผู้มีจิตศรัทธา",
+    amount: $("donationAmount").value.trim() || "99",
+    prayer: $("customPrayer").value.trim() || "ขอให้อากงอาม่าคุ้มครอง ให้ชีวิตราบรื่นและมีความร่มเย็น"
+  };
+}
+function renderWishGrid(){
+  const grid = $("wishGrid");
+  grid.innerHTML = "";
+  wishItems.forEach(item => {
+    const btn = document.createElement("button");
+    btn.className = "wish-btn";
+    btn.innerHTML = `<span class="wish-icon">${item.icon}</span><span class="wish-label">${item.label}</span>`;
+    btn.onclick = () => {
+      currentWishType = item.key;
+      const blessing = getBlessing(item.key);
+      $("wishModalTitle").textContent = "คำอวยพรเรื่อง " + item.label;
+      $("wishModalText").textContent = blessing;
+      openModal("wishModal");
+    };
+    grid.appendChild(btn);
+  });
+}
+function renderFortuneSection(){
+  const f = getTodayFortune();
+  $("todayDate").textContent = thaiDate(new Date());
+  $("fortuneColor").textContent = f.color;
+  $("fortuneNumber").textContent = f.number;
+  $("fortuneDirection").textContent = f.direction;
+  $("fortuneText").textContent = f.text;
+  $("scoreLuck").textContent = f.score[0];
+  $("scoreLove").textContent = f.score[1];
+  $("scoreWork").textContent = f.score[2];
+}
+function makeFortuneCard(){
+  const f = getTodayFortune();
+  currentOutputText = `🔮 ใบดูดวงประจำวัน\n${thaiDate(new Date())}\n${f.text}`;
+  currentDownloadName = "fortune-post.png";
+  $("outputTitle").textContent = "ใบดูดวงประจำวัน";
+  $("renderTarget").innerHTML = `
+    <div class="fortune-card-post" id="captureArea" style="aspect-ratio:4/5;padding:22px;display:flex;flex-direction:column;justify-content:space-between;">
+      <div>
+        <div class="output-top">
+          <img class="output-avatar" src="agong.png" alt="อากงอาม่า">
+          <div>
+            <div class="output-kicker">DAILY FORTUNE</div>
+            <div class="output-title">ดูดวงวันนี้</div>
+            <div class="output-sub">${thaiDate(new Date())}</div>
+          </div>
+        </div>
+        <div class="fortune-tags">
+          <span class="tag gold">${escapeHtml(f.color)}</span>
+          <span class="tag">${escapeHtml(f.number)}</span>
+          <span class="tag">${escapeHtml(f.direction)}</span>
+        </div>
+        <div class="output-message">${escapeHtml(f.text)}</div>
+      </div>
+      <div class="output-sign"><strong>พรจากอากงอาม่า</strong><br>ขอให้เดินทางในวันนี้ด้วยสติ ความสงบ และโอกาสที่ดี</div>
+    </div>`;
+  openModal("outputModal");
+}
+function makeBlessingCard(){
+  const typeMap = {
+    money:"การเงิน · โชคลาภ",
+    love:"ความรัก · คู่ครอง",
+    work:"หน้าที่การงาน",
+    health:"สุขภาพ · จิตใจ"
+  };
+  const blessing = getBlessing(currentWishType);
+  const receiver = $("customBlessName").value.trim() || "ลูกหลานผู้ศรัทธา";
+  currentOutputText = `🙏 คำอวยพรจากอากงอาม่า\nเรื่อง${typeMap[currentWishType]}\nถึง ${receiver}\n${blessing}`;
+  currentDownloadName = "blessing-post.png";
+  $("outputTitle").textContent = "การ์ดอวยพร";
+  $("renderTarget").innerHTML = `
+    <div class="output-card" id="captureArea" style="aspect-ratio:4/5;padding:22px;display:flex;flex-direction:column;justify-content:space-between;">
+      <div>
+        <div class="output-top">
+          <img class="output-avatar" src="agong.png" alt="อากงอาม่า">
+          <div>
+            <div class="output-kicker">BLESSED MESSAGE</div>
+            <div class="output-title">คำอวยพร</div>
+            <div class="output-sub">เรื่อง${typeMap[currentWishType]}</div>
+          </div>
+        </div>
+        <div class="output-message">${escapeHtml(blessing)}</div>
+      </div>
+      <div class="output-sign"><strong>ถึง ${escapeHtml(receiver)}</strong><br>ขอให้อากงอาม่าคุ้มครอง ให้สิ่งที่ตั้งใจค่อย ๆ สำเร็จอย่างราบรื่นและงดงาม</div>
+    </div>`;
+  openModal("outputModal");
+}
+function openPaymentModal(actionName){
+  pendingAction = actionName;
+  $("paymentBankName").textContent = paymentInfo.bankName;
+  $("paymentAccountName").textContent = paymentInfo.accountName;
+  $("paymentAccountNumber").textContent = paymentInfo.accountNumber;
+  $("paymentQrImage").src = buildPaymentQrUrl();
+  openModal("paymentModal");
+}
+function continueAfterPayment(){
+  closeModal("paymentModal");
+  makeCertificate();
+}
+function makeCertificate(){
+  const {name, amount, prayer} = donorData();
+  currentOutputText = `ใบอนุโมทนา\n${name}\nจำนวน ${amount} บาท\n${prayer}`;
+  currentDownloadName = "certificate-post.png";
+  $("outputTitle").textContent = "ใบอนุโมทนา";
+  $("renderTarget").innerHTML = `
+    <div class="certificate-card" id="captureArea" style="aspect-ratio:4/5;padding:24px;display:flex;flex-direction:column;justify-content:space-between;">
+      <div>
+        <div class="cert-header"><img class="cert-avatar" src="agong.png" alt="อากงอาม่า"></div>
+        <h3 class="cert-title">ใบอนุโมทนา</h3>
+        <p class="cert-sub">ศาลเจ้าอากงอาม่า</p>
+        <div class="cert-body">
+          <div class="cert-name">${escapeHtml(name)}</div>
+          <div class="cert-amount">ร่วมทำบุญจำนวน ${escapeHtml(amount)} บาท</div>
+          <div class="cert-message">ขออนุโมทนาในกุศลจิตและบุญกุศลที่ท่านได้บำเพ็ญในครั้งนี้<br>${escapeHtml(prayer)}</div>
+          <div class="cert-date">${thaiDate(new Date())}</div>
+        </div>
+      </div>
+      <div class="cert-footer">ขอให้อากงอาม่าคุ้มครอง ให้ชีวิตร่มเย็นและเจริญรุ่งเรือง</div>
+    </div>`;
+  openModal("outputModal");
+}
+async function captureBlob(){
+  const capture = $("captureArea");
+  const canvas = await html2canvas(capture, {backgroundColor:null, scale:2});
+  return new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+}
+async function downloadCurrentOutput(){
+  const blob = await captureBlob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = currentDownloadName;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+async function shareLineImage(){
+  const blob = await captureBlob();
+  const file = new File([blob], currentDownloadName, {type:"image/png"});
+  if (navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
+    await navigator.share({files:[file], title:"อากงอาม่า", text:"ส่งภาพจากอากงอาม่า"});
+  } else {
+    alert("เครื่องนี้แชร์ภาพตรงไม่ได้ ให้กดดาวน์โหลดภาพแล้วส่งใน LINE");
+  }
+}
+async function shareGeneralImage(){
+  const blob = await captureBlob();
+  const file = new File([blob], currentDownloadName, {type:"image/png"});
+  if (navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
+    await navigator.share({files:[file], title:"อากงอาม่า", text:"ภาพจากอากงอาม่า"});
+  } else {
+    alert("เครื่องนี้แชร์ภาพตรงไม่ได้ ให้กดดาวน์โหลดภาพแทน");
+  }
+}
+async function saveForFacebook(){
+  await downloadCurrentOutput();
+  alert("บันทึกภาพแล้ว จากนั้นเปิด Facebook แล้วเลือกโพสต์รูปนี้ได้เลย");
+}
+async function copyAccountNumber(){
+  try {
+    await navigator.clipboard.writeText(paymentInfo.accountNumber);
+    alert("คัดลอกเลขบัญชีแล้ว");
+  } catch(e) {
+    alert(paymentInfo.accountNumber);
+  }
+}
+function savePaymentQr(){
+  const link = document.createElement("a");
+  link.href = $("paymentQrImage").src;
+  link.download = "payment-qr.png";
+  link.click();
+}
+document.querySelectorAll(".amount-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".amount-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const amount = btn.dataset.amount;
+    $("donationAmount").value = amount === "0" ? "" : amount;
+    if(amount === "0") $("donationAmount").focus();
+  });
+});
+$("slipInput").addEventListener("change", (e)=>{
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    $("slipPreview").src = ev.target.result;
+    $("slipPreview").classList.remove("hidden");
+    $("slipPlaceholder").classList.add("hidden");
+  };
+  reader.readAsDataURL(file);
+});
+$("makeFortuneCardBtn").addEventListener("click", makeFortuneCard);
+$("useWishForCardBtn").addEventListener("click", ()=>{closeModal('wishModal'); makeBlessingCard();});
+$("generateBlessingCardBtn").addEventListener("click", ()=> openPaymentModal("blessing"));
+$("generateCertificateBtn").addEventListener("click", ()=> openPaymentModal("certificate"));
+$("copyAccountBtn").addEventListener("click", copyAccountNumber);
+$("saveQrBtn").addEventListener("click", savePaymentQr);
+$("confirmPaymentBtn").addEventListener("click", continueAfterPayment);
+$("downloadOutputBtn").addEventListener("click", downloadCurrentOutput);
+$("shareLineBtn").addEventListener("click", shareLineImage);
+$("shareGeneralBtn").addEventListener("click", shareGeneralImage);
+$("saveForFbBtn").addEventListener("click", saveForFacebook);
+
+renderWishGrid();
+renderFortuneSection();
+$("todayDate").textContent = thaiDate(new Date());
+</script>
+</body>
+</html>
