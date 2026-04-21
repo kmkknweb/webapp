@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>อากงอาม่าออนไลน์</title>
+
+<link rel="stylesheet" href="style.css" />
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#0f0f0f" />
+</head>
+
+<body>
+
+<!-- POPUP -->
+<div id="popup" class="popup hidden">
+  <div class="popup-card">
+    <img id="popup-img" src="images/agong.png" />
+    <h3 id="popup-title"></h3>
+    <p id="popup-msg"></p>
+    <button onclick="closePopup()">🙏 รับพร</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <img src="images/agong.png" class="hero-img" />
+  <h1>อากงอาม่าออนไลน์</h1>
+  <p>ขอพร • ดูดวง • ทำบุญ • แชร์การ์ดมงคล</p>
+</section>
+
+<!-- คำวันนี้ -->
+<section class="card">
+  <h2>✨ คำวันนี้</h2>
+  <p id="dailyText">
+    ในวันที่ใจเหนื่อย อย่าพึ่งท้อ แสงสว่างยังรออยู่
+  </p>
+</section>
+
+<!-- ดวง -->
+<section class="card">
+  <h2>🔮 ดวงวันนี้</h2>
+  <div class="grid">
+    <div>สีมงคล: ขาวทอง</div>
+    <div>เลข: 1, 8</div>
+    <div>ทิศ: ตะวันออก</div>
+  </div>
+</section>
+
+<!-- ทำบุญ -->
+<section class="card">
+  <h2>🙏 ทำบุญออนไลน์</h2>
+
+  <div class="grid-btn">
+    <button onclick="setAmount(39)">39</button>
+    <button onclick="setAmount(99)" class="active">99</button>
+    <button onclick="setAmount(199)">199</button>
+    <button onclick="setAmount(0)">กำหนดเอง</button>
+  </div>
+
+  <input id="amount" value="99" placeholder="จำนวนเงิน" />
+  <input id="name" placeholder="ชื่อผู้ทำบุญ" />
+
+  <input type="file" id="slip" />
+
+  <div class="action-row">
+    <button class="gold" onclick="alert('ออกใบอนุโมทนา')">
+      ✨ ออกใบอนุโมทนา
+    </button>
+    <button class="pink" onclick="alert('สร้างการ์ด')">
+      🎴 การ์ดอวยพร
+    </button>
+  </div>
+</section>
+
+<!-- INSTALL -->
+<section class="install">
+  <button onclick="showInstallGuide()">📲 เพิ่มไปหน้าจอหลัก</button>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>
