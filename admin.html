@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notice Editor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body{margin:0;font-family:'Kanit',sans-serif;background:#111;color:#fff;padding:18px}
+    .wrap{max-width:520px;margin:0 auto}
+    .card{background:#1c1c1c;border-radius:20px;padding:18px;margin-bottom:14px}
+    input,textarea,select{width:100%;padding:12px;border-radius:12px;border:none;background:#2a2a2a;color:#fff;font:inherit;margin-top:8px}
+    button{width:100%;padding:14px;border:none;border-radius:14px;background:#f2c46b;color:#23160d;font:inherit;font-weight:700;margin-top:12px;cursor:pointer}
+    pre{white-space:pre-wrap;word-break:break-word;background:#0f0f0f;padding:14px;border-radius:14px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>สร้าง notice.json</h1>
+      <label>Version</label>
+      <input id="version" type="number" value="1">
+      <label>Show</label>
+      <select id="show"><option value="true">true</option><option value="false">false</option></select>
+      <label>Title</label>
+      <input id="title" value="🙏 กิจกรรมวันนี้จากอากงอาม่า">
+      <label>Message</label>
+      <textarea id="message">วันนี้เหมาะกับการขอพรเรื่องการงาน การเรียน และการเริ่มต้นสิ่งใหม่</textarea>
+      <button id="buildBtn">สร้าง JSON</button>
+      <button id="copyBtn">คัดลอก JSON</button>
+    </div>
+    <div class="card">
+      <h2>ผลลัพธ์</h2>
+      <pre id="output"></pre>
+    </div>
+  </div>
+  <script>
+    function build(){
+      const obj = {
+        version: Number(document.getElementById('version').value || 1),
+        show: document.getElementById('show').value === 'true',
+        title: document.getElementById('title').value,
+        message: document.getElementById('message').value
+      };
+      document.getElementById('output').textContent = JSON.stringify(obj, null, 2);
+    }
+    document.getElementById('buildBtn').addEventListener('click', build);
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      build();
+      await navigator.clipboard.writeText(document.getElementById('output').textContent);
+      alert('คัดลอกแล้ว');
+    });
+    build();
+  </script>
+</body>
+</html>
