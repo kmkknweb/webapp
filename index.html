@@ -166,7 +166,7 @@
     #renderTargetWrapper{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:18px;padding:10px}
     #renderTarget{display:flex;justify-content:center}
     .post-card,.certificate-card{
-      width:100%;max-width:390px;border-radius:24px;overflow:hidden;position:relative;aspect-ratio:4/5
+      width:100%;max-width:390px;border-radius:24px;overflow:hidden;position:relative;aspect-ratio:4/5; min-height:520px;
     }
     .post-card{
       background:
@@ -777,13 +777,17 @@ async function copyAccountNumber(){
     alert(paymentInfo.accountNumber);
   }
 }
+
+  
 function savePaymentQr(){
   const a = document.createElement('a');
   a.href = $("paymentQrImage").src;
   a.download = "payment-qr.png";
+  a.rel = "noopener";
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
 }
-
   
 function initNotice(){
   function applyNotice(data, forcePopup = false){
