@@ -1,4 +1,4 @@
-const CACHE_NAME = 'agong-app-v2';
+const CACHE_NAME = 'agong-app-v3';
 
 const URLS_TO_CACHE = [
   '/',
@@ -60,4 +60,11 @@ self.addEventListener('fetch', event => {
       });
     })
   );
+});
+self.addEventListener('install', e => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil(self.clients.claim());
 });
