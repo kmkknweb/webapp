@@ -850,11 +850,14 @@ $("makeBlessingCardBtn").addEventListener('click', makeBlessingCard);
   
 // $("generateCertificateBtn").addEventListener('click', makeCertificate);
 $("generateCertificateBtn").addEventListener('click', () => {
-  const hasSlip = $("slipInput").files && $("slipInput").files[0];
+  const slipEl = $("slipInput");
+  const hasSlip = slipEl && slipEl.files && slipEl.files.length > 0;
+
   if (!hasSlip) {
     alert("กรุณาแนบสลิปก่อนออกใบอนุโมทนา");
     return;
   }
+
   makeCertificate();
 });
 
