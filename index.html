@@ -846,7 +846,19 @@ $("slipInput").addEventListener('change', (e) => {
 
 $("makeFortuneCardBtn").addEventListener('click', makeFortuneCard);
 $("makeBlessingCardBtn").addEventListener('click', makeBlessingCard);
-$("generateCertificateBtn").addEventListener('click', makeCertificate);
+
+  
+// $("generateCertificateBtn").addEventListener('click', makeCertificate);
+$("generateCertificateBtn").addEventListener('click', () => {
+  const hasSlip = $("slipInput").files && $("slipInput").files[0];
+  if (!hasSlip) {
+    alert("กรุณาแนบสลิปก่อนออกใบอนุโมทนา");
+    return;
+  }
+  makeCertificate();
+});
+
+  
 $("copyAccountBtn").addEventListener('click', copyAccountNumber);
 $("saveQrBtn").addEventListener('click', savePaymentQr);
 $("downloadOutputBtn").addEventListener('click', downloadCurrentOutput);
