@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>อากงอาม่าให้โชค</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0d0b10;
+      --text:#fff6eb;
+      --muted:#d7c8bc;
+      --gold:#f2c46b;
+      --gold2:#ffe5b1;
+      --red:#c91f3d;
+      --pink:#ff5fa3;
+      --purple:#7d4cff;
+      --line:rgba(255,255,255,.09);
+      --shadow:0 18px 40px rgba(0,0,0,.38);
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;padding:0;min-height:100%;
+      background:radial-gradient(circle at top,#44101f 0%, #1a1020 34%, #0d0b10 100%);
+      color:var(--text);
+      font-family:'Kanit',sans-serif;
+      overflow-x:hidden;
+    }
+    .bg-orb{
+      position:fixed;border-radius:999px;filter:blur(70px);pointer-events:none;opacity:.2;z-index:0;
+      animation:floatOrb 10s ease-in-out infinite;
+    }
+    .orb1{width:200px;height:200px;left:-60px;top:80px;background:var(--red)}
+    .orb2{width:230px;height:230px;right:-80px;top:180px;background:var(--purple);animation-delay:1.6s}
+    .orb3{width:170px;height:170px;left:40%;bottom:100px;background:var(--gold);animation-delay:3s}
+    .app{position:relative;z-index:2;max-width:460px;margin:0 auto;padding:18px 14px 50px}
+    .hero{text-align:center;padding:8px 6px 20px}
+    .hero-badge{
+      display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);color:var(--gold2);font-size:11px;letter-spacing:.8px;backdrop-filter:blur(10px);
+      box-shadow:0 0 0 1px rgba(242,196,107,.08),0 0 30px rgba(201,31,61,.08);
+    }
+    .hero-photo-wrap{width:220px;height:220px;margin:20px auto 10px;position:relative;display:grid;place-items:center}
+    .hero-ring{
+      position:absolute;inset:0;border-radius:50%;
+      background:radial-gradient(circle, rgba(255,229,177,.32) 0%, rgba(201,31,61,.18) 34%, rgba(125,76,255,.18) 58%, transparent 74%);
+      animation:pulse 4s ease-in-out infinite;
+    }
+    .hero-photo{
+      position:relative;width:184px;height:184px;border-radius:50%;object-fit:cover;display:block;
+      border:3px solid rgba(255,255,255,.13);
+      box-shadow:0 20px 44px rgba(0,0,0,.36),0 0 38px rgba(242,196,107,.16);
+      animation:floatHero 4.5s ease-in-out infinite;background:#2a1b12;
+    }
+    .hero-title{margin:8px 0 6px;font-size:34px;line-height:1.06;font-weight:800;letter-spacing:-.02em}
+    .hero-sub{margin:0 auto;max-width:340px;color:var(--muted);font-size:14px;line-height:1.8}
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));
+      border:1px solid var(--line);border-radius:24px;padding:16px;margin-bottom:14px;
+      box-shadow:var(--shadow);backdrop-filter:blur(12px);
+    }
+    .section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+    .section-head h2{margin:0;font-size:19px;font-weight:700}
+    .kicker{font-size:11px;letter-spacing:1px;color:var(--gold2);margin-bottom:8px}
+    .desc{margin:0;color:var(--muted);line-height:1.85;font-size:14px}
+    .question-title{font-size:22px;font-weight:800;line-height:1.35;margin:0 0 12px}
+    .choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .choice{
+      display:flex;align-items:center;gap:10px;padding:14px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+      border:1px solid var(--line);cursor:pointer;transition:.18s ease;
+    }
+    .choice.active{background:linear-gradient(135deg,rgba(242,196,107,.24),rgba(201,31,61,.16));transform:translateY(-1px)}
+    .choice-key{
+      width:34px;height:34px;border-radius:999px;display:grid;place-items:center;
+      background:rgba(255,255,255,.08);font-weight:800;color:var(--gold2);flex:0 0 auto;
+    }
+    .choice-text{font-size:18px;font-weight:700}
+    .text-input{
+      width:100%;padding:13px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);
+      color:var(--text);margin-bottom:10px;font:inherit
+    }
+    .text-input::placeholder{color:#baa896}
+    .primary-btn,.ghost-btn{
+      width:100%;padding:15px;border-radius:16px;border:none;font:inherit;font-weight:700;cursor:pointer
+    }
+    .primary-btn{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#23160d}
+    .ghost-btn{background:rgba(255,255,255,.06);color:#fff;border:1px solid var(--line)}
+    .rules{padding-left:18px;margin:0;color:var(--muted);line-height:1.85;font-size:14px}
+    .rules li{margin-bottom:6px}
+    .status{
+      margin-top:10px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line);
+      font-size:14px;line-height:1.7;display:none
+    }
+    .status.show{display:block}
+    .status.ok{color:#fff2d3}
+    .status.err{color:#ffd2d2}
+    .winner-link{
+      display:block;text-decoration:none;color:#fff;border-radius:20px;overflow:hidden
+    }
+    .winner-link-box{
+      padding:18px;background:
+        radial-gradient(circle at 20% 20%, rgba(255,229,177,.25), transparent 25%),
+        radial-gradient(circle at 80% 20%, rgba(125,76,255,.25), transparent 20%),
+        linear-gradient(135deg,#7d4cff 0%, #a24cff 40%, #c91f3d 100%);
+      box-shadow:var(--shadow)
+    }
+    .winner-link-box strong{display:block;font-size:18px;margin-bottom:6px}
+    .winner-link-box span{display:block;font-size:14px;line-height:1.7;opacity:.95}
+    .mini-pill{
+      margin-top:12px;display:inline-block;padding:10px 16px;border-radius:999px;background:rgba(255,255,255,.15);font-size:13px;font-weight:700
+    }
+    @keyframes floatHero{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    @keyframes pulse{0%,100%{transform:scale(1);opacity:.88}50%{transform:scale(1.05);opacity:1}}
+    @keyframes floatOrb{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+    @media (max-width:380px){
+      .choices{grid-template-columns:1fr}
+      .hero-title{font-size:30px}
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-orb orb1"></div><div class="bg-orb orb2"></div><div class="bg-orb orb3"></div>
+
+  <div class="app">
+    <section class="hero">
+      <div class="hero-badge">กิจกรรมประจำสัปดาห์ • ลุ้นรางวัล</div>
+      <div class="hero-photo-wrap"><div class="hero-ring"></div><img class="hero-photo" src="./agong.png" alt="อากงอาม่า"></div>
+      <h1 class="hero-title">อากงอาม่าให้โชค</h1>
+      <p class="hero-sub">ร่วมกิจกรรมสนุก ๆ ประจำสัปดาห์ ตอบคำถามง่าย ๆ แล้วลุ้นรับรางวัลจากอากงอาม่า</p>
+    </section>
+
+    <section class="card">
+      <div class="section-head"><h2>กิจกรรมประจำสัปดาห์</h2></div>
+      <div class="kicker">WEEKLY ACTIVITY</div>
+      <p class="desc">
+        กิจกรรมสัปดาห์นี้เป็นคำถามเกี่ยวกับหน้าแอปอากงอาม่าออนไลน์ ผู้ร่วมกิจกรรมกรุณาเลือกคำตอบเพียง 1 ข้อ
+        และกรอกชื่อ-นามสกุลให้ถูกต้องเพื่อใช้ตรวจสอบรายชื่อผู้ได้รับรางวัลในภายหลัง
+      </p>
+    </section>
+
+    <section class="card">
+      <div class="section-head"><h2>คำถามสัปดาห์แรก</h2></div>
+      <p class="question-title" id="questionText">ในหน้า app อากงอาม่าออนไลน์มีหมวดขอพรกี่หมวด</p>
+
+      <div class="choices" id="choiceGrid">
+        <button class="choice" type="button" data-answer="1">
+          <div class="choice-key">A</div>
+          <div class="choice-text">1</div>
+        </button>
+        <button class="choice" type="button" data-answer="2">
+          <div class="choice-key">B</div>
+          <div class="choice-text">2</div>
+        </button>
+        <button class="choice" type="button" data-answer="3">
+          <div class="choice-key">C</div>
+          <div class="choice-text">3</div>
+        </button>
+        <button class="choice" type="button" data-answer="4">
+          <div class="choice-key">D</div>
+          <div class="choice-text">4</div>
+        </button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head"><h2>ข้อมูลผู้ร่วมกิจกรรม</h2></div>
+      <input id="fullName" class="text-input" type="text" placeholder="ชื่อ-นามสกุล">
+      <button id="submitBtn" class="primary-btn">ส่งคำตอบ</button>
+      <div id="statusBox" class="status"></div>
+    </section>
+
+    <section class="card">
+      <div class="section-head"><h2>กติกา</h2></div>
+      <ul class="rules">
+        <li>1 รายชื่อสามารถร่วมกิจกรรมได้ 1 ครั้งต่อสัปดาห์</li>
+        <li>หากพบว่ามีการส่งซ้ำ จะยึดคำตอบครั้งแรกเป็นหลัก</li>
+        <li>ผู้ร่วมกิจกรรมกรุณาตรวจสอบรายชื่อผู้ได้รับรางวัลด้วยตนเอง</li>
+        <li>ผู้ได้รับรางวัลกรุณายืนยันตัวตนตามที่ผู้จัดกำหนดเมื่อรับรางวัล</li>
+      </ul>
+    </section>
+
+    <section class="card" style="padding:0;overflow:hidden">
+      <a class="winner-link" href="#" id="winnerLink">
+        <div class="winner-link-box">
+          <strong>🎁 ตรวจสอบรายชื่อผู้ได้รับรางวัล</strong>
+          <span>กดเพื่อดูรายชื่อผู้โชคดีประจำสัปดาห์และประจำเดือน</span>
+          <div class="mini-pill">เปิดรายชื่อผู้ได้รับรางวัล →</div>
+        </div>
+      </a>
+    </section>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGs9QTbag7bhhk7_XDUNSVp646CZTsFULT0vCfXm6BYgu1bnAMHYaaNzU111K3sbkTKQ/exec";
+    const WINNER_URL = "#"; // เปลี่ยนภายหลัง
+    const WEEK = "week_1";
+    const QUESTION = "ในหน้า app อากงอาม่าออนไลน์มีหมวดขอพรกี่หมวด";
+    const CHOICES = ["1", "2", "3", "4"];
+    const CORRECT_ANSWER = "4";
+
+    let selectedAnswer = "";
+
+    const choiceButtons = document.querySelectorAll(".choice");
+    const statusBox = document.getElementById("statusBox");
+    const submitBtn = document.getElementById("submitBtn");
+    const fullNameInput = document.getElementById("fullName");
+    const winnerLink = document.getElementById("winnerLink");
+
+    winnerLink.href = WINNER_URL;
+
+    choiceButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        choiceButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        selectedAnswer = btn.dataset.answer;
+      });
+    });
+
+    function showStatus(message, type="ok"){
+      statusBox.textContent = message;
+      statusBox.className = `status show ${type}`;
+    }
+
+    async function submitAnswer(){
+      const fullName = fullNameInput.value.trim();
+
+      if (!fullName) {
+        showStatus("กรุณากรอกชื่อ-นามสกุล", "err");
+        return;
+      }
+
+      if (!selectedAnswer) {
+        showStatus("กรุณาเลือกคำตอบ 1 ข้อ", "err");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "กำลังส่งคำตอบ...";
+
+      const payload = {
+        week: WEEK,
+        question: QUESTION,
+        choice_1: CHOICES[0],
+        choice_2: CHOICES[1],
+        choice_3: CHOICES[2],
+        choice_4: CHOICES[3],
+        correct_answer: CORRECT_ANSWER,
+        full_name: fullName,
+        selected_answer: selectedAnswer
+      };
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error("ส่งข้อมูลไม่สำเร็จ");
+
+        showStatus("ส่งคำตอบเรียบร้อยแล้ว กรุณาตรวจสอบรายชื่อผู้ได้รับรางวัลภายหลัง", "ok");
+        fullNameInput.value = "";
+        selectedAnswer = "";
+        choiceButtons.forEach(b => b.classList.remove("active"));
+      } catch (error) {
+        showStatus("ส่งคำตอบไม่สำเร็จ กรุณาลองใหม่อีกครั้ง", "err");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "ส่งคำตอบ";
+      }
+    }
+
+    submitBtn.addEventListener("click", submitAnswer);
+  </script>
+</body>
+</html>
