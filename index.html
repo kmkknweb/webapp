@@ -764,17 +764,8 @@ async function shareCurrentImage(){
     alert("เครื่องนี้แชร์ภาพตรงไม่ได้ ให้กดดาวน์โหลดภาพหรือบันทึกภาพแทน");
   }
 }
-async function saveForFacebook(){
-  await downloadCurrentOutput();
-  alert("บันทึกภาพแล้ว จากนั้นเปิด Facebook แล้วเลือกโพสต์รูปนี้ได้เลย");
-}
-async function copyCurrentText(){
-  try{
-    await navigator.clipboard.writeText(currentOutputText);
-    alert("คัดลอกข้อความแล้ว");
-  }catch(e){
-    alert(currentOutputText);
-  }
+
+
 }
 async function copyAccountNumber(){
   try{
