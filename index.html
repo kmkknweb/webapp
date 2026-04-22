@@ -510,6 +510,8 @@ let selectedFortuneCategory = null;
 let selectedBlessingCategory = null;
 let currentOutputText = "";
 let currentDownloadName = "agong-post.png";
+let latestNoticeData = null;
+  
 
 function $(id){ return document.getElementById(id); }
 function openModal(id){ $(id).classList.remove('hidden'); }
@@ -740,32 +742,47 @@ function savePaymentQr(){
   a.download = "payment-qr.png";
   a.click();
 }
+
+  
 function initNotice(){
-  function applyNotice(data){
+  function applyNotice(data, forcePopup = false){
     if(!data) return;
+
+    latestNoticeData = data;
+
     $("noticeTitle").textContent = data.title || "";
     $("noticeMessage").textContent = data.message || "";
     $("inlineNoticeText").textContent = data.message || "";
+
     const seen = localStorage.getItem('notice_version');
-    if(data.show && String(seen) !== String(data.version)){
+
+    if (data.show && (forcePopup || String(seen) !== String(data.version))) {
       openModal('noticeModal');
       localStorage.setItem('notice_version', String(data.version));
     }
   }
 
-  applyNotice(noticeData);
+  applyNotice(noticeData, false);
 
   if (db) {
     db.collection("settings").doc("notice").onSnapshot((doc) => {
       if (doc.exists) {
-        applyNotice(doc.data());
+        applyNotice(doc.data(), false);
       }
     }, (error) => {
       console.warn("Firestore notice listener failed:", error);
     });
   }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && latestNoticeData && latestNoticeData.show) {
+      applyNotice(latestNoticeData, true);
+    }
+  });
 }
 
+
+  
 document.querySelectorAll('.amount-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
