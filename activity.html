@@ -250,5 +250,12 @@
 
     submitBtn.addEventListener("click", submitAnswer);
   </script>
+
+
+  window.addEventListener("pageshow", function () {
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    window.location.href = "index.html";
+  }
+});
 </body>
 </html>
