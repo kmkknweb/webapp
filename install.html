@@ -17,10 +17,31 @@
     .hero img{width:140px;height:140px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.13)}
     h1{margin:10px 0 6px;font-size:28px}
     p{line-height:1.8;color:#e3d8d0}
-    .btn{
+.btn{
   display:block;
   width:100%;
+  padding:14px 16px;
+  border-radius:14px;
+  text-align:center;
+  font-weight:600;
+  font-size:16px;
+  text-decoration:none;
   box-sizing:border-box;
+  border:none;
+}
+
+/* ปุ่มทอง */
+.btn.primary{
+  background: linear-gradient(135deg,#f7d38b,#e6b85c);
+  color:#2b1b05;
+}
+
+/* ปุ่มรอง */
+.btn.secondary{
+  margin-top:10px;
+  background: rgba(255,255,255,0.06);
+  color:#ffffff;
+  border:1px solid rgba(255,255,255,0.08);
 }
     .secondary{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.09)}
     .steps li{margin-bottom:8px;color:#e3d8d0}
@@ -39,8 +60,8 @@
       <h1>ติดตั้งแอปอากงอาม่า</h1>
       <p>ถ้าเครื่องรองรับ คุณสามารถกดติดตั้งเพื่อเพิ่มแอปไว้ที่หน้าจอหลักได้ทันที</p>
       <button class="btn primary hidden" id="installBtn">ติดตั้งแอป</button>
-      <a class="btn secondary" href="./index.html" style="display:block;text-decoration:none;text-align:center">เปิดแอป</a>
-    </div>
+
+<a class="btn secondary" href="./index.html">เปิดแอป</a>
 
     <div class="card" id="androidHelp">
       <h2>Android / Chrome</h2>
