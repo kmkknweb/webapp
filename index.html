@@ -294,15 +294,15 @@
     </section>
 
     <section class="card" id="donateSection">
-      <div class="section-head"><h2>ร่วมบริจาค</h2></div>
+      <div class="section-head"><h2>ร่วมบริจาคทำบุญโรงทาน</h2></div>
       <div class="amount-grid">
-        <button class="amount-btn active" data-amount="99">99 บาท</button>
-        <button class="amount-btn" data-amount="199">199 บาท</button>
-        <button class="amount-btn" data-amount="399">399 บาท</button>
+        <button class="amount-btn active" data-amount="99">หนึ่งอิ่ม 49 บาท</button>
+        <button class="amount-btn" data-amount="199">สองอิ่ม 89 บาท</button>
+        <button class="amount-btn" data-amount="399">สามอิ่ม 139 บาท</button>
         <button class="amount-btn" data-amount="0">กำหนดเอง</button>
       </div>
       <input class="text-input" id="donorName" type="text" placeholder="ชื่อผู้บริจาค">
-      <input class="text-input" id="donationAmount" type="number" inputmode="numeric" value="99" placeholder="จำนวนเงิน">
+      <input class="text-input" id="donationAmount" type="number" inputmode="numeric" value="49" placeholder="จำนวนเงิน">
       <textarea class="text-input text-area" id="customPrayer" placeholder="คำอธิษฐานเพิ่มเติม (ถ้ามี)"></textarea>
       <label class="upload-box">
         <input type="file" id="slipInput" accept="image/*" hidden>
@@ -344,7 +344,7 @@
     <div class="modal-backdrop" onclick="closeModal('paymentModal')"></div>
     <div class="modal-panel">
       <button class="close-btn" onclick="closeModal('paymentModal')">×</button>
-      <h3>ชำระเงินทำบุญ</h3>
+      <h3>ชำระเงินทำบุญโรงทาน</h3>
       <div class="payment-hero">
         <div class="payment-qr"><img id="paymentQrImage" alt="QR ชำระเงิน"></div>
         <div class="payment-meta">
@@ -635,7 +635,7 @@ function selectBlessingCategory(key){
 function donorData(){
   return {
     name: $("donorName").value.trim() || "ผู้มีจิตศรัทธา",
-    amount: $("donationAmount").value.trim() || "99",
+    amount: $("donationAmount").value.trim() || "49",
     prayer: $("customPrayer").value.trim() || "ขอให้อากงอาม่าคุ้มครอง ให้ชีวิตราบรื่นและมีความร่มเย็น"
   };
 }
