@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>อากงอาม่าออนไลน์</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <style>
+    :root{
+      --bg:#0d0b10;
+      --panel:#17131d;
+      --panel-2:#1e1827;
+      --text:#fff6eb;
+      --muted:#d7c8bc;
+      --gold:#f2c46b;
+      --gold-2:#ffe5b1;
+      --red:#c91f3d;
+      --pink:#ff5fa3;
+      --purple:#7d4cff;
+      --line:rgba(255,255,255,.09);
+      --shadow:0 18px 40px rgba(0,0,0,.38);
+      --radius:24px;
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;padding:0;min-height:100%;
+      background:radial-gradient(circle at top,#44101f 0%, #1a1020 34%, #0d0b10 100%);
+      color:var(--text);
+      font-family:'Kanit',sans-serif;
+      overflow-x:hidden;
+    }
+    .bg-orb{
+      position:fixed;border-radius:999px;filter:blur(70px);pointer-events:none;opacity:.2;z-index:0;
+      animation:floatOrb 10s ease-in-out infinite;
+    }
+    .orb1{width:200px;height:200px;left:-60px;top:80px;background:var(--red)}
+    .orb2{width:230px;height:230px;right:-80px;top:180px;background:var(--purple);animation-delay:1.6s}
+    .orb3{width:170px;height:170px;left:40%;bottom:100px;background:var(--gold);animation-delay:3s}
+    .app{position:relative;z-index:2;max-width:460px;margin:0 auto;padding:18px 14px 90px}
+
+    /* ── Bottom Nav Bar ── */
+    .bottom-nav{
+      position:fixed;bottom:0;left:0;right:0;z-index:100;
+      display:flex;justify-content:space-around;align-items:center;
+      background:rgba(13,11,16,.92);
+      backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+      border-top:1px solid rgba(255,255,255,.1);
+      padding:8px 0 max(8px,env(safe-area-inset-bottom));
+      max-width:460px;margin:0 auto;
+    }
+    .bottom-nav-wrap{
+      position:fixed;bottom:0;left:0;right:0;z-index:99;
+      background:rgba(13,11,16,.92);
+      backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+      border-top:1px solid rgba(255,255,255,.1);
+    }
+    .nav-item{
+      display:flex;flex-direction:column;align-items:center;gap:3px;
+      padding:4px 14px;cursor:pointer;border:none;background:none;
+      color:#d7c8bc;font-family:'Kanit',sans-serif;transition:.15s ease;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .nav-item.active{color:#f2c46b;}
+    .nav-icon{font-size:20px;line-height:1;}
+    .nav-label{font-size:10px;font-weight:500;letter-spacing:.3px;white-space:nowrap;}
+    .nav-item.active .nav-label{color:#f2c46b;}
+
+    /* ── Tab Pages ── */
+    .tab-page{display:none;}
+    .tab-page.active{display:block;}
+    .tab-iframe-page{display:none;position:fixed;top:0;left:0;right:0;bottom:60px;z-index:80;}
+    .tab-iframe-page.active{display:block;}
+    .tab-iframe-page iframe{width:100%;height:100%;border:none;display:block;}
+    .iframe-topbar{
+      position:absolute;top:0;left:0;right:0;height:44px;z-index:81;
+      background:rgba(13,11,16,.95);backdrop-filter:blur(12px);
+      display:flex;align-items:center;justify-content:center;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .iframe-topbar-title{font-size:14px;font-weight:600;color:#ffe5b1;font-family:'Kanit',sans-serif;}
+    .iframe-back-btn{
+      position:absolute;left:12px;background:none;border:none;color:#f2c46b;
+      font-family:'Kanit',sans-serif;font-size:13px;cursor:pointer;padding:4px 8px;
+    }
+    .hero{text-align:center;padding:8px 6px 20px}
+    .hero-badge{
+      display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);color:var(--gold-2);font-size:11px;letter-spacing:.8px;backdrop-filter:blur(10px);
+      box-shadow:0 0 0 1px rgba(242,196,107,.08),0 0 30px rgba(201,31,61,.08);
+    }
+    .hero-photo-wrap{width:220px;height:220px;margin:20px auto 10px;position:relative;display:grid;place-items:center}
+    .hero-ring{
+      position:absolute;inset:0;border-radius:50%;
+      background:radial-gradient(circle, rgba(255,229,177,.32) 0%, rgba(201,31,61,.18) 34%, rgba(125,76,255,.18) 58%, transparent 74%);
+      animation:pulse 4s ease-in-out infinite;
+    }
+    .hero-photo{
+      position:relative;width:184px;height:184px;border-radius:50%;object-fit:cover;display:block;
+      border:3px solid rgba(255,255,255,.13);
+      box-shadow:0 20px 44px rgba(0,0,0,.36),0 0 38px rgba(242,196,107,.16);
+      animation:floatHero 4.5s ease-in-out infinite;
+      background:#2a1b12;
+    }
+    .hero-title{margin:8px 0 6px;font-size:32px;line-height:1.08;font-weight:800;letter-spacing:-.02em}
+    .hero-sub{margin:0 auto;max-width:320px;color:var(--muted);font-size:14px;line-height:1.75}
+    .hero-tags{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:12px;font-size:12px;color:var(--gold-2)}
+    .menu-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px}
+    .menu-btn{
+      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+      border:1px solid var(--line);border-radius:20px;padding:14px 10px;color:var(--text);font-family:'Kanit',sans-serif;
+      box-shadow:var(--shadow);cursor:pointer
+    }
+    .menu-btn strong{display:block;font-size:15px}
+    .menu-btn span{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));
+      border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px;
+      box-shadow:var(--shadow);backdrop-filter:blur(12px);
+    }
+    .section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+    .section-head h2{margin:0;font-size:19px;font-weight:700}
+    .mini-btn,.primary-btn,.secondary-btn,.ghost-btn,.amount-btn,.category-btn,.share-btn{
+      font-family:'Kanit',sans-serif;border:none;cursor:pointer
+    }
+    .mini-btn{
+      padding:9px 12px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--gold-2);font-size:12px
+    }
+    .primary-btn{
+      padding:14px;border-radius:16px;background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#23160d;font-size:15px;font-weight:700
+    }
+    .secondary-btn{
+      padding:14px;border-radius:16px;background:linear-gradient(135deg,var(--red),var(--pink));color:#fff;font-size:15px;font-weight:700
+    }
+    .ghost-btn{
+      padding:14px;border-radius:16px;background:rgba(255,255,255,.06);color:#fff;border:1px solid var(--line);font-size:15px;font-weight:600
+    }
+    .stack{display:grid;grid-template-columns:1fr;gap:10px}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .grid-4{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .daily-date{font-size:12px;color:var(--gold-2);margin-bottom:6px}
+    .fortune-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .tag{padding:7px 12px;border-radius:999px;font-size:12px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+    .tag.gold{color:var(--gold-2)}
+    .fortune-text,.bless-text,.notice-inline{margin:0;font-size:15px;line-height:1.85}
+    .fortune-text{margin-bottom:12px}
+    .score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .score-box{background:rgba(0,0,0,.18);border:1px solid var(--line);border-radius:14px;padding:10px 6px;text-align:center}
+    .score-box span{display:block;font-size:10px;color:var(--muted);margin-bottom:4px}
+    .score-box strong{font-size:15px;color:var(--gold-2)}
+    .category-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+    .category-btn{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:14px 10px;border-radius:18px;
+      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));color:var(--text);border:1px solid var(--line)
+    }
+    .category-btn.active{background:linear-gradient(135deg,rgba(242,196,107,.24),rgba(201,31,61,.16))}
+    .category-icon{font-size:24px}
+    .category-label{font-size:13px;line-height:1.4}
+    .result-box{
+      background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:12px
+    }
+    .result-kicker{font-size:11px;color:var(--gold-2);letter-spacing:1px;margin-bottom:6px}
+    .result-title{font-size:18px;font-weight:700;margin-bottom:8px}
+    .amount-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+    .amount-btn{
+      padding:12px;border-radius:14px;background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--line)
+    }
+    .amount-btn.active{background:linear-gradient(135deg,rgba(242,196,107,.24),rgba(201,31,61,.16))}
+    .text-input{
+      width:100%;padding:13px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);
+      color:var(--text);margin-bottom:10px;font:inherit
+    }
+    .text-input::placeholder{color:#baa896}
+    .text-area{min-height:92px;resize:vertical}
+    .upload-box{display:block;border:1px dashed rgba(255,255,255,.18);border-radius:18px;padding:16px;background:rgba(255,255,255,.03);margin-bottom:12px;cursor:pointer}
+    .upload-placeholder{text-align:center;color:var(--muted)}
+    .upload-placeholder span{display:block;font-size:14px;margin-bottom:3px}
+    .upload-placeholder small{font-size:11px}
+    .slip-preview{width:100%;max-height:230px;object-fit:cover;border-radius:14px;display:block}
+    .hidden{display:none !important}
+    .modal.hidden{display:none}
+    .modal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center}
+    .modal-backdrop{position:absolute;inset:0;background:rgba(5,5,9,.72);backdrop-filter:blur(6px)}
+    .modal-panel{
+      position:relative;z-index:2;width:min(92vw,420px);max-height:88vh;overflow:auto;
+      background:linear-gradient(180deg,#1a1221,#130f18);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:0 22px 60px rgba(0,0,0,.45)
+    }
+    .modal-panel h3{margin:0 0 10px;font-size:24px}
+    .modal-panel p{margin:0;color:var(--muted);line-height:1.8}
+    .close-btn{
+      position:absolute;right:10px;top:10px;width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,.08);color:#fff;font-size:22px;cursor:pointer
+    }
+    .notice-panel{text-align:center}
+    .notice-image{width:126px;height:126px;border-radius:50%;object-fit:cover;margin-bottom:10px;box-shadow:0 0 32px rgba(242,196,107,.16)}
+    .payment-hero{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+    .payment-qr{width:156px;height:156px;border-radius:18px;background:#fff;padding:10px;flex:0 0 auto;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+    .payment-qr img{width:100%;height:100%;object-fit:contain;display:block;border-radius:10px}
+    .payment-meta{flex:1}
+    .payment-kicker{font-size:11px;letter-spacing:1px;color:var(--gold-2);margin-bottom:6px}
+    .payment-bank{font-size:18px;font-weight:700;margin-bottom:4px}
+    .payment-name{font-size:13px;color:var(--muted);line-height:1.7}
+    .payment-account{margin-top:12px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+    .payment-account-label{font-size:11px;color:var(--gold-2);margin-bottom:4px}
+    .payment-account-value{font-size:20px;font-weight:700;letter-spacing:.5px}
+    .payment-tips{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.8}
+    .payment-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+    #renderTargetWrapper{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:18px;padding:10px}
+    #renderTarget{display:flex;justify-content:center}
+    .post-card,.certificate-card{
+      width:100%;max-width:390px;border-radius:24px;overflow:hidden;position:relative;aspect-ratio:4/5; min-height:520px;
+    }
+    .post-card{
+      background:
+        radial-gradient(circle at 12% 8%, rgba(242,196,107,.28), transparent 22%),
+        radial-gradient(circle at 82% 14%, rgba(201,31,61,.24), transparent 18%),
+        radial-gradient(circle at 50% 100%, rgba(125,76,255,.20), transparent 20%),
+        linear-gradient(145deg,#2a1116,#3c1421 36%,#171220 100%);
+      border:1px solid rgba(255,255,255,.10);padding:22px;color:#fff;display:flex;flex-direction:column;justify-content:space-between
+    }
+    .certificate-card{
+      background:linear-gradient(180deg, rgba(255,244,230,.98), rgba(255,249,239,.98));
+      border:4px solid #d7b168;padding:24px;color:#4b2d18;display:flex;flex-direction:column;justify-content:space-between
+    }
+    .post-top{display:flex;gap:12px;align-items:center;margin-bottom:16px}
+    .post-avatar,.cert-avatar{width:78px;height:78px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.14)}
+    .post-kicker{font-size:11px;letter-spacing:1px;color:#ffe2bf}
+    .post-title{font-size:28px;line-height:1.1;margin:3px 0 4px;font-weight:800}
+    .post-sub{font-size:12px;color:#f3d6c3}
+    .post-message{
+      background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px;font-size:17px;line-height:1.8;text-align:center
+    }
+    .post-sign{font-size:13px;line-height:1.8;color:#ffe6d3;margin-top:16px}
+    .post-sign strong{font-size:18px;color:#ffde9b}
+    .post-footer-date{font-size:11px;color:#f3d8c5;margin-top:8px;text-align:center}
+    .cert-header{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px}
+    .cert-avatar{border:3px solid #d7b168}
+    .cert-title{text-align:center;font-size:26px;margin:0;color:#8a5315;font-weight:800}
+    .cert-sub{text-align:center;margin:0 0 12px;color:#77502d;font-size:13px}
+    .cert-body{text-align:center;border:1px solid #e7d1a1;border-radius:18px;padding:18px;background:rgba(255,252,246,.85)}
+    .cert-name{font-size:24px;font-weight:700;margin:6px 0;color:#6c3b12}
+    .cert-amount{font-size:18px;color:#8a5315;margin:10px 0}
+    .cert-message{font-size:16px;line-height:1.9;color:#6b4d35}
+    .cert-date{margin-top:14px;font-size:13px;color:#8a6d4f}
+    .cert-footer{margin-top:14px;text-align:center;font-size:14px;color:#7d5632}
+    .share-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+    @keyframes floatHero{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    @keyframes pulse{0%,100%{transform:scale(1);opacity:.88}50%{transform:scale(1.05);opacity:1}}
+    @keyframes floatOrb{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+    @media (max-width:380px){
+      .menu-grid,.grid-2,.grid-4,.amount-grid,.payment-actions,.share-grid{grid-template-columns:1fr}
+      .hero-title{font-size:28px}
+      .payment-hero{flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-orb orb1"></div><div class="bg-orb orb2"></div><div class="bg-orb orb3"></div>
+
+  <!-- Tab: หน้าแรก (เนื้อหาเดิมทั้งหมด) -->
+  <div class="tab-page active" id="tab-home">
+  <div class="app">
+    <section class="hero">
+      <div class="hero-badge">ศรัทธายุคใหม่ • ขอพร • ดูดวง • ทำบุญ</div>
+      <div class="hero-photo-wrap"><div class="hero-ring"></div><img class="hero-photo" src="agong.png" alt="อากงอาม่า"></div>
+      <h1 class="hero-title">อากงอาม่าออนไลน์</h1>
+      <p class="hero-sub">ดูดวง ขอพร และร่วมบุญ ได้ในหน้าเดียว พร้อมออกใบเป็นภาพสวยสำหรับเก็บและแชร์</p>
+      <div class="hero-tags"><span>✦ ความร่มเย็น</span><span>✦ โชคดี</span><span>✦ งานราบรื่น</span></div>
+      <div class="menu-grid">
+        <button class="menu-btn" onclick="scrollToSection('fortuneSection')"><strong>🔮 ดูดวงวันนี้</strong><span>เลือกหมวดก่อนดู</span></button>
+        <button class="menu-btn" onclick="scrollToSection('blessSection')"><strong>🙏 อธิษฐานขอพร</strong><span>เลือกหมวดก่อนขอ</span></button>
+        <button class="menu-btn" onclick="scrollToSection('donateSection')"><strong>🧧 ร่วมบริจาค</strong><span>ออกใบอนุโมทนา</span></button>
+      </div>
+      <a class="top-link" href="https://kmkknweb.github.io/webpage/" target="_blank" rel="noopener">
+  <div class="link-card" style="
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,229,177,.25), transparent 25%),
+      radial-gradient(circle at 80% 20%, rgba(125,76,255,.25), transparent 20%),
+      linear-gradient(135deg,#7d4cff 0%, #a24cff 40%, #c91f3d 100%);
+    border-radius:22px;
+    padding:18px;
+    margin-top:14px;
+    box-shadow:0 18px 40px rgba(0,0,0,.4);
+  ">
+    <strong style="font-size:18px;display:block;margin-bottom:6px">
+      🌐 เข้าชมเว็บไซต์ศาลเจ้าปึงเถ่ากงม่าขอนแก่น
+    </strong>
+    <span style="font-size:14px;line-height:1.7;opacity:.95">
+      กดเพื่อดูข้อมูลศาลเจ้าแบบเต็ม รูปภาพ พิธี และรายละเอียดทั้งหมด
+    </span>
+    <div style="
+      margin-top:12px;
+      display:inline-block;
+      padding:10px 16px;
+      border-radius:999px;
+      background:rgba(255,255,255,.15);
+      font-size:13px;
+      font-weight:700;
+    ">
+      เปิดเว็บไซต์ →
+    </div>
+  </div>
+      </a>
+    </section>
+
+    <section class="card" id="fortuneSection">
+      <div class="section-head"><h2>ดูดวงวันนี้</h2></div>
+      <div class="category-grid" id="fortuneCategoryGrid"></div>
+      <div class="result-box hidden" id="fortuneResultBox">
+        <div class="result-kicker">DAILY FORTUNE</div>
+        <div class="result-title" id="fortuneResultTitle"></div>
+        <div class="daily-date" id="todayDate"></div>
+        <div class="fortune-tags">
+          <span class="tag gold" id="fortuneColor"></span>
+          <span class="tag" id="fortuneNumber"></span>
+          <span class="tag" id="fortuneDirection"></span>
+        </div>
+        <p class="fortune-text" id="fortuneText"></p>
+        <div class="score-grid">
+          <div class="score-box"><span>โชคลาภ</span><strong id="scoreLuck"></strong></div>
+          <div class="score-box"><span>ความรัก</span><strong id="scoreLove"></strong></div>
+          <div class="score-box"><span>การงาน</span><strong id="scoreWork"></strong></div>
+        </div>
+        <button class="primary-btn" id="makeFortuneCardBtn" style="margin-top:12px">ออกใบดูดวงเป็นภาพ</button>
+      </div>
+    </section>
+
+    <section class="card" id="blessSection">
+      <div class="section-head"><h2>อธิษฐานขอพร</h2></div>
+      <div class="category-grid" id="blessCategoryGrid"></div>
+      <div class="result-box hidden" id="blessResultBox">
+        <div class="result-kicker">BLESSED MESSAGE</div>
+        <div class="result-title" id="blessResultTitle"></div>
+        <p class="bless-text" id="blessText"></p>
+        <input class="text-input" id="blessReceiverName" type="text" placeholder="ชื่อผู้รับพร (ถ้ามี)">
+        <button class="primary-btn" id="makeBlessingCardBtn">ออกใบขอพรเป็นภาพ</button>
+      </div>
+    </section>
+
+    <section class="card" id="donateSection">
+      <div class="section-head"><h2>ร่วมบริจาคทำบุญโรงทาน</h2></div>
+      <div class="amount-grid">
+        <button class="amount-btn active" data-amount="49">หนึ่งอิ่ม 49 บาท</button>
+        <button class="amount-btn" data-amount="89">สองอิ่ม 89 บาท</button>
+        <button class="amount-btn" data-amount="149">สามอิ่ม 149 บาท</button>
+        <button class="amount-btn" data-amount="0">กำหนดเอง</button>
+      </div>
+
+      <div class="payment-hero">
+        <div class="payment-qr"><img id="paymentQrImage" alt="QR ชำระเงิน"></div>
+        <div class="payment-meta">
+          <div class="payment-kicker">SCAN TO PAY</div>
+          <div class="payment-bank" id="paymentBankName"></div>
+          <div class="payment-name" id="paymentAccountName"></div>
+        </div>
+      </div>
+      <div class="payment-account">
+        <div class="payment-account-label">เลขที่บัญชี / PromptPay</div>
+        <div class="payment-account-value" id="paymentAccountNumber"></div>
+      </div>
+      <div class="payment-tips">คัดลอกเลขบัญชีหรือบันทึก QR ไปเปิดในแอปธนาคาร แล้วโอนเสร็จค่อยดำเนินการต่อ</div>
+      <div class="payment-actions">
+        <button class="primary-btn" id="copyAccountBtn">คัดลอกเลขบัญชี</button>
+        <button class="secondary-btn" id="saveQrBtn">บันทึก QR</button>
+      </div>
+      
+
+      
+      <input class="text-input" id="donorName" type="text" placeholder="ชื่อผู้บริจาค">
+      <input class="text-input" id="donationAmount" type="number" inputmode="numeric" value="49" placeholder="จำนวนเงิน">
+      <textarea class="text-input text-area" id="customPrayer" placeholder="คำอธิษฐานเพิ่มเติม (ถ้ามี)"></textarea>
+      <label class="upload-box">
+        <input type="file" id="slipInput" accept="image/*" hidden>
+        <img id="slipPreview" class="slip-preview hidden" alt="สลิป">
+        <div class="upload-placeholder" id="slipPlaceholder"><span>＋ แนบสลิปโอนเงิน</span><small>กดเพื่อเลือกรูปจากเครื่อง</small></div>
+      </label>
+      <button class="secondary-btn" id="generateCertificateBtn">ออกใบอนุโมทนา</button>
+    </section>
+
+    <section class="card">
+     
+      <button class="ghost-btn" onclick="switchTab('activity')" style="margin-top:12px;width:100%">🎯 ไปร่วมกิจกรรมอากงอาม่าให้โชค</button>
+    </section>
+  </div>
+  </div><!-- end tab-home -->
+
+  <!-- Tab: กิจกรรม (ฝัง activity.html) -->
+  <div class="tab-page" id="tab-activity">
+    <div style="position:relative;min-height:100vh;">
+      <div class="iframe-topbar">
+        <button class="iframe-back-btn" onclick="switchTab('home')">← กลับ</button>
+        <span class="iframe-topbar-title">🎯 กิจกรรมประจำสัปดาห์</span>
+      </div>
+      <div style="padding-top:44px;">
+        <iframe id="iframeActivity" src="" title="กิจกรรม" style="width:100%;height:calc(100vh - 44px - 70px);border:none;display:block;"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: เว็บศาลเจ้า -->
+  <div class="tab-page" id="tab-shrine">
+    <div style="position:relative;min-height:100vh;">
+      <div class="iframe-topbar">
+        <button class="iframe-back-btn" onclick="switchTab('home')">← กลับ</button>
+        <span class="iframe-topbar-title">🏮 ศาลเจ้าปึงเถ่ากงม่า</span>
+      </div>
+      <div style="padding-top:44px;">
+        <iframe id="ifrineShrine" src="" title="เว็บศาลเจ้า" style="width:100%;height:calc(100vh - 44px - 70px);border:none;display:block;"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Virtual Tour -->
+  <div class="tab-page" id="tab-tour">
+    <div style="position:relative;min-height:100vh;">
+      <div class="iframe-topbar">
+        <button class="iframe-back-btn" onclick="switchTab('home')">← กลับ</button>
+        <span class="iframe-topbar-title">🌐 Virtual Tour 360°</span>
+      </div>
+      <div style="padding-top:44px;">
+        <iframe id="iframeTour" src="" title="Virtual Tour" style="width:100%;height:calc(100vh - 44px - 70px);border:none;display:block;"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <div class="bottom-nav-wrap">
+    <div class="bottom-nav">
+      <button class="nav-item active" id="nav-home" onclick="switchTab('home')">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">หน้าแรก</span>
+      </button>
+      <button class="nav-item" id="nav-activity" onclick="switchTab('activity')">
+        <span class="nav-icon">🎯</span>
+        <span class="nav-label">กิจกรรม</span>
+      </button>
+      <button class="nav-item" id="nav-shrine" onclick="switchTab('shrine')">
+        <span class="nav-icon">🏮</span>
+        <span class="nav-label">ศาลเจ้า</span>
+      </button>
+      <button class="nav-item" id="nav-tour" onclick="switchTab('tour')">
+        <span class="nav-icon">🌐</span>
+        <span class="nav-label">Virtual Tour</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="noticeModal">
+    <div class="modal-backdrop" onclick="closeModal('noticeModal')"></div>
+    <div class="modal-panel notice-panel">
+      <button class="close-btn" onclick="closeModal('noticeModal')">×</button>
+      <img class="notice-image" src="agong.png" alt="อากงอาม่า">
+      <h3 id="noticeTitle"></h3>
+      <p id="noticeMessage"></p>
+      <div style="margin-top:14px"><button class="primary-btn" onclick="closeModal('noticeModal')">รับทราบ</button></div>
+    </div>
+  </div>
+
+<div class="modal hidden" id="installModal">
+  <div class="modal-backdrop" onclick="closeModal('installModal')"></div>
+  <div class="modal-panel">
+
+    <button class="close-btn" onclick="closeModal('installModal')">×</button>
+
+    <h3>🎁 ร่วมกิจกรรมอากงอาม่าให้โชค</h3>
+
+    <p>ตอบคำถามประจำสัปดาห์ ลุ้นรับรางวัลจากอากงอาม่า</p>
+
+    <a href="./activity.html" style="
+      display:block;
+      margin-top:16px;
+      padding:14px;
+      border-radius:14px;
+      text-align:center;
+      font-weight:700;
+      background:linear-gradient(135deg,#f2c46b,#ffe5b1);
+      color:#23160d;
+      text-decoration:none;
+    ">
+      ไปหน้ากิจกรรม →
+    </a>
+
+  </div>
+</div>
+
+<div class="modal hidden" id="outputModal">
+    <div class="modal-backdrop" onclick="closeModal('outputModal')"></div>
+    <div class="modal-panel">
+      <button class="close-btn" onclick="closeModal('outputModal')">×</button>
+      <h3 id="outputTitle"></h3>
+      <div id="renderTargetWrapper"><div id="renderTarget"></div></div>
+      <div class="share-grid">
+        <button class="primary-btn" id="downloadOutputBtn">ดาวน์โหลดภาพ</button>
+        <button class="secondary-btn" id="shareImageBtn">แชร์ภาพ</button>
+        <button class="ghost-btn" id="saveForFbBtn">บันทึกภาพ</button>
+        <button class="ghost-btn" id="copyTextBtn">คัดลอกข้อความ</button>
+      </div>
+      <p style="margin-top:10px;font-size:12px;color:var(--muted)">* กดแชร์ภาพ แล้วเลือก LINE หรือแอปที่ต้องการ</p>
+    </div>
+  </div>
+
+<script>
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCLr6yKfOOnR2IqBQc2ytCEpMuTTrgcZ9Q",
+  authDomain: "webapp-5a606.firebaseapp.com",
+  projectId: "webapp-5a606",
+  storageBucket: "webapp-5a606.firebasestorage.app",
+  messagingSenderId: "4647661737",
+  appId: "1:4647661737:web:5729d78923c3b5b53739b8",
+  measurementId: "G-N88YXXZW34"
+};
+
+let db = null;
+try {
+  if (typeof firebase !== "undefined") {
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    db = firebase.firestore();
+  }
+} catch (e) {
+  console.warn("Firebase init failed:", e);
+}
+
+const noticeData = {
+  version: 1,
+  show: true,
+  title: "🙏 กิจกรรมวันนี้จากอากงอาม่า",
+  message: "วันนี้เหมาะกับการขอพรเรื่องการงาน การเรียน และการเริ่มต้นสิ่งใหม่ ใครยังไม่ได้ขอพรสามารถกดเลือกหมวดที่ต้องการได้เลย"
+};
+
+const fortuneCategories = [
+  { key:"workstudy", icon:"💼", label:"การงาน / การเรียน" },
+  { key:"money", icon:"💰", label:"การเงิน" },
+  { key:"love", icon:"❤️", label:"ความรัก" },
+  { key:"health", icon:"🧘", label:"สุขภาพ" }
+];
+
+const blessingCategories = [
+  { key:"money", icon:"💰", label:"การเงิน" },
+  { key:"love", icon:"❤️", label:"ความรัก" },
+  { key:"work", icon:"💼", label:"การงาน" },
+  { key:"health", icon:"🧘", label:"สุขภาพ" }
+];
+
+const fortunes = {
+  workstudy: [
+    "ช่วงนี้การงานและการเรียนของคุณมีแนวโน้มขยับไปในทิศทางที่ดี แม้อาจมีแรงกดดันอยู่บ้าง แต่ถ้าคุณจัดลำดับสิ่งสำคัญให้ชัด จะมีคนเห็นความตั้งใจและให้โอกาสที่สำคัญกับคุณในไม่ช้า",
+    "สิ่งที่คุณพยายามมาตลอดเริ่มส่งสัญญาณผลตอบแทน งานที่เคยค้างอาจค่อย ๆ คลี่คลาย และเรื่องการเรียนหรือการพัฒนาตัวเองจะเด่นเป็นพิเศษหากคุณทำอย่างสม่ำเสมอ",
+    "วันนี้เหมาะกับการเก็บรายละเอียดและแก้จุดเล็ก ๆ ที่มองข้าม เพราะสิ่งเหล่านี้จะกลายเป็นจุดที่ทำให้ผลงานโดดเด่น คนรอบตัวจะเริ่มเชื่อมั่นในความสามารถของคุณมากขึ้น",
+    "มีเกณฑ์ได้รับคำแนะนำหรือข้อเสนอที่เป็นประโยชน์ต่ออนาคตการงานและการเรียน อย่าเพิ่งรีบปฏิเสธสิ่งที่ดูเหมือนยาก เพราะนั่นอาจเป็นประตูบานใหม่ของคุณ",
+    "จังหวะของงานและการเรียนในช่วงนี้ต้องอาศัยความอดทนมากกว่าความเร็ว หากใจนิ่งและไม่เปรียบเทียบตัวเองกับคนอื่น คุณจะไปได้ไกลกว่าที่คิด",
+    "มีเกณฑ์ต้องตัดสินใจเกี่ยวกับเรื่องสำคัญด้านงานหรือการเรียน ให้ยึดสิ่งที่มั่นคงและต่อยอดได้ในระยะยาวมากกว่าความสะดวกชั่วคราว",
+    "ช่วงนี้ดวงด้านความก้าวหน้าเริ่มเปิด สิ่งที่เคยทำไว้เบื้องหลังอาจได้รับการมองเห็นมากขึ้น เหมาะกับการนำเสนอไอเดียหรือเริ่มต้นบทบาทใหม่",
+    "ความเหนื่อยที่สะสมอยู่จะค่อย ๆ เบาลงเมื่อคุณเริ่มจัดเวลาพักและเวลาเร่งงานให้สมดุล ดวงชี้ว่าถ้าดูแลตัวเองดี ผลงานจะยิ่งดีตามไปด้วย",
+    "การสื่อสารในที่ทำงานหรือในห้องเรียนจะเป็นกุญแจสำคัญในวันนี้ พูดให้น้อยแต่ชัดเจน จะช่วยให้สิ่งที่คุณทำได้รับความเข้าใจและความร่วมมือมากขึ้น",
+    "มีเกณฑ์ได้รับข่าวดีเล็ก ๆ ที่ต่อยอดเป็นโอกาสใหญ่ในอนาคต งานและการเรียนของคุณกำลังอยู่ในจังหวะสะสมผล ขอเพียงอย่าหยุดกลางทาง"
+  ],
+  money: [
+    "ดวงการเงินของคุณช่วงนี้ค่อย ๆ ดีขึ้นจากความขยันและการวางแผนที่ดี รายรับอาจไม่ได้มาแบบก้อนใหญ่ทันที แต่จะเริ่มมั่นคงและหมุนคล่องมากขึ้น",
+    "มีเกณฑ์ได้รับเงินจากช่องทางที่ไม่คาดคิด หรือได้โอกาสเพิ่มรายได้จากสิ่งที่คุณเคยทำเล่น ๆ มาก่อน หากต่อยอดดีจะกลายเป็นรายรับจริงได้",
+    "วันนี้เหมาะกับการทบทวนรายจ่ายและจัดระบบการเงินใหม่ ดวงชี้ว่าการตัดภาระเล็ก ๆ บางอย่างออก จะทำให้คุณสบายขึ้นกว่าที่คิด",
+    "การเงินยังอยู่ในจังหวะที่ควรระวังความใจอ่อน โดยเฉพาะการใช้จ่ายเพื่อความเกรงใจคนอื่น ถ้าใช้เงินกับสิ่งที่จำเป็นจริงจะเหลือเก็บมากขึ้น",
+    "มีเกณฑ์ได้ข่าวดีเรื่องหนี้ สัญญา หรือเงินที่ค้างอยู่ สิ่งที่กังวลเรื่องเงินจะคลี่คลายได้ทีละน้อย หากคุณกล้าจัดการตรง ๆ",
+    "โชคลาภของคุณมาในรูปแบบโอกาสมากกว่าการเสี่ยงดวง การตอบรับงานเล็ก ๆ หรือการคุยกับคนใหม่ ๆ อาจพาเงินเข้ามามากกว่าที่คิด",
+    "ช่วงนี้การเงินเด่นเรื่องการหมุนคล่องและการประคองตัวได้ดี หากคุณไม่เร่งลงทุนเกินกำลัง ดวงชี้ว่าความมั่นคงจะค่อย ๆ มาเอง",
+    "เหมาะกับการเริ่มวางแผนเก็บเงินจริงจัง เพราะจังหวะนี้สิ่งที่คุณเริ่มจะเห็นผลเร็ว มีเกณฑ์สร้างเงินก้อนแรกจากวินัยเล็ก ๆ ที่ทำต่อเนื่อง",
+    "รายจ่ายบางอย่างอาจมาแบบฉุกเฉิน แต่คุณยังมีทางออกและคนช่วยแนะนำ ดวงการเงินไม่ได้ปิด เพียงต้องใช้สติและอย่าตัดสินใจเร็วเกินไป",
+    "ถ้ากำลังรอเรื่องรายรับหรือโอกาสเพิ่มรายได้ ดวงชี้ว่ามีแนวโน้มขยับในทางที่ดี ขอเพียงคุณเปิดรับและพร้อมลงมือเมื่อโอกาสมาถึง"
+  ],
+  love: [
+    "ความรักของคุณช่วงนี้ต้องอาศัยความเข้าใจมากกว่าความคาดหวัง หากลดการตีความเกินจริงลง จะพบว่าความสัมพันธ์ยังมีพื้นที่ดี ๆ ให้เติบโต",
+    "มีเกณฑ์ได้คุยกับคนที่ทำให้ใจสบาย หรือคนเก่าอาจกลับมาพูดคุยกันด้วยบรรยากาศที่ดีขึ้น แต่ต้องค่อย ๆ ดูกันไปอย่างมีสติ",
+    "สำหรับคนมีคู่ ดวงชี้ว่าความสัมพันธ์จะดีขึ้นเมื่อเปิดใจพูดเรื่องเล็ก ๆ ที่ค้างคา ส่วนคนโสดมีเกณฑ์เจอคนถูกใจจากงานหรือการเรียน",
+    "ความรักวันนี้เน้นเรื่องความชัดเจน ถ้าคุณรู้สึกอะไรให้พูดในเวลาที่เหมาะสม จะช่วยให้ความสัมพันธ์เดินไปในทิศทางที่สบายใจขึ้น",
+    "คุณอาจกำลังต้องการคนที่เข้าใจจริง ๆ มากกว่าคนที่ทำให้ตื่นเต้น ดวงความรักบอกว่าความนิ่งและความจริงใจจะนำพาคนที่ใช่เข้ามาเอง",
+    "อย่าเพิ่งรีบตัดสินความสัมพันธ์จากอารมณ์ชั่ววูบ เพราะสิ่งที่เห็นวันนี้อาจไม่ใช่ภาพทั้งหมด หากใจเย็นแล้วค่อยคุย ผลจะออกมาดีกว่า",
+    "มีเกณฑ์ได้รับความใส่ใจจากคนรอบตัวมากขึ้น ความรักที่ดีในช่วงนี้อาจมาในรูปของมิตรภาพที่ค่อย ๆ พัฒนาอย่างเป็นธรรมชาติ",
+    "ดวงความรักเปิดทางให้เรื่องเก่า ๆ คลี่คลาย ถ้าคุณพร้อมให้อภัยหรือเริ่มต้นใหม่แบบไม่กดดัน ความสัมพันธ์จะเบาสบายขึ้นมาก",
+    "สำหรับคนโสด วันนี้เหมาะกับการเปิดใจให้คนที่เข้ามาในชีวิตโดยไม่เปรียบเทียบกับอดีต ดวงชี้ว่าความสุขใหม่เริ่มได้จากมุมมองใหม่",
+    "คำทำนายวันนี้บอกให้เชื่อในคุณค่าของตัวเองก่อน เมื่อคุณรักตัวเองอย่างมั่นคง ความรักที่เข้ามาจะสมดุลและไม่ทำให้เหนื่อยเกินไป"
+  ],
+  health: [
+    "สุขภาพของคุณช่วงนี้ต้องการการพักที่มีคุณภาพมากกว่าการนอนให้ครบชั่วโมง ลองลดความเครียดก่อนนอน จะช่วยให้ทั้งร่างกายและใจฟื้นตัวได้ดีขึ้น",
+    "ดวงสุขภาพวันนี้เตือนเรื่องความล้าแฝง แม้ภายนอกจะดูปกติ แต่ร่างกายกำลังส่งสัญญาณให้ชะลอ หากฟังตัวเองมากขึ้นจะกลับมาสดชื่นเร็ว",
+    "เหมาะกับการเริ่มดูแลตัวเองแบบค่อยเป็นค่อยไป เช่น ดื่มน้ำมากขึ้น เดินมากขึ้น หรือพักสายตาให้เป็นเวลา สิ่งเล็ก ๆ จะเห็นผลในไม่ช้า",
+    "สุขภาพใจของคุณสำคัญไม่แพ้ร่างกาย วันนี้ควรหลีกเลี่ยงคนหรือเรื่องที่ดึงพลังงานมากเกินไป แล้วหาพื้นที่สงบให้ตัวเองได้อยู่กับใจบ้าง",
+    "มีเกณฑ์ฟื้นตัวจากอาการอ่อนล้าหรือความเครียดเดิม ๆ ถ้าคุณให้เวลาตัวเองกับการพักอย่างจริงจัง ไม่ฝืนเกินความจำเป็น",
+    "คำทำนายวันนี้บอกว่าร่างกายยังไหว แต่ใจอาจต้องการกำลังใจเพิ่มเติม ลองทำสิ่งที่ทำแล้วสบายใจ จะช่วยให้พลังกลับมาเร็วกว่าที่คิด",
+    "เหมาะกับการเริ่มต้นกิจวัตรดูแลสุขภาพใหม่ เช่น นอนเร็ว ออกกำลังเบา ๆ หรือกินอาหารให้ตรงเวลา ดวงชี้ว่าวินัยเล็ก ๆ จะเปลี่ยนหลายอย่าง",
+    "หากมีอาการสะสมจากการทำงานหนักหรือเรียนหนัก ควรให้ความสำคัญกับการยืดเหยียดและผ่อนคลาย เพราะร่างกายกำลังต้องการการดูแลมากกว่าปกติ",
+    "วันนี้ควรระวังการคิดมากจนกระทบการพักผ่อน หากปล่อยวางเรื่องที่ควบคุมไม่ได้บ้าง ใจจะเบาและร่างกายจะตอบสนองดีขึ้น",
+    "ดวงสุขภาพวันนี้ค่อนข้างดี หากคุณรักษาสมดุลระหว่างงาน การพัก และอาหาร จะรู้สึกว่าพลังงานค่อย ๆ กลับมาอย่างมั่นคง"
+  ]
+};
+
+const blessings = {
+  money: [
+    "ขอให้อากงอาม่าคุ้มครอง ให้การเงินคล่องตัว รายรับมั่นคง มีคนเมตตาอุปถัมภ์ และมีโอกาสใหม่ ๆ เข้ามาอย่างต่อเนื่อง",
+    "ขอให้สิ่งที่ทำเกี่ยวกับเงิน การค้า หรือการลงทุน ดำเนินไปอย่างราบรื่น มีสติในการตัดสินใจ และเห็นผลตอบแทนที่งอกงาม",
+    "ขอให้มีเงินหมุนสบาย ไม่ติดขัดกะทันหัน เก็บเงินอยู่ และมีทรัพย์เพิ่มพูนจากความขยันและความสุจริต",
+    "ขอให้ค้าขายดี ลูกค้าไว้ใจ คู่ค้าเมตตา เจรจาอะไรก็สำเร็จ และทุกความพยายามแปรเป็นรายได้ที่มั่นคง",
+    "ขอให้หนี้ภาระเบาลง ปัญหาการเงินคลี่คลาย เปิดทางให้ความมั่งคั่งเข้ามาแบบค่อยเป็นค่อยไปแต่ยั่งยืน",
+    "ขอให้รายรับเพิ่มขึ้นจากช่องทางใหม่ ๆ และมีปัญญาใช้เงินอย่างเหมาะสม เพื่อให้เกิดความมั่นคงในระยะยาว",
+    "ขอให้โชคลาภมาในทางที่ดี ถูกที่ ถูกเวลา และเป็นโชคที่หนุนให้ชีวิตเบาสบายขึ้นอย่างแท้จริง",
+    "ขอให้มีผู้ใหญ่สนับสนุน โอกาสดี ๆ เรื่องงานและเงินเข้ามา พร้อมทั้งมีกำลังใจในการสร้างฐานะให้มั่นคง",
+    "ขอให้ทุกการลงมือทำด้วยความตั้งใจและซื่อสัตย์ ส่งผลกลับมาเป็นผลกำไร ความไว้วางใจ และทรัพย์สินที่เพิ่มพูน",
+    "ขอให้ความกังวลเรื่องเงินค่อย ๆ จางลง แทนที่ด้วยความคล่องตัว ความมั่นใจ และความสบายใจในทุกการใช้จ่าย"
+  ],
+  love: [
+    "ขอให้อากงอาม่าคุ้มครอง ให้หัวใจของคุณพบความรักที่จริงใจ อ่อนโยน และพาไปสู่ความสัมพันธ์ที่ร่มเย็น",
+    "ขอให้คนรักเข้าใจกันมากขึ้น พูดคุยกันด้วยความเมตตา และผ่านทุกเรื่องยากด้วยใจที่ยังจับมือกันไว้แน่น",
+    "ขอให้คนโสดพบคนดีในเวลาที่เหมาะสม เป็นความรักที่สบายใจ ไม่เร่งรัด และเติบโตไปอย่างงดงาม",
+    "ขอให้ความรักครั้งนี้เต็มไปด้วยความไว้ใจ ความสม่ำเสมอ และความมั่นคงที่ทำให้ทั้งสองคนรู้สึกปลอดภัย",
+    "ขอให้เรื่องที่ค้างคาในใจค่อย ๆ คลี่คลาย เปิดทางให้ความเข้าใจ ความอบอุ่น และการเริ่มต้นใหม่ที่ดีขึ้น",
+    "ขอให้คุณรักตัวเองอย่างเต็มหัวใจ เพื่อดึงดูดความรักที่สมดุลและไม่ทำให้เหนื่อยเกินไป",
+    "ขอให้ความสัมพันธ์ที่ดีเข้ามาในรูปแบบที่สอดคล้องกับชีวิตของคุณ เป็นรักที่เกื้อหนุน ไม่ฉุดรั้ง",
+    "ขอให้หัวใจเข้มแข็งพอจะปล่อยสิ่งที่ไม่ใช่ และกล้ารับสิ่งที่ดีจริงเข้ามาอย่างไม่หวาดกลัว",
+    "ขอให้ครอบครัว คู่ครอง หรือคนที่คุณรัก มีความร่มเย็น เข้าใจกัน และเป็นกำลังใจให้กันเสมอ",
+    "ขอให้ความรักในชีวิตคุณเต็มไปด้วยความจริงใจ ความอ่อนโยน และความสุขที่ยั่งยืน"
+  ],
+  work: [
+    "ขอให้อากงอาม่าคุ้มครอง ให้การงานก้าวหน้า ผู้ใหญ่เมตตา และทุกสิ่งที่คุณลงมือทำได้รับการยอมรับอย่างเหมาะสม",
+    "ขอให้โปรเจกต์และหน้าที่ที่รับผิดชอบสำเร็จตามเป้าหมาย มีทีมที่ดี และได้รับความร่วมมือในเวลาที่ต้องการ",
+    "ขอให้ความขยัน ความอดทน และความซื่อสัตย์ของคุณแปรเป็นโอกาสใหม่ ความมั่นคง และความสำเร็จที่ชัดเจน",
+    "ขอให้คำพูดและความสามารถของคุณเป็นที่มองเห็น มีคนเชื่อมั่น และเปิดทางให้ก้าวหน้าในอาชีพ",
+    "ขอให้ทุกปัญหาเรื่องงานค่อย ๆ คลี่คลาย มีสติในการตัดสินใจ และมองเห็นทางออกที่ดีที่สุดในเวลาที่เหมาะสม",
+    "ขอให้มีแรงใจในวันที่เหนื่อย และมีปัญญาในวันที่ต้องเลือก เพื่อให้เส้นทางการงานมั่นคงและงอกงาม",
+    "ขอให้การเจรจา การขาย การเสนองาน หรือการติดต่อสำคัญ ผ่านพ้นไปอย่างราบรื่นและเกิดผลดีเกินคาด",
+    "ขอให้ได้พบหัวหน้า ลูกค้า หรือคู่ค้าที่ดี มีคนสนับสนุน และช่วยผลักดันให้สิ่งที่หวังเป็นจริง",
+    "ขอให้ก้าวข้ามความกังวลเรื่องงานและเปลี่ยนเป็นความมั่นใจในคุณค่าของตัวเอง เพื่อเติบโตอย่างมั่นคง",
+    "ขอให้การงานของคุณเป็นแหล่งสร้างทั้งรายได้ ความภาคภูมิใจ และความสุขในชีวิตอย่างต่อเนื่อง"
+  ],
+  health: [
+    "ขอให้อากงอาม่าคุ้มครอง ให้สุขภาพแข็งแรง ทั้งกายและใจ มีพลังตื่นมาพร้อมความสดชื่นในทุกวัน",
+    "ขอให้โรคภัยเบาบาง อาการไม่สบายค่อย ๆ ดีขึ้น และร่างกายฟื้นตัวอย่างมั่นคงและอ่อนโยน",
+    "ขอให้จิตใจสงบ ปล่อยวางเรื่องหนักได้ง่ายขึ้น และมีความเข้มแข็งพอจะผ่านช่วงเวลาที่เหนื่อยล้า",
+    "ขอให้หลับสบาย พักผ่อนได้เต็มที่ และตื่นขึ้นมาด้วยพลังใจที่พร้อมเผชิญทุกสิ่งอย่างมั่นคง",
+    "ขอให้มีวินัยดูแลตัวเองอย่างสม่ำเสมอ ทั้งเรื่องอาหาร การพักผ่อน และการออกกำลัง เพื่อให้สุขภาพดีขึ้นทุกวัน",
+    "ขอให้ใจเบา ไม่คิดมากเกินจำเป็น และมีพื้นที่ให้ตัวเองได้พักอย่างแท้จริงทั้งร่างกายและอารมณ์",
+    "ขอให้ความเครียดลดลง ความสงบเพิ่มขึ้น และชีวิตกลับมาสมดุลทั้งในเรื่องงานและสุขภาพ",
+    "ขอให้มีแรงใจดูแลตัวเองต่อไป แม้ในวันที่เหนื่อย เพื่อให้สุขภาพที่ดีค่อย ๆ กลับมาอย่างยั่งยืน",
+    "ขอให้พบแพทย์ ยา วิธีดูแล หรือคำแนะนำที่เหมาะสมกับตัวเอง ช่วยให้ทุกอย่างคลี่คลายไปในทางที่ดี",
+    "ขอให้สุขภาพกายแข็งแรง สุขภาพใจมั่นคง และมีความร่มเย็นอยู่กับตัวในทุกวัน"
+  ]
+};
+
+const paymentInfo = {
+  bankName: "ธนาคารกสิกรไทย",
+  accountName: "ศาลเจ้าอากงอาม่า",
+  accountNumber: "012-3-45678-9",
+  qrValue: "KBank 012-3-45678-9 | ศาลเจ้าอากงอาม่า"
+};
+
+let selectedFortuneCategory = null;
+let selectedBlessingCategory = null;
+let currentOutputText = "";
+let currentDownloadName = "agong-post.png";
+let latestNoticeData = null;
+  
+
+function $(id){ return document.getElementById(id); }
+function openModal(id){ $(id).classList.remove('hidden'); }
+function closeModal(id){ $(id).classList.add('hidden'); }
+function scrollToSection(id){ $(id).scrollIntoView({behavior:'smooth', block:'start'}); }
+function thaiDate(date){
+  const days=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
+  const months=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+  return `วัน${days[date.getDay()]}ที่ ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()+543}`;
+}
+function todayKey(){
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+}
+function getOrCreate(key, generator){
+  const old = localStorage.getItem(key);
+  if(old) return JSON.parse(old);
+  const value = generator();
+  localStorage.setItem(key, JSON.stringify(value));
+  return value;
+}
+function randomFrom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function escapeHtml(text){
+  return String(text).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+function buildPaymentQrUrl(){
+  return `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(paymentInfo.qrValue)}`;
+}
+function scoreByCategory(key){
+  const map = {
+    workstudy:["★★★★☆","★★★☆☆","★★★★★"],
+    money:["★★★★★","★★★☆☆","★★★★☆"],
+    love:["★★★☆☆","★★★★★","★★★☆☆"],
+    health:["★★★☆☆","★★★☆☆","★★★★☆"]
+  };
+  return map[key] || ["★★★★☆","★★★★☆","★★★★☆"];
+}
+function tagByCategory(key){
+  const map = {
+    workstudy:{color:"สีมงคล: น้ำเงินมงคล",number:"เลขมงคล: 4, 8",direction:"ทิศมงคล: ตะวันออก"},
+    money:{color:"สีมงคล: ทองประกายชมพู",number:"เลขมงคล: 6, 9",direction:"ทิศมงคล: เหนือ"},
+    love:{color:"สีมงคล: ชมพูอ่อน",number:"เลขมงคล: 2, 7",direction:"ทิศมงคล: ตะวันตกเฉียงใต้"},
+    health:{color:"สีมงคล: เขียวมรกต",number:"เลขมงคล: 3, 5",direction:"ทิศมงคล: ใต้"}
+  };
+  return map[key];
+}
+function renderCategoryGrid(targetId, items, clickHandler, activeKey){
+  const wrap = $(targetId);
+  wrap.innerHTML = "";
+  items.forEach(item => {
+    const btn = document.createElement("button");
+    btn.className = "category-btn" + (activeKey === item.key ? " active" : "");
+    btn.innerHTML = `<span class="category-icon">${item.icon}</span><span class="category-label">${item.label}</span>`;
+    btn.onclick = () => clickHandler(item.key);
+    wrap.appendChild(btn);
+  });
+}
+function getFortuneForCategory(key){
+  return getOrCreate(`fortune_${key}_${todayKey()}`, () => randomFrom(fortunes[key]));
+}
+function getBlessingForCategory(key){
+  return getOrCreate(`blessing_${key}`, () => randomFrom(blessings[key]));
+}
+function selectFortuneCategory(key){
+  selectedFortuneCategory = key;
+  renderCategoryGrid('fortuneCategoryGrid', fortuneCategories, selectFortuneCategory, key);
+  const text = getFortuneForCategory(key);
+  const tags = tagByCategory(key);
+  const scores = scoreByCategory(key);
+  const label = fortuneCategories.find(i => i.key === key).label;
+  $("fortuneResultTitle").textContent = "ดวงเรื่อง" + label;
+  $("todayDate").textContent = thaiDate(new Date());
+  $("fortuneColor").textContent = tags.color;
+  $("fortuneNumber").textContent = tags.number;
+  $("fortuneDirection").textContent = tags.direction;
+  $("fortuneText").textContent = text;
+  $("scoreLuck").textContent = scores[0];
+  $("scoreLove").textContent = scores[1];
+  $("scoreWork").textContent = scores[2];
+  $("fortuneResultBox").classList.remove('hidden');
+}
+function selectBlessingCategory(key){
+  selectedBlessingCategory = key;
+  renderCategoryGrid('blessCategoryGrid', blessingCategories, selectBlessingCategory, key);
+  const text = getBlessingForCategory(key);
+  const label = blessingCategories.find(i => i.key === key).label;
+  $("blessResultTitle").textContent = "ขอพรเรื่อง" + label;
+  $("blessText").textContent = text;
+  $("blessResultBox").classList.remove('hidden');
+}
+function donorData(){
+  return {
+    name: $("donorName").value.trim() || "ผู้มีจิตศรัทธา",
+    amount: $("donationAmount").value.trim() || "49",
+    prayer: $("customPrayer").value.trim() || "ขอให้อากงอาม่าคุ้มครอง ให้ชีวิตราบรื่นและมีความร่มเย็น"
+  };
+}
+function makeFortuneCard(){
+  if(!selectedFortuneCategory) return;
+  const label = fortuneCategories.find(i => i.key === selectedFortuneCategory).label;
+  const text = getFortuneForCategory(selectedFortuneCategory);
+  currentOutputText = `🔮 ใบดูดวงประจำวัน\nหมวด: ${label}\n${thaiDate(new Date())}\n${text}`;
+  currentDownloadName = "fortune-post.png";
+  $("outputTitle").textContent = "ใบดูดวงประจำวัน";
+  $("renderTarget").innerHTML = `
+    <div class="post-card" id="captureArea">
+      <div>
+        <div class="post-top">
+          <img class="post-avatar" src="agong.png" alt="อากงอาม่า">
+          <div>
+            <div class="post-kicker">DAILY FORTUNE</div>
+            <div class="post-title">ดูดวงวันนี้</div>
+            <div class="post-sub">หมวด${escapeHtml(label)}</div>
+          </div>
+        </div>
+        <div class="post-message">${escapeHtml(text)}</div>
+      </div>
+      <div>
+        <div class="post-sign"><strong>คำทำนายประจำวัน</strong><br>${escapeHtml(thaiDate(new Date()))}</div>
+        <div class="post-footer-date">อากงอาม่าออนไลน์</div>
+      </div>
+    </div>`;
+  openModal('outputModal');
+}
+function makeBlessingCard(){
+  if(!selectedBlessingCategory) return;
+  const label = blessingCategories.find(i => i.key === selectedBlessingCategory).label;
+  const text = getBlessingForCategory(selectedBlessingCategory);
+  const receiver = $("blessReceiverName").value.trim() || "ลูกหลานผู้ศรัทธา";
+  currentOutputText = `🙏 ใบขอพร\nหมวด: ${label}\nถึง ${receiver}\n${text}`;
+  currentDownloadName = "blessing-post.png";
+  $("outputTitle").textContent = "ใบขอพร";
+  $("renderTarget").innerHTML = `
+    <div class="post-card" id="captureArea">
+      <div>
+        <div class="post-top">
+          <img class="post-avatar" src="agong.png" alt="อากงอาม่า">
+          <div>
+            <div class="post-kicker">BLESSED MESSAGE</div>
+            <div class="post-title">ใบขอพร</div>
+            <div class="post-sub">หมวด${escapeHtml(label)}</div>
+          </div>
+        </div>
+        <div class="post-message">${escapeHtml(text)}</div>
+      </div>
+      <div>
+        <div class="post-sign"><strong>ถึง ${escapeHtml(receiver)}</strong><br>ขอให้อากงอาม่าคุ้มครอง ให้สิ่งที่หวังค่อย ๆ สำเร็จในเวลาที่เหมาะสม</div>
+        <div class="post-footer-date">อากงอาม่าออนไลน์</div>
+      </div>
+    </div>`;
+  openModal('outputModal');
+}
+function openPaymentModal(){
+  $("paymentBankName").textContent = paymentInfo.bankName;
+  $("paymentAccountName").textContent = paymentInfo.accountName;
+  $("paymentAccountNumber").textContent = paymentInfo.accountNumber;
+  $("paymentQrImage").src = buildPaymentQrUrl();
+  openModal('paymentModal');
+}
+function makeCertificate(){
+  const {name, amount, prayer} = donorData();
+  currentOutputText = `ใบอนุโมทนา\n${name}\nจำนวน ${amount} บาท\n${prayer}`;
+  currentDownloadName = "certificate-post.png";
+  $("outputTitle").textContent = "ใบอนุโมทนา";
+  $("renderTarget").innerHTML = `
+    <div class="certificate-card" id="captureArea">
+      <div>
+        <div class="cert-header"><img class="cert-avatar" src="agong.png" alt="อากงอาม่า"></div>
+        <h3 class="cert-title">ใบอนุโมทนา</h3>
+        <p class="cert-sub">ศาลเจ้าอากงอาม่า</p>
+        <div class="cert-body">
+          <div class="cert-name">${escapeHtml(name)}</div>
+          <div class="cert-amount">ร่วมทำบุญจำนวน ${escapeHtml(amount)} บาท</div>
+          <div class="cert-message">ขออนุโมทนาในกุศลจิตและบุญกุศลที่ท่านได้บำเพ็ญในครั้งนี้<br>${escapeHtml(prayer)}</div>
+          <div class="cert-date">${thaiDate(new Date())}</div>
+        </div>
+      </div>
+      <div class="cert-footer">ขอให้อากงอาม่าคุ้มครอง ให้ชีวิตร่มเย็นและเจริญรุ่งเรือง</div>
+    </div>`;
+  openModal('outputModal');
+}
+async function captureBlob(){
+  const capture = $("captureArea");
+  const canvas = await html2canvas(capture, {backgroundColor:null, scale:2});
+  return new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+}
+async function downloadCurrentOutput(){
+  const blob = await captureBlob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = currentDownloadName;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+async function shareCurrentImage(){
+  const blob = await captureBlob();
+  const file = new File([blob], currentDownloadName, {type:"image/png"});
+  if (navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
+    await navigator.share({files:[file], title:"อากงอาม่า", text:"แชร์ภาพจากอากงอาม่า"});
+  } else {
+    alert("เครื่องนี้แชร์ภาพตรงไม่ได้ ให้กดดาวน์โหลดภาพหรือบันทึกภาพแทน");
+  }
+}
+async function saveForFacebook(){
+  await downloadCurrentOutput();
+  alert("บันทึกภาพแล้ว จากนั้นเปิด Facebook แล้วเลือกโพสต์รูปนี้ได้เลย");
+}
+async function copyCurrentText(){
+  try{
+    await navigator.clipboard.writeText(currentOutputText);
+    alert("คัดลอกข้อความแล้ว");
+  }catch(e){
+    alert(currentOutputText);
+  }
+}
+async function copyAccountNumber(){
+  try{
+    await navigator.clipboard.writeText(paymentInfo.accountNumber);
+    alert("คัดลอกเลขบัญชีแล้ว");
+  }catch(e){
+    alert(paymentInfo.accountNumber);
+  }
+}
+
+  
+function savePaymentQr(){
+  const a = document.createElement('a');
+  a.href = $("paymentQrImage").src;
+  a.download = "payment-qr.png";
+  a.rel = "noopener";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+  
+function initNotice(){
+  function applyNotice(data, forcePopup = false){
+    if(!data) return;
+
+    latestNoticeData = data;
+
+    $("noticeTitle").textContent = data.title || "";
+    $("noticeMessage").textContent = data.message || "";
+   // $("inlineNoticeText").textContent = data.message || "";
+
+    const seen = localStorage.getItem('notice_version');
+
+    if (data.show && (forcePopup || String(seen) !== String(data.version))) {
+      openModal('noticeModal');
+      localStorage.setItem('notice_version', String(data.version));
+    }
+  }
+
+  applyNotice(noticeData, false);
+
+  if (db) {
+    db.collection("settings").doc("notice").onSnapshot((doc) => {
+      if (doc.exists) {
+        applyNotice(doc.data(), false);
+      }
+    }, (error) => {
+      console.warn("Firestore notice listener failed:", error);
+    });
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && latestNoticeData && latestNoticeData.show) {
+      applyNotice(latestNoticeData, true);
+    }
+  });
+}
+
+
+  
+document.querySelectorAll('.amount-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const amount = btn.dataset.amount;
+    $("donationAmount").value = amount === "0" ? "" : amount;
+    if(amount === "0") $("donationAmount").focus();
+  });
+});
+
+$("slipInput").addEventListener('change', (e) => {
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    $("slipPreview").src = ev.target.result;
+    $("slipPreview").classList.remove('hidden');
+    $("slipPlaceholder").classList.add('hidden');
+  };
+  reader.readAsDataURL(file);
+});
+  function initPaymentInfo(){
+  $("paymentBankName").textContent = paymentInfo.bankName;
+  $("paymentAccountName").textContent = paymentInfo.accountName;
+  $("paymentAccountNumber").textContent = paymentInfo.accountNumber;
+  $("paymentQrImage").src = buildPaymentQrUrl();
+  }
+
+$("makeFortuneCardBtn").addEventListener('click', makeFortuneCard);
+$("makeBlessingCardBtn").addEventListener('click', makeBlessingCard);
+$("generateCertificateBtn").addEventListener('click', makeCertificate);
+$("copyAccountBtn").addEventListener('click', copyAccountNumber);
+$("saveQrBtn").addEventListener('click', savePaymentQr);
+$("downloadOutputBtn").addEventListener('click', downloadCurrentOutput);
+$("shareImageBtn").addEventListener('click', shareCurrentImage);
+$("saveForFbBtn").addEventListener('click', saveForFacebook);
+$("copyTextBtn").addEventListener('click', copyCurrentText);
+
+renderCategoryGrid('fortuneCategoryGrid', fortuneCategories, selectFortuneCategory, null);
+renderCategoryGrid('blessCategoryGrid', blessingCategories, selectBlessingCategory, null);
+  initPaymentInfo();
+initNotice();
+
+/* ── Tab Navigation ── */
+// ⚙️ ตั้งค่า URL ของเว็บศาลเจ้าและ Virtual Tour ที่นี่
+const SHRINE_URL = 'https://YOUR-GITHUB-USERNAME.github.io/YOUR-SHRINE-REPO/';
+const TOUR_URL   = 'https://YOUR-GITHUB-USERNAME.github.io/YOUR-TOUR-REPO/';
+
+const tabs = ['home','activity','shrine','tour'];
+let iframesLoaded = {};
+
+function switchTab(tab) {
+  tabs.forEach(t => {
+    const page = document.getElementById('tab-' + t);
+    const nav  = document.getElementById('nav-' + t);
+    if (page) page.classList.toggle('active', t === tab);
+    if (nav)  nav.classList.toggle('active',  t === tab);
+  });
+  // โหลด iframe ครั้งแรกที่เปิด tab (lazy load)
+  if (tab === 'activity' && !iframesLoaded.activity) {
+    document.getElementById('iframeActivity').src = './activity.html';
+    iframesLoaded.activity = true;
+  }
+  if (tab === 'shrine' && !iframesLoaded.shrine) {
+    document.getElementById('ifrineShrine').src = SHRINE_URL;
+    iframesLoaded.shrine = true;
+  }
+  if (tab === 'tour' && !iframesLoaded.tour) {
+    document.getElementById('iframeTour').src = TOUR_URL;
+    iframesLoaded.tour = true;
+  }
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
