@@ -74,6 +74,13 @@
     @keyframes floatOrb{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
     @media (max-width:380px){.choices{grid-template-columns:1fr}.hero-title{font-size:30px}}
   </style>
+  <script>
+  if(window.self !== window.top){
+    document.addEventListener('DOMContentLoaded',()=>{
+      document.querySelectorAll('.back-link').forEach(el=>el.style.display='none');
+    });
+  }
+</script>
 </head>
 <body>
   <a href="./index.html" class="back-home-btn">← กลับหน้าแรก</a>
