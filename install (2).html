@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+  <title>ติดตั้งแอปอากงอาม่า</title>
+  <meta name="theme-color" content="#6d1423"/>
+  <link rel="manifest" href="./manifest.json"/>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Kanit',sans-serif;background:#0d0b10;color:#fff;overflow:hidden;height:100vh;width:100vw;}
+
+    /* SPLASH */
+    #splash{
+      position:fixed;inset:0;z-index:100;overflow:hidden;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      background:radial-gradient(circle at 50% 55%,#2a0a14 0%,#1a1020 45%,#0d0b10 100%);
+    }
+    .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.2;pointer-events:none;animation:orbF 9s ease-in-out infinite;}
+    @keyframes orbF{0%,100%{transform:translateY(0)}50%{transform:translateY(-28px)}}
+
+    /* stars */
+    .st{position:absolute;border-radius:50%;background:#fff;animation:tw var(--d,2s) ease-in-out infinite;animation-delay:var(--dl,0s);}
+    @keyframes tw{0%,100%{opacity:.1}50%{opacity:.9}}
+
+    /* DRAGONS */
+    .d1{position:fixed;width:150px;height:auto;top:15%;z-index:10;pointer-events:none;filter:drop-shadow(0 0 14px rgba(242,196,107,.8));animation:df1 10s linear infinite;}
+    .d2{position:fixed;width:130px;bottom:18%;z-index:10;pointer-events:none;animation:df2 14s linear 5s infinite;}
+    .d2 img{width:100%;display:block;transform:scaleX(-1);filter:drop-shadow(0 0 12px rgba(180,100,255,.8));}
+    @keyframes df1{
+      0%  {left:-160px;opacity:1}
+      43% {left:110vw;opacity:1}
+      44% {left:110vw;opacity:0}
+      45% {left:-160px;opacity:0}
+      46% {opacity:1}
+      100%{left:-160px;opacity:1}
+    }
+    @keyframes df2{
+      0%  {right:-140px;opacity:1}
+      43% {right:110vw;opacity:1}
+      44% {right:110vw;opacity:0}
+      45% {right:-140px;opacity:0}
+      46% {opacity:1}
+      100%{right:-140px;opacity:1}
+    }
+
+    /* CRYSTAL BALL */
+    #ballWrap{position:relative;width:280px;height:280px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+    .ring{position:absolute;width:100%;height:100%;border-radius:50%;border:1.5px solid rgba(242,196,107,.2);animation:ringPulse 3s ease-in-out infinite;}
+    .ring:nth-child(2){width:90%;height:90%;animation-delay:.5s;border-color:rgba(160,100,255,.2);}
+    .ring:nth-child(3){width:80%;height:80%;animation-delay:1s;border-color:rgba(242,196,107,.15);}
+    @keyframes ringPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.05);opacity:1}}
+    #ball{
+      width:140px;height:140px;border-radius:50%;cursor:pointer;position:relative;z-index:2;
+      background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.9),rgba(180,140,255,.8) 30%,rgba(125,76,255,.7) 55%,rgba(60,20,120,.9));
+      box-shadow:0 0 40px rgba(160,100,255,.8),0 0 80px rgba(125,76,255,.4),inset 0 0 30px rgba(255,255,255,.15);
+      animation:ballGlow 2.5s ease-in-out infinite;
+      -webkit-tap-highlight-color:transparent;
+    }
+    #ball::before{content:'';position:absolute;top:18%;left:22%;width:28%;height:20%;background:radial-gradient(ellipse,rgba(255,255,255,.7),transparent);border-radius:50%;transform:rotate(-30deg);}
+    @keyframes ballGlow{
+      0%,100%{box-shadow:0 0 40px rgba(160,100,255,.8),0 0 80px rgba(125,76,255,.4)}
+      50%{box-shadow:0 0 70px rgba(200,150,255,1),0 0 130px rgba(125,76,255,.7),0 0 180px rgba(125,76,255,.3)}
+    }
+    #sym{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:34px;animation:symFade 1.2s ease-in-out infinite;pointer-events:none;}
+    @keyframes symFade{0%,100%{opacity:.5}50%{opacity:.95}}
+
+    .tap-title{font-size:21px;font-weight:800;color:#ffe5b1;text-align:center;margin-bottom:6px;text-shadow:0 0 20px rgba(242,196,107,.5);}
+    .tap-sub{font-size:13px;color:#d7c8bc;text-align:center;margin-bottom:18px;}
+    .tap-hint{font-size:14px;font-weight:600;color:#c8a0ff;letter-spacing:.5px;animation:hint 2s ease-in-out infinite;}
+    @keyframes hint{0%,100%{opacity:.5}50%{opacity:1}}
+
+    /* PARTICLES */
+    #pc{position:fixed;inset:0;pointer-events:none;z-index:200;}
+    #fl{position:fixed;inset:0;z-index:199;background:radial-gradient(circle,rgba(200,160,255,1),rgba(242,196,107,.8));opacity:0;pointer-events:none;transition:opacity .08s;}
+
+    /* INSTALL */
+    #inst{display:none;min-height:100vh;overflow-y:auto;background:radial-gradient(circle at top,#44101f 0%,#1a1020 34%,#0d0b10 100%);padding:18px;animation:fi .8s ease forwards;}
+    @keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .wrap{max-width:460px;margin:0 auto;}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.09);border-radius:24px;padding:18px;margin-bottom:14px;box-shadow:0 18px 40px rgba(0,0,0,.38);}
+    .hero{text-align:center;}
+    .hero img{width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid rgba(242,196,107,.3);box-shadow:0 0 30px rgba(242,196,107,.2);}
+    .hero h1{margin:10px 0 6px;font-size:24px;color:#ffe5b1;}
+    .hero p{line-height:1.8;color:#d7c8bc;font-size:14px;}
+    .btn{display:block;width:100%;padding:14px;border-radius:14px;text-align:center;font-weight:700;font-size:16px;text-decoration:none;border:none;cursor:pointer;font-family:'Kanit',sans-serif;margin-top:10px;}
+    .btn.pri{background:linear-gradient(135deg,#f7d38b,#e6b85c);color:#2b1b05;}
+    .btn.sec{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.09);}
+    .btn.hid{display:none;}
+    h2{color:#ffe5b1;margin-bottom:8px;font-size:18px;}
+    p,li{color:#d7c8bc;line-height:1.8;font-size:14px;}
+    ol{padding-left:20px;}ol li{margin-bottom:6px;}
+  </style>
+</head>
+<body>
+
+<canvas id="pc"></canvas>
+<div id="fl"></div>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="orb" style="width:250px;height:250px;left:-80px;top:-40px;background:#c91f3d;"></div>
+  <div class="orb" style="width:230px;height:230px;right:-60px;bottom:0;background:#7d4cff;animation-delay:2s;"></div>
+  <div id="sw"></div>
+
+  <!-- DRAGONS -->
+  <img class="d1" src="./dragon.gif" alt="">
+  <div class="d2"><img src="./dragon.gif" alt=""></div>
+
+  <div class="tap-title">ศาลเจ้าปึงเถ่ากงม่า</div>
+  <div class="tap-sub">ขอนแก่น · อากงอาม่าออนไลน์</div>
+
+  <div id="ballWrap">
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div id="ball"><div id="sym">龍</div></div>
+  </div>
+
+  <div class="tap-hint">✦ แตะลูกแก้วเพื่อเข้าสู่ศาลเจ้า ✦</div>
+</div>
+
+<!-- INSTALL -->
+<div id="inst">
+  <div class="wrap">
+    <div class="card hero">
+      <img src="./agong.png" alt="อากงอาม่า">
+      <h1>ติดตั้งแอปอากงอาม่า</h1>
+      <p>สามารถกดติดตั้งเพื่อเพิ่มแอปไว้ที่หน้าจอหลักได้ทันที</p>
+      <button class="btn pri hid" id="iBtn">ติดตั้งแอป</button>
+      <a class="btn sec" href="./index.html">เปิดแอป</a>
+    </div>
+    <div class="card">
+      <h2>Android / Chrome</h2>
+      <p>ถ้าปุ่มติดตั้งขึ้น กดได้เลย<br>ถ้าไม่ขึ้น กด <strong>⋮</strong> แล้วเลือก <strong>เพิ่มไปหน้าจอหลัก</strong></p>
+    </div>
+    <div class="card">
+      <h2>iPhone / iPad</h2>
+      <ol>
+        <li>เปิดด้วย Safari</li>
+        <li>กดปุ่ม Share</li>
+        <li>เลือก <strong>Add to Home Screen</strong></li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<script>
+/* STARS */
+const sw=document.getElementById('sw');
+for(let i=0;i<55;i++){
+  const s=document.createElement('div');s.className='st';
+  const z=.8+Math.random()*2.5;
+  s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${z}px;height:${z}px;--d:${1.5+Math.random()*3}s;--dl:${Math.random()*4}s;`;
+  sw.appendChild(s);
+}
+
+/* SYMBOL CYCLE */
+const syms=['龍','福','壽','✦','☯','卦','命'];
+let si=0;
+setInterval(()=>{ si=(si+1)%syms.length; document.getElementById('sym').textContent=syms[si]; },1200);
+
+/* PARTICLES */
+const pc=document.getElementById('pc');
+const cx=pc.getContext('2d');
+pc.width=window.innerWidth;pc.height=window.innerHeight;
+window.addEventListener('resize',()=>{pc.width=window.innerWidth;pc.height=window.innerHeight;});
+let pts=[];
+function burst(bx,by){
+  for(let i=0;i<120;i++){
+    const a=Math.random()*Math.PI*2,spd=3+Math.random()*10;
+    pts.push({x:bx,y:by,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,life:1,
+      dec:.012+Math.random()*.02,sz:2+Math.random()*5,g:.15,
+      col:['#f2c46b','#ffe5b1','#c8a0ff','#ff6b6b','#fff','#a855f7'][Math.floor(Math.random()*6)]});
+  }
+}
+function drawPts(){
+  cx.clearRect(0,0,pc.width,pc.height);
+  pts=pts.filter(p=>p.life>0);
+  for(const p of pts){
+    p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.vx*=.97;p.life-=p.dec;
+    cx.globalAlpha=Math.max(0,p.life);cx.fillStyle=p.col;
+    cx.beginPath();cx.arc(p.x,p.y,p.sz,0,Math.PI*2);cx.fill();
+  }
+  cx.globalAlpha=1;
+  if(pts.length>0)requestAnimationFrame(drawPts);
+}
+
+/* SOUND */
+function playSound(){
+  try{
+    const ac=new(window.AudioContext||window.webkitAudioContext)();
+    ac.resume().then(()=>{
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.type='sine';o.frequency.setValueAtTime(180,ac.currentTime);
+      o.frequency.exponentialRampToValueAtTime(80,ac.currentTime+1.5);
+      g.gain.setValueAtTime(0,ac.currentTime);
+      g.gain.linearRampToValueAtTime(.4,ac.currentTime+.05);
+      g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+2);
+      o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+2);
+      const o2=ac.createOscillator(),g2=ac.createGain();
+      o2.type='triangle';o2.frequency.setValueAtTime(880,ac.currentTime);
+      o2.frequency.exponentialRampToValueAtTime(440,ac.currentTime+.8);
+      g2.gain.setValueAtTime(.25,ac.currentTime);
+      g2.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.8);
+      o2.connect(g2);g2.connect(ac.destination);o2.start();o2.stop(ac.currentTime+.8);
+    });
+  }catch(e){console.log('sound:',e);}
+}
+const voice=new Audio('./intro-voice.mp3');
+voice.preload='auto';
+
+/* ENTER */
+let entered=false;
+function enter(){
+  if(entered)return;
+  entered=true;
+  if(navigator.vibrate)navigator.vibrate([60,30,120,30,60]);
+  playSound();
+  voice.currentTime=0;
+  voice.play().catch(e=>console.log('voice:',e));
+  const fl=document.getElementById('fl');
+  fl.style.opacity='1';
+  setTimeout(()=>fl.style.opacity='0',150);
+  const b=document.getElementById('ball');
+  const r=b.getBoundingClientRect();
+  burst(r.left+r.width/2,r.top+r.height/2);
+  drawPts();
+  setTimeout(()=>{
+    const sp=document.getElementById('splash');
+    sp.style.transition='opacity .7s ease';
+    sp.style.opacity='0';
+    setTimeout(()=>{
+      sp.style.display='none';
+      document.getElementById('inst').style.display='block';
+      document.body.style.overflow='auto';
+    },700);
+  },300);
+}
+
+document.getElementById('ball').addEventListener('click',enter);
+document.getElementById('ball').addEventListener('touchstart',function(e){e.preventDefault();enter();},{passive:false});
+
+/* INSTALL PWA */
+let dp=null;
+const ib=document.getElementById('iBtn');
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;ib.classList.remove('hid');});
+ib.addEventListener('click',async()=>{if(!dp)return;dp.prompt();await dp.userChoice;dp=null;ib.classList.add('hid');});
+window.addEventListener('appinstalled',()=>ib.classList.add('hid'));
+if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+</script>
+</body>
+</html>
