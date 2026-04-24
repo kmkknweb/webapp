@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ติดตั้งแอปอากงอาม่า</title>
+  <meta name="theme-color" content="#6d1423" />
+  <link rel="manifest" href="./manifest.json" />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:'Kanit',sans-serif;
+      background:#0d0b10;color:#fff;
+      overflow:hidden;height:100vh;width:100vw;
+    }
+
+    /* ══ SPLASH ══ */
+    #splash{
+      position:fixed;inset:0;z-index:100;
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      background:radial-gradient(circle at 50% 60%,#2a0a14 0%,#1a1020 40%,#0d0b10 100%);
+      overflow:hidden;
+    }
+
+    /* bg orbs */
+    .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.2;pointer-events:none;}
+    .orb1{width:300px;height:300px;left:-80px;top:-40px;background:#c91f3d;animation:orbFloat 8s ease-in-out infinite;}
+    .orb2{width:280px;height:280px;right:-60px;bottom:0;background:#7d4cff;animation:orbFloat 10s ease-in-out 2s infinite;}
+    .orb3{width:200px;height:200px;left:30%;top:10%;background:#f2c46b;animation:orbFloat 12s ease-in-out 1s infinite;opacity:.1;}
+    @keyframes orbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-30px)}}
+
+    /* stars */
+    .star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d) ease-in-out infinite;animation-delay:var(--del);}
+    @keyframes twinkle{0%,100%{opacity:.15}50%{opacity:.9}}
+
+    /* dragon SVG container */
+    #dragonWrap{
+      position:relative;width:320px;height:320px;
+      display:flex;align-items:center;justify-content:center;
+      margin-bottom:24px;
+    }
+
+    /* crystal ball */
+    #crystalBall{
+      width:130px;height:130px;border-radius:50%;
+      background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.9),rgba(180,140,255,.8) 30%,rgba(125,76,255,.7) 55%,rgba(60,20,120,.9) 80%,rgba(20,5,50,1));
+      box-shadow:
+        0 0 40px rgba(160,100,255,.8),
+        0 0 80px rgba(125,76,255,.4),
+        0 0 120px rgba(125,76,255,.2),
+        inset 0 0 30px rgba(255,255,255,.15);
+      cursor:pointer;
+      position:relative;z-index:2;
+      transition:transform .15s ease;
+      animation:ballPulse 2.5s ease-in-out infinite;
+    }
+    #crystalBall::before{
+      content:'';position:absolute;
+      top:18%;left:22%;width:30%;height:22%;
+      background:radial-gradient(ellipse,rgba(255,255,255,.7),transparent);
+      border-radius:50%;transform:rotate(-30deg);
+    }
+    #crystalBall:active{transform:scale(.93);}
+    @keyframes ballPulse{
+      0%,100%{box-shadow:0 0 40px rgba(160,100,255,.8),0 0 80px rgba(125,76,255,.4),inset 0 0 30px rgba(255,255,255,.15);}
+      50%{box-shadow:0 0 60px rgba(200,150,255,1),0 0 120px rgba(125,76,255,.7),0 0 180px rgba(125,76,255,.3),inset 0 0 40px rgba(255,255,255,.25);}
+    }
+
+    /* symbols inside ball */
+    #ballSymbols{
+      position:absolute;inset:0;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-size:32px;animation:symbolSpin 6s ease-in-out infinite;
+      opacity:.6;
+    }
+    @keyframes symbolSpin{
+      0%,100%{transform:scale(1);opacity:.5}
+      50%{transform:scale(1.15);opacity:.9}
+    }
+
+    /* tap hint */
+    .tap-ring{
+      position:absolute;width:150px;height:150px;border-radius:50%;
+      border:2px solid rgba(160,100,255,.5);
+      animation:tapRing 2s ease-out infinite;
+      pointer-events:none;
+    }
+    .tap-ring:nth-child(2){animation-delay:.6s;border-color:rgba(242,196,107,.4);}
+    .tap-ring:nth-child(3){animation-delay:1.2s;border-color:rgba(160,100,255,.3);}
+    @keyframes tapRing{
+      0%{transform:scale(1);opacity:.8}
+      100%{transform:scale(2.2);opacity:0}
+    }
+
+    /* text */
+    .splash-title{
+      font-size:22px;font-weight:800;color:#ffe5b1;
+      text-align:center;margin-bottom:6px;
+      text-shadow:0 0 20px rgba(242,196,107,.5);
+    }
+    .splash-sub{
+      font-size:13px;color:#d7c8bc;text-align:center;margin-bottom:20px;
+    }
+    @keyframes dragonFly{
+      0%{left:-160px;top:12%;}
+      40%{top:8%;}
+      60%{top:16%;}
+      100%{left:110vw;top:12%;}
+    }
+    @keyframes dragonFly2{
+      0%{right:-120px;bottom:15%;}
+      30%{bottom:10%;}
+      70%{bottom:20%;}
+      100%{right:110vw;bottom:15%;}
+    }
+    @keyframes dragonFly{
+      0%{transform:translateX(-160px) translateY(0);}
+      45%{transform:translateX(110vw) translateY(-30px);}
+      46%{transform:translateX(110vw) translateY(-30px);opacity:0;}
+      47%{transform:translateX(-160px) translateY(20px);opacity:0;}
+      48%{opacity:1;}
+      100%{transform:translateX(-160px) translateY(0);}
+    }
+    @keyframes dragonFly2{
+      0%{transform:scaleX(-1) translateX(-120px) translateY(0);}
+      48%{transform:scaleX(-1) translateX(110vw) translateY(20px);}
+      49%{transform:scaleX(-1) translateX(110vw) translateY(20px);opacity:0;}
+      50%{transform:scaleX(-1) translateX(-120px) translateY(-10px);opacity:0;}
+      51%{opacity:1;}
+      100%{transform:scaleX(-1) translateX(-120px) translateY(0);}
+    }
+    .tap-hint{
+      font-size:14px;font-weight:600;color:#c8a0ff;
+      text-align:center;letter-spacing:.5px;
+      animation:hintPulse 2s ease-in-out infinite;
+    }
+    @keyframes hintPulse{0%,100%{opacity:.6}50%{opacity:1}}
+
+    /* particle canvas */
+    #pCanvas{position:fixed;inset:0;pointer-events:none;z-index:200;}
+
+    /* flash overlay */
+    #flashOverlay{
+      position:fixed;inset:0;z-index:199;
+      background:radial-gradient(circle,rgba(200,160,255,1),rgba(242,196,107,.8));
+      opacity:0;pointer-events:none;
+      transition:opacity .08s ease;
+    }
+
+    /* ══ INSTALL SCREEN ══ */
+    #installScreen{
+      display:none;min-height:100vh;overflow-y:auto;
+      background:radial-gradient(circle at top,#44101f 0%,#1a1020 34%,#0d0b10 100%);
+      padding:18px;
+      animation:fadeIn .8s ease forwards;
+    }
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .wrap{max-width:460px;margin:0 auto;}
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.09);border-radius:24px;
+      padding:18px;box-shadow:0 18px 40px rgba(0,0,0,.38);margin-bottom:14px;
+    }
+    .hero{text-align:center;}
+    .hero img{width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid rgba(242,196,107,.3);box-shadow:0 0 30px rgba(242,196,107,.2);}
+    .hero h1{margin:10px 0 6px;font-size:24px;color:#ffe5b1;}
+    .hero p{line-height:1.8;color:#d7c8bc;font-size:14px;}
+    .btn{
+      display:block;width:100%;padding:14px;border-radius:14px;
+      text-align:center;font-weight:700;font-size:16px;
+      text-decoration:none;border:none;cursor:pointer;
+      font-family:'Kanit',sans-serif;margin-top:10px;
+    }
+    .btn.primary{background:linear-gradient(135deg,#f7d38b,#e6b85c);color:#2b1b05;}
+    .btn.secondary{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.09);}
+    .btn.hidden{display:none;}
+    h2{color:#ffe5b1;margin-bottom:8px;font-size:18px;}
+    p,li{color:#d7c8bc;line-height:1.8;font-size:14px;}
+    ol{padding-left:20px;}
+    ol li{margin-bottom:6px;}
+  </style>
+</head>
+<body>
+
+<canvas id="pCanvas"></canvas>
+<div id="flashOverlay"></div>
+
+<!-- ══ SPLASH ══ -->
+<div id="splash">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div id="starsWrap"></div>
+
+  <div class="splash-title">ศาลเจ้าปึงเถ่ากงม่า</div>
+  <div class="splash-sub">ขอนแก่น · อากงอาม่าออนไลน์</div>
+
+  <!-- มังกร gif บินลอย -->
+  <img src="./dragon.gif" id="dragonGif" style="
+    position:absolute;
+    width:160px;
+    pointer-events:none;
+    z-index:3;
+    top:12%;
+    left:-160px;
+    animation:dragonFly 8s linear infinite;
+    filter:drop-shadow(0 0 12px rgba(242,196,107,.6));
+  " alt="dragon">
+  <img src="./dragon.gif" id="dragonGif2" style="
+    position:absolute;
+    width:120px;
+    pointer-events:none;
+    z-index:3;
+    bottom:15%;
+    right:-120px;
+    animation:dragonFly2 11s linear 3s infinite;
+    filter:drop-shadow(0 0 10px rgba(200,100,255,.6)) scaleX(-1);
+    transform:scaleX(-1);
+  " alt="dragon">
+
+  <!-- dragon.gif บินลอยไปมา -->
+  <img id="dragonGif" src="./dragon.gif" alt="มังกร" style="
+    position:fixed;
+    width:160px;
+    top:15%;left:-160px;
+    pointer-events:none;
+    z-index:10;
+    filter:drop-shadow(0 0 12px rgba(242,196,107,.6));
+    animation:dragonFly 8s ease-in-out infinite;
+  ">
+  <img id="dragonGif2" src="./dragon.gif" alt="มังกร" style="
+    position:fixed;
+    width:120px;
+    bottom:20%;right:-120px;
+    pointer-events:none;
+    z-index:10;
+    filter:drop-shadow(0 0 10px rgba(160,100,255,.6)) scaleX(-1);
+    transform:scaleX(-1);
+    animation:dragonFly2 11s ease-in-out 2s infinite;
+  ">
+
+  <div id="dragonWrap">
+    <!-- tap rings -->
+    <div class="tap-ring"></div>
+    <div class="tap-ring"></div>
+    <div class="tap-ring"></div>
+
+
+
+    <!-- Crystal Ball -->
+    <div id="crystalBall">
+      <div id="ballSymbols">龍</div>
+    </div>
+  </div>
+
+  <div class="tap-hint">✦ แตะลูกแก้วเพื่อเข้าสู่ศาลเจ้า ✦</div>
+</div>
+
+<!-- ══ INSTALL SCREEN ══ -->
+<div id="installScreen">
+  <div class="wrap">
+    <div class="card hero">
+      <img src="./agong.png" alt="อากงอาม่า">
+      <h1>ติดตั้งแอปอากงอาม่า</h1>
+      <p>ถ้าเครื่องรองรับ สามารถกดติดตั้งเพื่อเพิ่มแอปไว้ที่หน้าจอหลักได้ทันที</p>
+      <button class="btn primary hidden" id="installBtn">ติดตั้งแอป</button>
+      <a class="btn secondary" href="./index.html">เปิดแอป</a>
+    </div>
+    <div class="card">
+      <h2>Android / Chrome</h2>
+      <p>ถ้าปุ่มติดตั้งขึ้น กดปุ่มได้เลย<br>ถ้าปุ่มไม่ขึ้น กดเมนู <strong>⋮</strong> แล้วเลือก <strong>เพิ่มไปหน้าจอหลัก</strong></p>
+    </div>
+    <div class="card">
+      <h2>iPhone / iPad</h2>
+      <ol>
+        <li>เปิดเว็บนี้ด้วย Safari</li>
+        <li>กดปุ่ม Share</li>
+        <li>เลือก <strong>Add to Home Screen</strong></li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Stars ── */
+const starsWrap = document.getElementById('starsWrap');
+for(let i=0;i<50;i++){
+  const s = document.createElement('div');
+  s.className = 'star';
+  const sz = .8+Math.random()*2.5;
+  s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;width:${sz}px;height:${sz}px;--d:${1.5+Math.random()*3}s;--del:${Math.random()*4}s;`;
+  starsWrap.appendChild(s);
+}
+
+/* ── Symbol cycle ── */
+const symbols = ['龍','福','壽','✦','☯','卦','命'];
+let si = 0;
+setInterval(()=>{
+  si = (si+1) % symbols.length;
+  document.getElementById('ballSymbols').textContent = symbols[si];
+}, 1200);
+
+/* ── Particle canvas ── */
+const pc = document.getElementById('pCanvas');
+const px = pc.getContext('2d');
+pc.width = window.innerWidth; pc.height = window.innerHeight;
+window.addEventListener('resize',()=>{ pc.width=window.innerWidth; pc.height=window.innerHeight; });
+let parts = [];
+function spawnBurst(cx,cy){
+  for(let i=0;i<120;i++){
+    const a = Math.random()*Math.PI*2;
+    const spd = 3+Math.random()*10;
+    const cols = ['#f2c46b','#ffe5b1','#c8a0ff','#ff6b6b','#fff','#a855f7','#ffd32a'];
+    parts.push({
+      x:cx,y:cy,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,
+      life:1,decay:.014+Math.random()*.02,
+      size:2+Math.random()*5,
+      color:cols[Math.floor(Math.random()*cols.length)],
+      gravity:.15,
+    });
+  }
+}
+function animParts(){
+  px.clearRect(0,0,pc.width,pc.height);
+  parts = parts.filter(p=>p.life>0);
+  for(const p of parts){
+    p.x+=p.vx; p.y+=p.vy; p.vy+=p.gravity;
+    p.vx*=.97; p.life-=p.decay;
+    px.globalAlpha = Math.max(0,p.life);
+    px.fillStyle = p.color;
+    px.beginPath(); px.arc(p.x,p.y,p.size,0,Math.PI*2); px.fill();
+  }
+  px.globalAlpha=1;
+  if(parts.length>0) requestAnimationFrame(animParts);
+}
+
+/* ── Web Audio Sound + Voice ── */
+// สร้าง AudioContext ใน gesture เท่านั้น
+async function playMagicSound(){
+  try{
+    const ac = new(window.AudioContext||window.webkitAudioContext)();
+    // resume ถ้า suspended (iOS requirement)
+    if(ac.state === 'suspended') await ac.resume();
+
+    // เสียงฆ้อง
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type='sine';
+    osc.frequency.setValueAtTime(180,ac.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(80,ac.currentTime+1.5);
+    gain.gain.setValueAtTime(0,ac.currentTime);
+    gain.gain.linearRampToValueAtTime(.5,ac.currentTime+.05);
+    gain.gain.exponentialRampToValueAtTime(.001,ac.currentTime+2);
+    osc.connect(gain); gain.connect(ac.destination);
+    osc.start(); osc.stop(ac.currentTime+2);
+
+    // เสียง shimmer
+    const osc2 = ac.createOscillator();
+    const gain2 = ac.createGain();
+    osc2.type='triangle';
+    osc2.frequency.setValueAtTime(880,ac.currentTime);
+    osc2.frequency.exponentialRampToValueAtTime(440,ac.currentTime+.8);
+    gain2.gain.setValueAtTime(.3,ac.currentTime);
+    gain2.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.8);
+    osc2.connect(gain2); gain2.connect(ac.destination);
+    osc2.start(); osc2.stop(ac.currentTime+.8);
+  }catch(e){ console.log('audio error:',e); }
+}
+
+/* ── Voice ── */
+// สร้าง Audio object ล่วงหน้า แต่ play ใน gesture
+const voice = new Audio('./intro-voice.mp3');
+voice.preload = 'auto';
+voice.load();
+
+/* ── Enter app ── */
+function enterApp(){
+  const ball = document.getElementById('crystalBall');
+  const flash = document.getElementById('flashOverlay');
+  const splash = document.getElementById('splash');
+
+  // haptic
+  if(navigator.vibrate) navigator.vibrate([60,30,120,30,60]);
+
+  // เล่นเสียง — ทั้งหมดใน gesture เดียว
+  playMagicSound();
+  voice.currentTime = 0;
+  const vp = voice.play();
+  if(vp) vp.catch(e=>console.log('voice error:',e));
+
+  // flash
+  flash.style.opacity='1';
+  setTimeout(()=>{ flash.style.opacity='0'; },150);
+
+  // burst particles จากตำแหน่งลูกแก้ว
+  const rect = ball.getBoundingClientRect();
+  const cx = rect.left + rect.width/2;
+  const cy = rect.top + rect.height/2;
+  spawnBurst(cx,cy);
+  animParts();
+
+  // fade out splash แล้วแสดง install
+  setTimeout(()=>{
+    splash.style.transition='opacity .7s ease';
+    splash.style.opacity='0';
+    setTimeout(()=>{
+      splash.style.display='none';
+      document.getElementById('installScreen').style.display='block';
+      document.body.style.overflow='auto';
+    },700);
+  },300);
+}
+
+document.getElementById('crystalBall').addEventListener('click', enterApp);
+document.getElementById('crystalBall').addEventListener('touchstart',(e)=>{
+  e.preventDefault(); enterApp();
+},{passive:false});
+
+/* ══ INSTALL LOGIC ══ */
+let deferredPrompt = null;
+const installBtn = document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt',(e)=>{
+  e.preventDefault(); deferredPrompt=e;
+  installBtn.classList.remove('hidden');
+});
+installBtn.addEventListener('click',async()=>{
+  if(!deferredPrompt)return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt=null;
+  installBtn.classList.add('hidden');
+});
+window.addEventListener('appinstalled',()=>{ installBtn.classList.add('hidden'); });
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
