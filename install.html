@@ -314,8 +314,19 @@
   }
 
   /* ── Intro audio (เว้นไว้ใส่ทีหลัง) ── */
-  const introAudio = new Audio('./intro-voice.mp3');
-   introAudio.play().catch(()=>{});
+const introAudio = new Audio('./intro-voice.mp3');
+
+// รอให้ user แตะหน้าจอก่อนแล้วค่อยเล่น
+document.addEventListener('click', function playOnce(){
+  introAudio.play().catch(()=>{});
+  document.removeEventListener('click', playOnce);
+}, {once:true});
+
+// หรือถ้าอยากให้เล่นทันทีที่เปิด (บาง browser อาจบล็อก)
+introAudio.play().catch(()=>{
+  // ถ้าถูกบล็อก รอ user แตะ
+  document.addEventListener('click', ()=> introAudio.play().catch(()=>{}), {once:true});
+});
 
   /* ── Show install screen ── */
   function showInstall(){
