@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+y<!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
@@ -318,7 +318,7 @@ const introAudio = new Audio('./intro-voice.mp3');
 
 // รอให้ user แตะหน้าจอก่อนแล้วค่อยเล่น
 document.addEventListener('click', function playOnce(){
-  introAudio.play().catch(()=>{});
+introAudio.play().catch(err => console.log('Audio error:', err));
   document.removeEventListener('click', playOnce);
 }, {once:true});
 
