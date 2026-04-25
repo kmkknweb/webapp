@@ -1086,7 +1086,29 @@ initNotice();
 
 /* switchTab moved to top */
 
+// ── ตรวจสอบ Standalone + บันทึก install ──────────────────
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyDWD-xrpmr--x2F86Jq3jb5QI9xdVCXMAdiJ3oc5d_EvASVRQ-KI1LEgE6zZkkRVREgg/exec';
 
+function checkStandaloneInstall() {
+  const isStandalone =
+    window.navigator.standalone === true ||
+    window.matchMedia('(display-mode: standalone)').matches;
+  const alreadyTracked = localStorage.getItem('install_tracked');
+  if (!isStandalone || alreadyTracked) return;
+
+  localStorage.setItem('install_tracked', 'yes');
+  const refBy = localStorage.getItem('ref_by') || '';
+  const uid   = localStorage.getItem('uid')    || '';
+  const url   = SCRIPT_URL
+    + '?action=install'
+    + '&ref_by='      + encodeURIComponent(refBy)
+    + '&visitor_uid=' + encodeURIComponent(uid)
+    + '&page='        + encodeURIComponent(window.location.href)
+    + '&user_agent='  + encodeURIComponent(navigator.userAgent);
+  fetch(url, { method: 'GET', mode: 'no-cors' }).catch(() => {});
+}
+
+checkStandaloneInstall();
 
 
   
