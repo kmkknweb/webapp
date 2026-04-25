@@ -543,6 +543,11 @@ function trackInstall() {
 
   document.getElementById("installedBadge").classList.add("show");
 
+  // ดึง ref_by จาก localStorage ที่เซฟไว้ตอนเปิดลิงก์
+  // ไม่ดึงจาก URL เพราะตอน appinstalled ยิง URL อาจไม่มี ?ref= แล้ว
+  const refBy = localStorage.getItem("ref_by") || "";
+  
+
   const url = SCRIPT_URL
     + "?action=install"
     + "&ref_by="      + encodeURIComponent(captureRef())
