@@ -257,6 +257,57 @@
       .hero-title{font-size:28px}
       .payment-hero{flex-direction:column}
     }
+
+/*กิจกรรมชวนเพื่อนโหลด app*/
+    .referral-hero-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  width:min(100%,360px);
+  margin:8px auto 14px;
+  padding:13px 14px;
+  border-radius:20px;
+  text-decoration:none;
+  font-family:'Kanit',sans-serif;
+  color:#23160d;
+  background:linear-gradient(135deg,#f2c46b,#ffe5b1 55%,#ffcf6e);
+  border:1px solid rgba(255,255,255,.28);
+  box-shadow:
+    0 14px 34px rgba(0,0,0,.34),
+    0 0 22px rgba(242,196,107,.24);
+}
+
+.referral-hero-btn strong{
+  display:block;
+  font-size:15px;
+  font-weight:800;
+  line-height:1.25;
+}
+
+.referral-hero-btn small{
+  display:block;
+  font-size:11px;
+  font-weight:500;
+  opacity:.82;
+  margin-top:2px;
+}
+
+.referral-icon{
+  font-size:24px;
+  flex:0 0 auto;
+}
+
+.referral-arrow{
+  font-size:22px;
+  font-weight:800;
+  flex:0 0 auto;
+}
+
+
+/*กิจกรรมชวนเพื่อนโหลด app*/
+
+
   </style>
 </head>
 <body>
@@ -383,6 +434,19 @@ function switchTab(tab){
       <h1 class="hero-title">อากงอาม่าออนไลน์</h1>
       <p class="hero-sub">ศาลเจ้าปึงเถ่ากงม่าขอนแก่น</p>
          <p class="hero-sub">ขอพร ดูดวง ทำบุญ และเยี่ยมชมออนไลน์</p>
+
+      
+      <!-- กิจกรรมชวนเพื่อนโหลด app -->
+<a href="./referral.html" class="referral-hero-btn">
+  <span class="referral-icon">🎁</span>
+  <span>
+    <strong>ชวนเพื่อนร่วมใช้แอปศาลเจ้า</strong>
+    <small>รับสิทธิ์ลุ้นรางวัลพิเศษ</small>
+  </span>
+  <span class="referral-arrow">→</span>
+</a>
+
+      
     </section>
 
     <!-- Dashboard การ์ด 6 ใบ -->
