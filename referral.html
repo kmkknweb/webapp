@@ -262,36 +262,6 @@
     <p>ติดตั้งแอปอากงอาม่า แล้วลงทะเบียนรับสิทธิ์<br>ยิ่งชวนมาก ยิ่งได้สิทธิ์มาก<br>กรุณากดติดตั้ง app ที่ปุ่มด้านล่างสุดก่อนการลงทะเบียนร่วมสนุก</p>
   </div>
 
-  <!-- ลิงก์แนะนำ -->
-  <div class="card">
-    <div class="card-label">🏮 รหัสและลิงก์ของคุณ</div>
-    <div class="info-box">
-      <div class="lbl">รหัสแนะนำของคุณ</div>
-      <div class="val" id="myCode">กำลังโหลด…</div>
-    </div>
-    <div class="info-box">
-      <div class="lbl">ลิงก์สำหรับส่งให้เพื่อน</div>
-      <div class="val sm" id="shareLinkText">กำลังโหลด…</div>
-    </div>
-    <button class="btn btn-ghost" onclick="copyShareLink()">📋 คัดลอกลิงก์</button>
-    <button class="btn btn-line"  onclick="shareToLine()">💬 แชร์ผ่าน LINE</button>
-
-    <div class="qr-panel">
-      <div class="qr-title">🧾 QR Code ส่วนตัวของคุณ</div>
-      <div class="qr-box">
-        <img id="myQrImage" src="" alt="QR Code สำหรับชวนเพื่อน">
-      </div>
-      <div class="qr-caption">ให้เพื่อนสแกน QR นี้ เพื่อเข้าหน้าติดตั้งแอปพร้อมรหัสแนะนำของคุณ</div>
-      <div class="qr-actions">
-        <button class="btn btn-ghost" type="button" onclick="copyShareLink()">📋 คัดลอกลิงก์</button>
-        <button class="btn btn-ghost" type="button" onclick="downloadMyQR()">⬇️ บันทึก QR</button>
-      </div>
-    </div>
-  </div>
-
-
-  
-  
 
 
   <!-- ลงทะเบียน -->
@@ -326,6 +296,41 @@
 
 </div>
 
+  
+
+
+
+  
+  <!-- ลิงก์แนะนำ -->
+  <div class="card">
+    <div class="card-label">🏮 รหัสและลิงก์ของคุณ</div>
+    <div class="info-box">
+      <div class="lbl">รหัสแนะนำของคุณ</div>
+      <div class="val" id="myCode">กำลังโหลด…</div>
+    </div>
+    <div class="info-box">
+      <div class="lbl">ลิงก์สำหรับส่งให้เพื่อน</div>
+      <div class="val sm" id="shareLinkText">กำลังโหลด…</div>
+    </div>
+    <button class="btn btn-ghost" onclick="copyShareLink()">📋 คัดลอกลิงก์</button>
+    <button class="btn btn-line"  onclick="shareToLine()">💬 แชร์ผ่าน LINE</button>
+
+    <div class="qr-panel">
+      <div class="qr-title">🧾 QR Code ส่วนตัวของคุณ</div>
+      <div class="qr-box">
+        <img id="myQrImage" src="" alt="QR Code สำหรับชวนเพื่อน">
+      </div>
+      <div class="qr-caption">ให้เพื่อนสแกน QR นี้ เพื่อเข้าหน้าติดตั้งแอปพร้อมรหัสแนะนำของคุณ</div>
+      <div class="qr-actions">
+        <button class="btn btn-ghost" type="button" onclick="copyShareLink()">📋 คัดลอกลิงก์</button>
+        <button class="btn btn-ghost" type="button" onclick="downloadMyQR()">⬇️ บันทึก QR</button>
+      </div>
+    </div>
+  </div>
+
+
+  
+  
 
   <!-- ติดตั้งแอป -->
   <div class="card">
