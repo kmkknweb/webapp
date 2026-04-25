@@ -83,11 +83,17 @@
       box-shadow:0 0 0 1px rgba(242,196,107,.08),0 0 30px rgba(201,31,61,.08);
     }
     .hero-photo-wrap{width:220px;height:220px;margin:20px auto 10px;position:relative;display:grid;place-items:center}
+
+    
     .hero-ring{
       position:absolute;inset:0;border-radius:50%;
       background:radial-gradient(circle, rgba(255,229,177,.32) 0%, rgba(201,31,61,.18) 34%, rgba(125,76,255,.18) 58%, transparent 74%);
       animation:pulse 4s ease-in-out infinite;
+      filter: drop-shadow(0 0 10px gold)
+          drop-shadow(0 0 25px rgba(255, 215, 0, 0.8));
     }
+
+    
     .hero-photo{
       position:relative;width:184px;height:184px;border-radius:50%;object-fit:cover;display:block;
       border:3px solid rgba(255,255,255,.13);
