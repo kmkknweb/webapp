@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>กิจกรรมแนะนำเพื่อน</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #fff7ec 0%, #ffffff 55%);
+      color: #3b2414;
+      padding: 18px;
+    }
+    .wrap { max-width: 520px; margin: 0 auto; }
+    .card {
+      background: #fff;
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: 0 10px 30px rgba(80, 40, 10, 0.12);
+      border: 1px solid rgba(160, 90, 20, 0.12);
+    }
+    .hero { text-align: center; margin-bottom: 18px; }
+    .badge {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #b71c1c;
+      color: #fff;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    h1 { font-size: 24px; line-height: 1.25; margin: 8px 0; }
+    p { font-size: 15px; line-height: 1.7; color: #65452d; }
+    .box {
+      background: #fff9f0;
+      border: 1px dashed #d09a45;
+      border-radius: 16px;
+      padding: 14px;
+      margin: 14px 0;
+      word-break: break-all;
+    }
+    .label { font-size: 13px; color: #8a5a2b; margin-bottom: 4px; }
+    .code { font-size: 20px; font-weight: 800; color: #b71c1c; }
+    .link { font-size: 14px; color: #3b2414; }
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .primary { background: #b71c1c; color: #fff; }
+    .secondary { background: #f4e5d0; color: #5b3216; }
+    .line { background: #06c755; color: #fff; }
+    form { margin-top: 20px; }
+    input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #e0c6a3;
+      border-radius: 14px;
+      font-size: 16px;
+      margin-top: 8px;
+      margin-bottom: 12px;
+      outline: none;
+    }
+    input:focus { border-color: #b71c1c; }
+    .small { font-size: 12px; color: #8a725f; }
+    .status {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 14px;
+      display: none;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .ok { background: #e9f7ef; color: #146c43; }
+    .err { background: #fdecea; color: #b3261e; }
+    .rule {
+      margin-top: 18px;
+      padding: 14px;
+      background: #faf7f2;
+      border-radius: 16px;
+      font-size: 13px;
+      color: #6b4b35;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="hero">
+        <div class="badge">กิจกรรมพิเศษ</div>
+        <h1>ชวนเพื่อนใช้เว็บแอปศาลเจ้า</h1>
+        <p>คัดลอกลิงก์ของคุณแล้วส่งให้เพื่อน เมื่อเพื่อนกดเข้ามาและลงทะเบียน ระบบจะบันทึกว่าเพื่อนมาจากรหัสแนะนำของคุณ</p>
+      </div>
+
+      <div class="box">
+        <div class="label">รหัสแนะนำของคุณ</div>
+        <div class="code" id="myCode">-</div>
+      </div>
+
+      <div class="box">
+        <div class="label">ลิงก์สำหรับแนะนำเพื่อน</div>
+        <div class="link" id="shareLinkText">-</div>
+      </div>
+
+      <button class="primary" type="button" onclick="copyShareLink()">คัดลอกลิงก์แนะนำ</button>
+      <button class="line" type="button" onclick="shareToLine()">แชร์ผ่าน LINE</button>
+      <button class="secondary" type="button" onclick="goInstallPage()">ไปหน้าเว็บแอปหลัก</button>
+
+      <form id="registerForm">
+        <h2 style="font-size:20px; margin:22px 0 6px;">ลงทะเบียนรับสิทธิ์</h2>
+        <p class="small">กรอกข้อมูลเพื่อร่วมกิจกรรม ระบบจะบันทึก UID ของเครื่องนี้และรหัสผู้แนะนำ หากมี</p>
+
+        <label>ชื่อ</label>
+        <input id="name" type="text" placeholder="กรอกชื่อ" required />
+
+        <label>เบอร์โทร</label>
+        <input id="phone" type="tel" placeholder="กรอกเบอร์โทร" required />
+
+        <button class="primary" type="submit">ลงทะเบียน</button>
+      </form>
+
+      <div id="statusBox" class="status"></div>
+
+      <div class="rule">
+        <strong>หมายเหตุ:</strong><br>
+        1 เบอร์โทรควรลงทะเบียน 1 ครั้ง หากพบข้อมูลซ้ำ คณะกรรมการสามารถพิจารณาตัดสิทธิ์ได้<br>
+        ลิงก์แนะนำจะพาเพื่อนไปที่หน้าเว็บแอปหลัก พร้อมรหัสอ้างอิงของคุณ
+      </div>
+    </div>
+  </div>
+
+<script>
+  // URL จริงของคุณ
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyDWD-xrpmr--x2F86Jq3jb5QI9xdVCXMAdiJ3oc5d_EvASVRQ-KI1LEgE6zZkkRVREgg/exec";
+  const APP_BASE_URL = "https://kmkknweb.github.io/webapp/install.html";
+
+  function getUserId() {
+    let uid = localStorage.getItem("uid");
+    if (!uid) {
+      uid = "U" + Date.now() + Math.floor(Math.random() * 1000);
+      localStorage.setItem("uid", uid);
+    }
+    return uid;
+  }
+
+  function captureRefFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+    if (ref) {
+      localStorage.setItem("ref_by", ref);
+    }
+  }
+
+  function getShareLink() {
+    const uid = getUserId();
+    return APP_BASE_URL + "?ref=" + encodeURIComponent(uid);
+  }
+
+  function renderReferralInfo() {
+    const uid = getUserId();
+    const link = getShareLink();
+    document.getElementById("myCode").textContent = uid;
+    document.getElementById("shareLinkText").textContent = link;
+  }
+
+  async function copyShareLink() {
+    const link = getShareLink();
+    try {
+      await navigator.clipboard.writeText(link);
+      showStatus("คัดลอกลิงก์แล้ว สามารถนำไปส่งให้เพื่อนได้เลย", true);
+    } catch (err) {
+      showStatus("คัดลอกอัตโนมัติไม่ได้ กรุณากดค้างที่ลิงก์แล้วคัดลอกเอง", false);
+    }
+  }
+
+  function shareToLine() {
+    const text = "ชวนร่วมใช้เว็บแอปศาลเจ้า: " + getShareLink();
+    const lineUrl = "https://social-plugins.line.me/lineit/share?url=" + encodeURIComponent(getShareLink()) + "&text=" + encodeURIComponent(text);
+    window.open(lineUrl, "_blank");
+  }
+
+  function goInstallPage() {
+    window.location.href = APP_BASE_URL;
+  }
+
+  function showStatus(message, ok) {
+    const box = document.getElementById("statusBox");
+    box.textContent = message;
+    box.className = "status " + (ok ? "ok" : "err");
+    box.style.display = "block";
+  }
+
+  document.getElementById("registerForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const uid = getUserId();
+    const refBy = localStorage.getItem("ref_by") || "";
+
+    if (!name || !phone) {
+      showStatus("กรุณากรอกชื่อและเบอร์โทร", false);
+      return;
+    }
+
+    const payload = {
+      name: name,
+      phone: phone,
+      uid: uid,
+      ref_by: refBy,
+      page: window.location.href,
+      user_agent: navigator.userAgent
+    };
+
+    showStatus("กำลังบันทึกข้อมูล...", true);
+
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+
+      const text = await res.text();
+      console.log("Apps Script response:", text);
+
+      localStorage.setItem("registered", "yes");
+      showStatus("ลงทะเบียนเรียบร้อยแล้ว ขอบคุณที่ร่วมกิจกรรม", true);
+      document.getElementById("registerForm").reset();
+    } catch (err) {
+      console.error(err);
+      showStatus("บันทึกไม่สำเร็จ กรุณาตรวจสอบ URL Apps Script หรือการ Deploy", false);
+    }
+  });
+
+  captureRefFromUrl();
+  renderReferralInfo();
+</script>
+</body>
+</html>
