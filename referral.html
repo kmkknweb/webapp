@@ -178,6 +178,45 @@
     <button class="btn btn-ghost" onclick="copyShareLink()">📋 คัดลอกลิงก์</button>
     <button class="btn btn-line"  onclick="shareToLine()">💬 แชร์ผ่าน LINE</button>
   </div>
+
+
+  
+  
+
+
+  <!-- ลงทะเบียน -->
+  <div class="card">
+    <div class="card-label">✍️ ลงทะเบียนรับสิทธิ์</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7;">
+      กรอกข้อมูลเพื่อยืนยันตัวตนและรับสิทธิ์ร่วมกิจกรรม
+    </p>
+    <form id="registerForm" onsubmit="handleSubmit(event)">
+      <div class="form-group">
+        <label>ชื่อ-นามสกุล</label>
+        <input id="fname" type="text" placeholder="กรอกชื่อ-นามสกุล" required />
+      </div>
+      <div class="form-group">
+        <label>เบอร์โทรศัพท์</label>
+        <input id="fphone" type="tel" placeholder="กรอกเบอร์โทร 10 หลัก" required />
+      </div>
+      <button class="btn btn-gold" type="submit" id="submitBtn" style="font-size:16px;">
+        ✅ ลงทะเบียน
+      </button>
+    </form>
+    <div id="statusBox" class="status"></div>
+  </div>
+
+  <!-- หมายเหตุ -->
+  <div class="rules">
+    <strong>หมายเหตุ</strong><br>
+    • 1 เบอร์โทรควรลงทะเบียน 1 ครั้ง หากพบข้อมูลซ้ำ คณะกรรมการสามารถพิจารณาตัดสิทธิ์ได้<br>
+    • ระบบจะบันทึกว่าคุณมาจากคำแนะนำของใคร และบันทึกวันที่ติดตั้งแอปด้วย<br>
+    • ลิงก์แนะนำจะพาเพื่อนมายังหน้านี้พร้อมรหัสของคุณโดยอัตโนมัติ
+  </div>
+
+</div>
+
+
   <!-- ติดตั้งแอป -->
   <div class="card">
     <div class="card-label">📲 ติดตั้งแอป</div>
@@ -213,41 +252,11 @@
         แล้วเลือก <strong style="color:var(--gold2)">เพิ่มไปหน้าจอหลัก</strong>
       </p>
     </div>
-  </div> -->
+  </div> 
 
 
-  <!-- ลงทะเบียน -->
-  <div class="card">
-    <div class="card-label">✍️ ลงทะเบียนรับสิทธิ์</div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7;">
-      กรอกข้อมูลเพื่อยืนยันตัวตนและรับสิทธิ์ร่วมกิจกรรม
-    </p>
-    <form id="registerForm" onsubmit="handleSubmit(event)">
-      <div class="form-group">
-        <label>ชื่อ-นามสกุล</label>
-        <input id="fname" type="text" placeholder="กรอกชื่อ-นามสกุล" required />
-      </div>
-      <div class="form-group">
-        <label>เบอร์โทรศัพท์</label>
-        <input id="fphone" type="tel" placeholder="กรอกเบอร์โทร 10 หลัก" required />
-      </div>
-      <button class="btn btn-gold" type="submit" id="submitBtn" style="font-size:16px;">
-        ✅ ลงทะเบียน
-      </button>
-    </form>
-    <div id="statusBox" class="status"></div>
-  </div>
-
-  <!-- หมายเหตุ -->
-  <div class="rules">
-    <strong>หมายเหตุ</strong><br>
-    • 1 เบอร์โทรควรลงทะเบียน 1 ครั้ง หากพบข้อมูลซ้ำ คณะกรรมการสามารถพิจารณาตัดสิทธิ์ได้<br>
-    • ระบบจะบันทึกว่าคุณมาจากคำแนะนำของใคร และบันทึกวันที่ติดตั้งแอปด้วย<br>
-    • ลิงก์แนะนำจะพาเพื่อนมายังหน้านี้พร้อมรหัสของคุณโดยอัตโนมัติ
-  </div>
-
-</div>
-
+  
+  
 <script>
 // ── Config ──────────────────────────────────────────────────
 const SCRIPT_URL   = "https://script.google.com/macros/s/AKfycbyDWD-xrpmr--x2F86Jq3jb5QI9xdVCXMAdiJ3oc5d_EvASVRQ-KI1LEgE6zZkkRVREgg/exec";
