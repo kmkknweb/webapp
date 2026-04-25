@@ -1021,6 +1021,49 @@ if($("paymentAccountNumber")) initPaymentInfo();
 initNotice();
 
 /* switchTab moved to top */
+
+
+  
+/* เก็บข้อมูลคนที่ถูก reference เข้ามา */
+
+const SCRIPT_URL = "ใส่_URL_APPS_SCRIPT_ของคุณตรงนี้";
+
+function getUserId() {
+  let uid = localStorage.getItem("uid");
+  if (!uid) {
+    uid = "U" + Date.now() + Math.floor(Math.random() * 1000);
+    localStorage.setItem("uid", uid);
+  }
+  return uid;
+}
+
+function trackReferralVisit() {
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get("ref");
+
+  if (ref) {
+    localStorage.setItem("ref_by", ref);
+
+    const visitorUid = getUserId();
+
+    const url =
+      SCRIPT_URL +
+      "?action=visit" +
+      "&ref_by=" + encodeURIComponent(ref) +
+      "&visitor_uid=" + encodeURIComponent(visitorUid) +
+      "&page=" + encodeURIComponent(window.location.href) +
+      "&user_agent=" + encodeURIComponent(navigator.userAgent);
+
+    fetch(url, { method: "GET", mode: "no-cors" });
+  }
+}
+
+trackReferralVisit();
+
+
+
+
+  
 </script>
 </body>
 </html>
