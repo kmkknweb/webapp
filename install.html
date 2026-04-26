@@ -624,6 +624,14 @@
     }
 
 // บันทึกทันทีที่โหลดหน้า ถ้ามี ref
+
+    const isStandalone =
+  window.navigator.standalone === true ||
+  window.matchMedia('(display-mode: standalone)').matches;
+
+if (isStandalone) {
+  window.location.replace('./index.html');
+}
     
   </script>
 </body>
