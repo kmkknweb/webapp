@@ -118,3 +118,19 @@ self.addEventListener('notificationclick', event => {
       })
   );
 });
+self.addEventListener('push', event => {
+  let data = {};
+
+  try {
+    data = event.data.json();
+  } catch {
+    data = { title: 'แจ้งเตือน', body: 'มีข้อความใหม่' };
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'แจ้งเตือน', {
+      body: data.body || '',
+      icon: './agong.png'
+    })
+  );
+});
