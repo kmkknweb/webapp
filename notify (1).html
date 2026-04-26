@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เปิดรับแจ้งเตือน</title>
+</head>
+<body style="font-family:sans-serif;text-align:center;padding:40px">
+
+<h2>🔔 รับแจ้งเตือน</h2>
+<p>กดปุ่มด้านล่างเพื่อเปิดรับแจ้งเตือน</p>
+
+<button onclick="subscribeUser()" style="padding:15px 25px;font-size:16px">
+  เปิดรับแจ้งเตือน
+</button>
+
+<p id="status"></p>
+
+<script>
+const VAPID_PUBLIC_KEY = 'BClrlIsycnGqCbfjt3DBcG6ER2CLWNVboIGBUzXv4JI3ksH263ZhFX8L0nCnltG4NWSNRDhKc1Sc5_7pkiYYerE';
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/-/g, '+')
+    .replace(/_/g, '/');
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+async function subscribeUser() {
+  const status = document.getElementById('status');
+  try {
+    status.innerText = 'กำลังสมัคร...';
+
+    // 1. ขอ permission
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      status.innerText = '❌ ไม่อนุญาตแจ้งเตือน';
+      return;
+    }
+
+    // 2. register SW เอง (ปลอดภัย — ถ้า register ซ้ำ browser จะใช้อันเดิม)
+    await navigator.serviceWorker.register('./service-worker.js');
+    const reg = await navigator.serviceWorker.ready;
+
+    // 3. subscribe — ถ้ามีอยู่แล้วใช้อันเดิม ไม่ unsubscribe ทิ้ง
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+    }
+
+    // 4. ส่ง subscription ไปบันทึกที่ server
+    status.innerText = 'กำลังส่งข้อมูลไป server...';
+    const res = await fetch(
+      'https://notifications-ebon.vercel.app/api/send-notification?action=subscribe',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sub)
+      }
+    );
+
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(`server ตอบ ${res.status}: ${txt}`);
+    }
+
+    status.innerText = '✅ สมัครสำเร็จแล้ว';
+
+  } catch (err) {
+    console.error(err);
+    status.innerText = '❌ สมัครไม่สำเร็จ: ' + err.message;
+  }
+}
+</script>
+
+</body>
+</html>
