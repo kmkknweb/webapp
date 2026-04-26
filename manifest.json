@@ -10,12 +10,12 @@
     "src": "./agong.png",
     "sizes": "192x192",
     "type": "image/png",
-    "purpose": "any maskable"    ← เพิ่มบรรทัดนี้
+    "purpose": "any maskable"    
   },
   {
     "src": "./agong.png",
     "sizes": "512x512",
     "type": "image/png",
-    "purpose": "any maskable"    ← เพิ่มบรรทัดนี้
+    "purpose": "any maskable"   
   }
 ]
