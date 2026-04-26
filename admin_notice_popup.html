@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Notice & Popup</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0d0b10;--panel:#17131d;--panel2:#21192a;--text:#fff6eb;--muted:#d7c8bc;--gold:#f2c46b;--gold2:#ffe5b1;--red:#c91f3d;--line:rgba(255,255,255,.1);--shadow:0 18px 40px rgba(0,0,0,.38)}
+    *{box-sizing:border-box} body{margin:0;font-family:'Kanit',sans-serif;background:radial-gradient(circle at top,#44101f 0%,#1a1020 34%,#0d0b10 100%);color:var(--text);padding:16px;min-height:100vh}
+    .wrap{max-width:920px;margin:0 auto;padding-bottom:32px}.hero{padding:8px 2px 14px}.hero h1{margin:0;font-size:28px;line-height:1.25}.hero p{margin:6px 0 0;color:var(--muted);line-height:1.7}.grid-main{display:grid;grid-template-columns:1fr 1fr;gap:14px}.card{background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}.card h2{margin:0 0 6px;font-size:21px}.hint{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.7}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}label{display:block;margin:10px 0 5px;color:var(--gold2);font-size:13px}input,textarea,select{width:100%;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#2a2230;color:#fff;font:inherit;outline:none}input:focus,textarea:focus,select:focus{border-color:rgba(242,196,107,.45);box-shadow:0 0 0 3px rgba(242,196,107,.08)}textarea{min-height:130px;resize:vertical}.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}button{width:100%;padding:14px;border:none;border-radius:15px;background:linear-gradient(135deg,#f2c46b,#ffe5b1);color:#23160d;font:inherit;font-weight:800;cursor:pointer}.secondary{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.1)}.danger{background:linear-gradient(135deg,#7a1b2a,#c91f3d);color:#fff}.status{font-size:13px;color:#ffe5b1;line-height:1.7;min-height:22px}.preview{border:1px dashed rgba(255,255,255,.16);border-radius:18px;padding:14px;background:rgba(0,0,0,.12);margin-top:10px}.preview-title{font-size:13px;color:var(--gold2);margin-bottom:6px}.preview-box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px;line-height:1.75}.small{font-size:12px;color:var(--muted);line-height:1.7}.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(242,196,107,.12);border:1px solid rgba(242,196,107,.18);color:var(--gold2);border-radius:999px;padding:6px 10px;font-size:12px;margin-bottom:8px}.full{grid-column:1/-1}@media(max-width:760px){.grid-main,.grid,.grid-3,.btn-row{grid-template-columns:1fr}.hero h1{font-size:24px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="badge">Firebase Admin • Notice + Popup</div>
+      <h1>จัดการประกาศและ Popup</h1>
+      <p>หน้านี้บันทึกข้อมูลไปที่ Firestore เดิม แยกเป็น <b>settings/notice</b> และ <b>settings/popupNotice</b></p>
+    </div>
+
+    <div class="grid-main">
+      <section class="card">
+        <h2>1) Notice Card หน้าแรก</h2>
+        <p class="hint">ใช้สำหรับข้อความประกาศที่อยู่บนหน้า index แบบไม่เด้ง</p>
+        <div class="grid">
+          <div><label for="noticeVersion">Version</label><input id="noticeVersion" type="number" min="1" value="1"></div>
+          <div><label for="noticeShow">การแสดงผล</label><select id="noticeShow"><option value="true">แสดง</option><option value="false">ซ่อน</option></select></div>
+        </div>
+        <label for="noticeTitle">หัวข้อ</label><input id="noticeTitle" type="text" placeholder="เช่น ประกาศจากศาลเจ้า">
+        <label for="noticeMessage">ข้อความ</label><textarea id="noticeMessage" placeholder="ข้อความประกาศหน้าแรก"></textarea>
+        <div class="btn-row"><button id="saveNoticeBtn">บันทึก Notice</button><button id="loadNoticeBtn" class="secondary">โหลดค่าปัจจุบัน</button></div>
+        <p class="status" id="noticeStatus">พร้อมใช้งาน</p>
+        <div class="preview"><div class="preview-title">ตัวอย่าง Notice</div><div class="preview-box"><b id="noticePreviewTitle">-</b><br><span id="noticePreviewMessage">-</span></div></div>
+      </section>
+
+      <section class="card">
+        <h2>2) Popup Notice</h2>
+        <p class="hint">ใช้สำหรับกล่องเด้ง เช่น กิจกรรมช่วงเวลาพิเศษ ปิด/เปิดได้ และกำหนดวันหมดอายุได้</p>
+        <div class="grid">
+          <div><label for="popupEnabled">เปิด/ปิด Popup</label><select id="popupEnabled"><option value="true">เปิด</option><option value="false">ปิด</option></select></div>
+          <div><label for="popupVersion">Version</label><input id="popupVersion" type="number" min="1" value="1"></div>
+        </div>
+        <div class="grid">
+          <div><label for="popupMaxShow">เด้งสูงสุดกี่ครั้ง</label><input id="popupMaxShow" type="number" min="1" value="3"></div>
+          <div><label for="popupButtonText">ข้อความปุ่ม</label><input id="popupButtonText" type="text" value="รับทราบ"></div>
+        </div>
+        <label for="popupTitle">หัวข้อ Popup</label><input id="popupTitle" type="text" placeholder="เช่น 🎁 กิจกรรมพิเศษ">
+        <label for="popupMessage">ข้อความ Popup</label><textarea id="popupMessage" placeholder="รายละเอียดกิจกรรม / ข้อความแจ้งเตือน"></textarea>
+        <label for="popupButtonUrl">ลิงก์ปุ่ม (เว้นว่างได้)</label><input id="popupButtonUrl" type="text" placeholder="เช่น ./activity.html หรือ https://...">
+        <div class="grid">
+          <div><label for="popupStartAt">วันเวลาเริ่มแสดง</label><input id="popupStartAt" type="datetime-local"></div>
+          <div><label for="popupEndAt">วันเวลาสิ้นสุด</label><input id="popupEndAt" type="datetime-local"></div>
+        </div>
+        <div class="btn-row"><button id="savePopupBtn">บันทึก Popup</button><button id="loadPopupBtn" class="secondary">โหลดค่าปัจจุบัน</button></div>
+        <button id="disablePopupBtn" class="danger">ปิด Popup ทันที</button>
+        <p class="status" id="popupStatus">พร้อมใช้งาน</p>
+        <div class="preview"><div class="preview-title">ตัวอย่าง Popup</div><div class="preview-box"><b id="popupPreviewTitle">-</b><br><span id="popupPreviewMessage">-</span><br><span class="small" id="popupPreviewMeta">-</span></div></div>
+      </section>
+
+      <section class="card full">
+        <h2>3) วิธีทดสอบหลังอัปโหลดไฟล์</h2>
+        <p class="small">เปิด admin ไฟล์นี้ → บันทึก Notice / Popup → เปิด index ที่แก้แล้ว → ทดสอบเปิด/ปิด, maxShow, version, startAt/endAt</p>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCLr6yKfOOnR2IqBQc2ytCEpMuTTrgcZ9Q",
+      authDomain: "webapp-5a606.firebaseapp.com",
+      projectId: "webapp-5a606",
+      storageBucket: "webapp-5a606.firebasestorage.app",
+      messagingSenderId: "4647661737",
+      appId: "1:4647661737:web:5729d78923c3b5b53739b8",
+      measurementId: "G-N88YXXZW34"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const $ = id => document.getElementById(id);
+    const setStatus = (id,text) => { $(id).textContent = text; };
+    function localDateTimeToIso(value){ if(!value) return ""; const d = new Date(value); return isNaN(d.getTime()) ? "" : d.toISOString(); }
+    function isoToLocalDateTime(value){ if(!value) return ""; const d = new Date(value); if(isNaN(d.getTime())) return ""; const pad=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+    function updateNoticePreview(){ $('noticePreviewTitle').textContent=$('noticeTitle').value||'-'; $('noticePreviewMessage').textContent=$('noticeMessage').value||'-'; }
+    function updatePopupPreview(){ $('popupPreviewTitle').textContent=$('popupTitle').value||'-'; $('popupPreviewMessage').textContent=$('popupMessage').value||'-'; $('popupPreviewMeta').textContent=`สถานะ: ${$('popupEnabled').value==='true'?'เปิด':'ปิด'} • เด้งสูงสุด ${$('popupMaxShow').value||1} ครั้ง • version ${$('popupVersion').value||1}`; }
+    ['noticeTitle','noticeMessage'].forEach(id=>$(id).addEventListener('input',updateNoticePreview));
+    ['popupEnabled','popupVersion','popupMaxShow','popupTitle','popupMessage','popupButtonText','popupButtonUrl','popupStartAt','popupEndAt'].forEach(id=>$(id).addEventListener('input',updatePopupPreview));
+
+    async function loadNotice(){
+      try{ setStatus('noticeStatus','กำลังโหลด Notice...'); const snap=await db.collection('settings').doc('notice').get(); if(!snap.exists){setStatus('noticeStatus','ยังไม่มีข้อมูล Notice'); updateNoticePreview(); return;} const d=snap.data(); $('noticeVersion').value=d.version??1; $('noticeShow').value=String(d.show ?? true); $('noticeTitle').value=d.title||''; $('noticeMessage').value=d.message||''; updateNoticePreview(); setStatus('noticeStatus','โหลด Notice สำเร็จ'); }catch(e){ console.error(e); setStatus('noticeStatus','โหลด Notice ไม่สำเร็จ'); }
+    }
+    async function saveNotice(){
+      try{ setStatus('noticeStatus','กำลังบันทึก Notice...'); const data={version:Number($('noticeVersion').value||1),show:$('noticeShow').value==='true',title:$('noticeTitle').value.trim(),message:$('noticeMessage').value.trim(),updatedAt:new Date().toISOString()}; await db.collection('settings').doc('notice').set(data); updateNoticePreview(); setStatus('noticeStatus','บันทึก Notice สำเร็จ'); alert('บันทึก Notice สำเร็จ'); }catch(e){ console.error(e); setStatus('noticeStatus','บันทึก Notice ไม่สำเร็จ'); alert('บันทึก Notice ไม่สำเร็จ'); }
+    }
+    async function loadPopup(){
+      try{ setStatus('popupStatus','กำลังโหลด Popup...'); const snap=await db.collection('settings').doc('popupNotice').get(); if(!snap.exists){setStatus('popupStatus','ยังไม่มีข้อมูล Popup'); updatePopupPreview(); return;} const d=snap.data(); $('popupEnabled').value=String(d.enabled ?? false); $('popupVersion').value=d.version??1; $('popupMaxShow').value=d.maxShow??3; $('popupTitle').value=d.title||''; $('popupMessage').value=d.message||''; $('popupButtonText').value=d.buttonText||'รับทราบ'; $('popupButtonUrl').value=d.buttonUrl||''; $('popupStartAt').value=isoToLocalDateTime(d.startAt); $('popupEndAt').value=isoToLocalDateTime(d.endAt); updatePopupPreview(); setStatus('popupStatus','โหลด Popup สำเร็จ'); }catch(e){ console.error(e); setStatus('popupStatus','โหลด Popup ไม่สำเร็จ'); }
+    }
+    async function savePopup(){
+      try{ setStatus('popupStatus','กำลังบันทึก Popup...'); const data={enabled:$('popupEnabled').value==='true',version:Number($('popupVersion').value||1),maxShow:Number($('popupMaxShow').value||1),title:$('popupTitle').value.trim(),message:$('popupMessage').value.trim(),buttonText:$('popupButtonText').value.trim()||'รับทราบ',buttonUrl:$('popupButtonUrl').value.trim(),startAt:localDateTimeToIso($('popupStartAt').value),endAt:localDateTimeToIso($('popupEndAt').value),updatedAt:new Date().toISOString()}; await db.collection('settings').doc('popupNotice').set(data); updatePopupPreview(); setStatus('popupStatus','บันทึก Popup สำเร็จ'); alert('บันทึก Popup สำเร็จ'); }catch(e){ console.error(e); setStatus('popupStatus','บันทึก Popup ไม่สำเร็จ'); alert('บันทึก Popup ไม่สำเร็จ'); }
+    }
+    async function disablePopup(){ $('popupEnabled').value='false'; updatePopupPreview(); await savePopup(); }
+    $('saveNoticeBtn').addEventListener('click',saveNotice); $('loadNoticeBtn').addEventListener('click',loadNotice); $('savePopupBtn').addEventListener('click',savePopup); $('loadPopupBtn').addEventListener('click',loadPopup); $('disablePopupBtn').addEventListener('click',disablePopup);
+    loadNotice(); loadPopup(); updateNoticePreview(); updatePopupPreview();
+  </script>
+</body>
+</html>
