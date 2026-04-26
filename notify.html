@@ -62,6 +62,9 @@ async function refreshCurrentStatus() {
   if (isIOS && !isStandalone) { iosGuide.style.display = 'block'; setStatus('iPhone/iPad ต้องเปิดจากไอคอนบนหน้าจอโฮมก่อน จึงจะรับแจ้งเตือนได้', 'bad'); return; }
   try { const reg = await registerServiceWorker(); const sub = await reg.pushManager.getSubscription(); if (Notification.permission === 'granted' && sub) { subscribeBtn.textContent = '✅ เปิดรับแจ้งเตือนแล้ว'; setStatus('✅ เครื่องนี้เปิดรับแจ้งเตือนแล้ว', 'ok'); } else if (Notification.permission === 'denied') { setStatus('❌ เครื่องนี้บล็อกการแจ้งเตือนไว้ ต้องไปเปิดอนุญาตในการตั้งค่าก่อน', 'bad'); } else { setStatus('พร้อมให้เปิดรับแจ้งเตือน'); } } catch (err) { console.error(err); setStatus('เตรียมระบบแจ้งเตือนไม่สำเร็จ: ' + err.message, 'bad'); }
 }
+
+
+  
 async function subscribeUser() {
   try {
     subscribeBtn.disabled = true; setStatus('⏳ กำลังขออนุญาตแจ้งเตือน...');
