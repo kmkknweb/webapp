@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เปิดรับแจ้งเตือน</title>
+</head>
+<body style="font-family: sans-serif; text-align:center; padding:40px;">
+
+<h2>🔔 รับแจ้งเตือนจากศาลเจ้า</h2>
+<p>กดปุ่มด้านล่างเพื่อเปิดรับข่าวสารและกิจกรรม</p>
+
+<button onclick="subscribe()" style="padding:15px 25px; font-size:18px;">
+  เปิดรับแจ้งเตือน
+</button>
+
+<script>
+const VAPID_PUBLIC_KEY = 'ใส่ของคุณ';
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+async function subscribe() {
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') {
+    alert('คุณไม่ได้อนุญาตแจ้งเตือน');
+    return;
+  }
+
+  const reg = await navigator.serviceWorker.register('./sw.js');
+
+  const sub = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+  });
+
+  await fetch('https://notifications-ebon.vercel.app/api/subscribe', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(sub)
+  });
+
+  alert('เปิดรับแจ้งเตือนเรียบร้อยแล้ว');
+}
+</script>
+
+</body>
+</html>
