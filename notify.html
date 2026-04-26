@@ -31,41 +31,39 @@ function urlBase64ToUint8Array(base64String) {
 
 async function subscribeUser() {
   const status = document.getElementById('status');
-
   try {
     status.innerText = 'กำลังสมัคร...';
-
     const permission = await Notification.requestPermission();
-
     if (permission !== 'granted') {
       status.innerText = '❌ ไม่อนุญาตแจ้งเตือน';
       return;
     }
 
-    await navigator.serviceWorker.register('./service-worker.js');
-    const reg = await navigator.serviceWorker.ready;
-
+    const reg = await navigator.serviceWorker.ready;   // ← ใช้ SW ที่ register ไว้แล้ว
+                                                        //   จาก install.html ไม่ต้อง register ซ้ำ
     let sub = await reg.pushManager.getSubscription();
-    if (sub) await sub.unsubscribe();
 
-    sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-    });
+    if (!sub) {                                        // ← subscribe ใหม่ ถ้ายังไม่มีเท่านั้น
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+    }
 
-    const res = await fetch('https://notifications-ebon.vercel.app/api/send-notification?action=subscribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(sub)
-    });
-
+    const res = await fetch(                           // ← ส่ง subscription ไป server
+      'https://notifications-ebon.vercel.app/api/send-notification?action=subscribe',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sub)
+      }
+    );
     if (!res.ok) throw new Error('สมัครไม่สำเร็จ');
-
     status.innerText = '✅ สมัครสำเร็จแล้ว';
 
   } catch (err) {
     console.error(err);
-    status.innerText = '❌ สมัครไม่สำเร็จ';
+    status.innerText = '❌ สมัครไม่สำเร็จ: ' + err.message;
   }
 }
 </script>
