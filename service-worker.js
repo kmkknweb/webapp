@@ -1,4 +1,4 @@
-const CACHE_NAME = 'agong-app-v13';
+const CACHE_NAME = 'agong-app-v14';
 
 const URLS_TO_CACHE = [
   './',
