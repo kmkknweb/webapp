@@ -58,3 +58,49 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+
+
+
+
+
+
+self.addEventListener('push', function(event) {
+  let data = {};
+
+  try {
+    data = event.data.json();
+  } catch (e) {
+    data = {
+      title: 'แจ้งเตือน',
+      body: event.data.text()
+    };
+  }
+
+
+
+
+  
+  self.registration.showNotification(data.title || 'แจ้งเตือน', {
+    body: data.body || '',
+    icon: '/agong.png',
+    data: {
+      url: data.url || '/'
+    }
+  });
+});
+
+
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window' }).then(clientList => {
+      for (const client of clientList) {
+        if (client.url === event.notification.data.url && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      return clients.openWindow(event.notification.data.url);
+    })
+  );
+});
