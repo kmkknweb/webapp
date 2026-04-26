@@ -2,20 +2,22 @@
   "name": "อากงอาม่าออนไลน์",
   "short_name": "อากงอาม่า",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0d0b10",
   "theme_color": "#6d1423",
-"icons": [
-  {
-    "src": "./agong.png",
-    "sizes": "192x192",
-    "type": "image/png",
-    "purpose": "any maskable"    
-  },
-  {
-    "src": "./agong.png",
-    "sizes": "512x512",
-    "type": "image/png",
-    "purpose": "any maskable"   
-  }
-]
+  "icons": [
+    {
+      "src": "./agong.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./agong.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
