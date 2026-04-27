@@ -301,7 +301,7 @@ button {
           </div>
         </div>
 
-        <label for="cardCtaUrl">ลิงก์ปุ่ม "ส่งพรให้คนที่คุณรัก" (ปกติคือ URL ของ card/index.html)</label>
+        <label for="cardCtaUrl">ลิงก์ปุ่ม "ส่งพรให้คนที่คุณรัก" (ปกติคือ URL ของ greetings-cards.html)</label>
         <input id="cardCtaUrl" type="text" placeholder="เช่น ./card/index.html หรือ https://yourdomain.com/card/">
 
         <label for="cardNote">หมายเหตุสำหรับ admin (ไม่แสดงให้ผู้ใช้เห็น)</label>
@@ -346,7 +346,7 @@ button {
             🍳 kitchen-god — เจ้าครัว (เดือน 12/23)<br>
             ⭐ threestar — ฮกลกซิ่ว (ทั่วไป)<br>
             🌸 general — ทั่วไป / มงคล<br>
-            <span style="color:var(--gold2)">→ รวม 18 ธีม · เพิ่มได้ใน THEMES{} ของ card/index.html</span>
+            <span style="color:var(--gold2)">→ รวม 18 ธีม · เพิ่มได้ใน THEMES{} ของ greetings-cards.html</span>
           </div>
         </div>
       </section>
@@ -604,7 +604,7 @@ button {
         const d = snap.data();
         $('cardEnabled').value = String(d.enabled ?? true);
         $('cardTheme').value = d.theme || 'general';
-        $('cardCtaUrl').value = d.ctaUrl || './card/index.html';
+        $('cardCtaUrl').value = d.ctaUrl || './greetings-cards.html';
         $('cardNote').value = d.note || '';
         updateCardPreview();
         setStatus('cardStatus','โหลดข้อมูลสำเร็จ • อัปเดตล่าสุด: ' + (d.updatedAt ? new Date(d.updatedAt).toLocaleString('th-TH') : '-'));
@@ -616,7 +616,7 @@ button {
         const data = {
           enabled: $('cardEnabled').value === 'true',
           theme: $('cardTheme').value,
-          ctaUrl: $('cardCtaUrl').value.trim() || './card/index.html',
+          ctaUrl: $('cardCtaUrl').value.trim() || './greetings-cards.html',
           note: $('cardNote').value.trim(),
           updatedAt: new Date().toISOString()
         };
