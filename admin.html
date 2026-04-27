@@ -20,6 +20,40 @@
     th{color:var(--gold2);font-weight:700;background:rgba(255,255,255,.04);position:sticky;top:0}
     .pill{display:inline-flex;border-radius:999px;padding:4px 8px;font-size:11px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:var(--gold2)}
     .ok{color:#9ff0c1}.bad{color:#ffb0b0}
+    html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.stats-card {
+  width: 100%;
+  max-width: 920px;
+  margin: 20px auto 14px;
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+.stats-frame-box {
+  width: 100%;
+  height: 420px;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 16px;
+}
+
+.stats-frame-box iframe {
+  width: 100%;
+  height: 420px;
+  border: 0;
+  display: block;
+}
   </style>
 </head>
 
@@ -27,45 +61,20 @@
 
 <body>
 
-  <!-- statistics -->
-  <div style="
-    width:100%;
-    max-width:1200px;
-    margin:20px auto;
-    padding:12px;
-    box-sizing:border-box;
-  ">
-
-    <h2 style="color:#fff;">📊 สถิติผู้ใช้งาน</h2>
-
-    <div style="
-      width:100%;
-      height:45vh;
-      overflow:auto;
-      background:#fff;
-      border-radius:12px;
-    ">
-      <iframe
-        src="https://datastudio.google.com/embed/reporting/c38d2941-c8d2-44f2-9fe5-f6450af580b8/page/CXRwF"
-        style="
-          width:100%;
-          height:1000px;
-          border:0;
-          display:block;
-        "
-        allowfullscreen>
-      </iframe>
-    </div>
-
-  </div>
-
-
-
-
-  
 
   
   <div class="wrap">
+    <section class="card full stats-card">
+  <h2>📊 สถิติผู้ใช้งาน</h2>
+  <p class="hint">ข้อมูลจาก Google Analytics ผ่าน Looker Studio</p>
+
+  <div class="stats-frame-box">
+    <iframe
+      src="https://datastudio.google.com/embed/reporting/c38d2941-c8d2-44f2-9fe5-f6450af580b8/page/CXRwF"
+      allowfullscreen>
+    </iframe>
+  </div>
+</section>
     <div class="hero">
       <div class="badge">Firebase Admin • Notice + Popup + Notification + Activity</div>
       <h1>จัดการประกาศ, Popup, Notification และกิจกรรม</h1>
