@@ -68,6 +68,54 @@ html, body {
   text-decoration: none;
   font-weight: 800;
 }
+    /* ===== FIX OVERFLOW (ADD ONLY) ===== */
+
+/* กันหน้าเว็บล้น */
+html, body {
+  overflow-x: hidden !important;
+}
+
+/* กันการ์ดล้น */
+.card {
+  overflow: hidden !important;
+}
+
+/* บังคับ grid ไม่ให้ดันขยาย */
+.grid-main,
+.grid,
+.grid-3,
+.btn-row {
+  min-width: 0 !important;
+}
+
+.grid-main > *,
+.grid > *,
+.grid-3 > *,
+.btn-row > * {
+  min-width: 0 !important;
+}
+
+/* ให้ข้อความยาวตัดบรรทัด */
+.card p,
+.card h1,
+.card h2,
+.card label,
+.card .hint,
+.card .small,
+.card .status {
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+}
+
+/* input ไม่ให้ดัน */
+input,
+textarea,
+select,
+button {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box;
+}
   </style>
 </head>
 
