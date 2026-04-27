@@ -4,17 +4,54 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>เปิดรับแจ้งเตือน</title>
-</head>
-<body style="font-family:sans-serif;text-align:center;padding:40px">
+</head><body style="margin:0;font-family:'Kanit',sans-serif;background:#0d0b10;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;">
 
-<h2>🔔 รับแจ้งเตือน</h2>
-<p>กดปุ่มด้านล่างเพื่อเปิดรับแจ้งเตือน</p>
+  <div style="max-width:420px;width:100%;padding:24px;text-align:center">
 
-<button onclick="subscribeUser()" style="padding:15px 25px;font-size:16px">
-  เปิดรับแจ้งเตือน
-</button>
+    <!-- โลโก้ -->
+    <img src="./agong.png" style="width:120px;height:120px;border-radius:50%;box-shadow:0 0 30px rgba(242,196,107,0.3);margin-bottom:20px;">
 
-<p id="status"></p>
+    <!-- หัวข้อ -->
+    <h2 style="margin:0 0 10px;font-size:24px;color:#ffe5b1;">
+      🔔 เปิดรับแจ้งเตือน
+    </h2>
+
+    <!-- คำอธิบาย -->
+    <p style="color:#e3d8d0;line-height:1.8;margin-bottom:24px;">
+      รับข่าวสารกิจกรรมสำคัญ<br>
+      โปรโมชั่น และประกาศจากศาลเจ้า<br>
+      ได้ทันทีบนมือถือของคุณ
+    </p>
+
+    <!-- ปุ่ม -->
+    <button onclick="subscribeUser()" 
+      style="
+        width:100%;
+        padding:16px;
+        font-size:16px;
+        font-weight:bold;
+        border:none;
+        border-radius:16px;
+        background:linear-gradient(135deg,#f7d38b,#e6b85c);
+        color:#2b1b05;
+        box-shadow:0 10px 25px rgba(242,196,107,0.3);
+        cursor:pointer;
+      ">
+      🔔 เปิดรับแจ้งเตือน
+    </button>
+
+    <!-- สถานะ -->
+    <p id="status" style="margin-top:16px;font-size:14px;color:#ffe5b1;"></p>
+
+    <!-- หมายเหตุ -->
+    <p style="margin-top:20px;font-size:12px;color:#aaa;line-height:1.6;">
+      คุณสามารถปิดการแจ้งเตือนได้ทุกเมื่อ<br>
+      ผ่านการตั้งค่าในอุปกรณ์ของคุณ
+    </p>
+
+  </div>
+
+</body>
 
 <script>
 const VAPID_PUBLIC_KEY = 'BEKZqk7DqYA6PrsqanHfDQjDmvNPnQGvClusMMzY8mSCoNYziJuNkifMWokKFBPU3wFxcPlBlwVYr3T0Ah90cng';
