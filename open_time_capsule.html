@@ -112,17 +112,150 @@ button:hover{
 }
 
 @keyframes glow{
-  from{box-shadow:0 0 10px rgba(255,200,100,.3)}
-  to{box-shadow:0 0 30px rgba(255,200,100,.9)}
+<!DOCTYPE html><html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เปิดคำอธิษฐาน</title><link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>
+body{
+  margin:0;
+  font-family:'Kanit',sans-serif;
+  background: radial-gradient(circle at center,#8f1d1d,#1a0505);
+  color:#fff;
+  overflow:hidden;
 }
 
-</style></head><body><h1>🔓 เปิดคำอธิษฐาน</h1>
-<div class="subtitle">จากอดีต…สู่วันนี้</div><div class="container">
-  <input id="codeInput" placeholder="TC-2026-XXXXX">
-  <button onclick="openCapsule()">เปิด Time Capsule</button>
-  <div class="msg" id="msg"></div>
-</div><div class="card glow" id="card">
-  <h2>คำอธิษฐานของคุณ</h2>
+.wrap{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:20px;
+}
+
+h1{
+  font-size:44px;
+  margin-bottom:10px;
+  letter-spacing:1px;
+}
+
+.subtitle{
+  opacity:.8;
+  margin-bottom:30px;
+}
+
+.input-box{
+  background:rgba(255,255,255,0.08);
+  padding:25px;
+  border-radius:25px;
+  backdrop-filter:blur(10px);
+  box-shadow:0 20px 80px rgba(0,0,0,0.7);
+}
+
+input{
+  width:260px;
+  padding:16px;
+  border:none;
+  border-radius:15px;
+  margin-bottom:15px;
+  font-size:16px;
+  text-align:center;
+  text-transform:uppercase;
+}
+
+.btn{
+  padding:16px 30px;
+  border:none;
+  border-radius:999px;
+  font-size:18px;
+  font-weight:600;
+  cursor:pointer;
+  background:linear-gradient(180deg,#fff0b3,#f1b93f);
+  box-shadow:0 0 20px rgba(255,200,100,.5);
+  transition:.3s;
+}
+
+.btn:hover{
+  transform:scale(1.08);
+  box-shadow:0 0 40px rgba(255,200,100,1);
+}
+
+.msg{
+  margin-top:20px;
+  font-size:16px;
+}
+
+.card{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  width:90%;
+  max-width:420px;
+  background:linear-gradient(160deg,#4a0f0f,#841b1b 60%,#b97822);
+  border-radius:30px;
+  padding:30px;
+  box-shadow:0 30px 120px rgba(0,0,0,0.9);
+  text-align:center;
+  transition:.6s ease;
+}
+
+.card.show{
+  transform:translate(-50%,-50%) scale(1);
+}
+
+.agong{
+  width:140px;
+  margin-bottom:10px;
+  animation:float 3s ease-in-out infinite;
+  filter:drop-shadow(0 0 25px rgba(255,200,100,.7));
+}
+
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-12px)}
+}
+
+.quote{
+  font-size:22px;
+  margin:20px 0;
+  line-height:1.7;
+}
+
+.name{
+  opacity:.85;
+}
+
+.glow{
+  position:absolute;
+  width:200px;
+  height:200px;
+  background:radial-gradient(circle,#ffd27a,transparent);
+  border-radius:50%;
+  filter:blur(40px);
+  animation:pulse 2s infinite;
+  z-index:-1;
+}
+
+@keyframes pulse{
+  0%{transform:scale(1);opacity:.6}
+  50%{transform:scale(1.3);opacity:1}
+  100%{transform:scale(1);opacity:.6}
+}
+
+</style></head><body><div class="wrap">
+  <h1>🔮 เปิดคำอธิษฐาน</h1>
+  <div class="subtitle">เมื่อเวลามาถึง...คำอธิษฐานจะปรากฏ</div>  <div class="input-box">
+    <input id="codeInput" placeholder="TC-2026-XXXXX">
+    <br>
+    <button class="btn" onclick="openCapsule()">✨ เปิดโคม</button>
+    <div class="msg" id="msg"></div>
+  </div>
+</div><div class="card" id="card">
+  <div class="glow"></div>
+  <img src="images/agong.png" class="agong">
   <div class="quote" id="wish"></div>
   <div class="name" id="name"></div>
 </div><script type="module">
@@ -146,8 +279,7 @@ window.openCapsule = async function(){
   const msg = document.getElementById("msg");
   const card = document.getElementById("card");
 
-  msg.innerText = "กำลังค้นหา...";
-  card.style.display = "none";
+  msg.innerText = "กำลังเปิด...";
 
   const q = query(collection(db, "timeCapsules"), where("code","==",code));
   const snap = await getDocs(q);
@@ -159,18 +291,19 @@ window.openCapsule = async function(){
 
   const data = snap.docs[0].data();
   const unlockAt = data.unlockAt.toDate();
-  const now = new Date();
 
-  if(now < unlockAt){
-    msg.innerText = "⏳ ยังไม่ถึงเวลาเปิด";
+  if(new Date() < unlockAt){
+    msg.innerText = "⏳ ยังไม่ถึงเวลา";
     return;
   }
 
-  document.getElementById("wish").innerText = data.wish;
-  document.getElementById("name").innerText = data.name || "";
-
-  card.style.display = "block";
   msg.innerText = "";
+
+  setTimeout(()=>{
+    document.getElementById("wish").innerText = data.wish;
+    document.getElementById("name").innerText = data.name || "";
+    card.classList.add("show");
+  },800);
 };
 </script></body>
 </html>
