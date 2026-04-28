@@ -13,24 +13,32 @@ body{
   font-family:'Kanit',sans-serif;
   background:radial-gradient(circle,#8f1d1d,#1a0303);
   color:#fff;
-  text-align:center;
   overflow:hidden;
 }
 
-/* ฉาก */
+/* ฉากหลัง particle */
+canvas{
+  position:fixed;
+  top:0;
+  left:0;
+}
+
+/* layout */
 .container{
+  position:relative;
   height:100vh;
   display:flex;
   flex-direction:column;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
+  text-align:center;
 }
 
 /* อากง */
 .agong{
-  width:140px;
+  width:150px;
   animation:float 3s infinite ease-in-out;
-  filter:drop-shadow(0 0 30px gold);
+  filter:drop-shadow(0 0 40px gold);
 }
 
 @keyframes float{
@@ -40,10 +48,10 @@ body{
 
 /* input */
 input{
-  margin-top:20px;
   padding:15px;
   border-radius:15px;
   border:none;
+  margin-top:20px;
   text-align:center;
   font-size:18px;
   text-transform:uppercase;
@@ -57,7 +65,7 @@ button{
   border-radius:999px;
   font-size:18px;
   background:linear-gradient(#fff0b3,#f1b93f);
-  box-shadow:0 0 30px rgba(255,200,100,.6);
+  box-shadow:0 0 30px rgba(255,200,100,.8);
   cursor:pointer;
   transition:.3s;
 }
@@ -68,10 +76,7 @@ button:hover{
 /* overlay */
 .overlay{
   position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  bottom:0;
+  inset:0;
   background:rgba(0,0,0,.9);
   display:none;
   justify-content:center;
@@ -80,8 +85,8 @@ button:hover{
 }
 
 .light{
-  width:150px;
-  height:150px;
+  width:200px;
+  height:200px;
   border-radius:50%;
   background:radial-gradient(circle,gold,transparent);
   animation:pulse 1.5s infinite;
@@ -89,10 +94,10 @@ button:hover{
 
 @keyframes pulse{
   0%,100%{transform:scale(1)}
-  50%{transform:scale(1.3)}
+  50%{transform:scale(1.4)}
 }
 
-/* การ์ด */
+/* card */
 .card{
   position:fixed;
   top:50%;
@@ -103,7 +108,7 @@ button:hover{
   padding:30px;
   border-radius:25px;
   width:90%;
-  max-width:400px;
+  max-width:420px;
   transition:.6s;
 }
 
@@ -114,12 +119,15 @@ button:hover{
 .quote{
   font-size:22px;
   margin-top:20px;
+  line-height:1.6;
 }
 
 </style>
 </head>
 
 <body>
+
+<canvas id="bg"></canvas>
 
 <div class="container">
   <img src="images/agong.png" class="agong">
@@ -154,7 +162,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* พิมพ์ทีละตัว */
+/* type effect */
 function typeText(text, el){
   let i=0;
   el.innerHTML="";
@@ -168,6 +176,7 @@ function typeText(text, el){
   t();
 }
 
+/* main */
 window.openCapsule = async function(){
   const code = document.getElementById("codeInput").value.toUpperCase();
   const overlay = document.getElementById("overlay");
@@ -198,8 +207,38 @@ window.openCapsule = async function(){
     overlay.style.display="none";
     card.classList.add("show");
     typeText(data.wish,document.getElementById("wish"));
-  },1200);
+  },1500);
 }
+
+/* particle background */
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+for(let i=0;i<80;i++){
+  particles.push({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    r:Math.random()*2+1,
+    dy:Math.random()*1
+  });
+}
+
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="rgba(255,200,100,0.5)";
+  particles.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fill();
+    p.y-=p.dy;
+    if(p.y<0) p.y=canvas.height;
+  });
+  requestAnimationFrame(draw);
+}
+draw();
 </script>
 
 </body>
