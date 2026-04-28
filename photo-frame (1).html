@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>กรอบภาพ</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a0a04;font-family:'Kanit',sans-serif;color:#fff8e8;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding-bottom:60px}
+.topbar{width:100%;background:#0e0404;border-bottom:1px solid rgba(212,168,67,.25);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.topbar-title{font-size:13px;font-weight:700;color:#d4a843}
+.topbar-btn{font-size:12px;background:none;border:none;color:rgba(255,248,232,.45);font-family:inherit;cursor:pointer;text-decoration:underline}
+.topbar-btn:hover{color:#d4a843}
+.page{width:100%;max-width:1100px;padding:24px 16px 0;display:flex;flex-direction:column;align-items:center;gap:20px}
+#mainCanvas{display:block;border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.7)}
+.controls{width:100%;max-width:680px;display:flex;flex-direction:column;gap:14px}
+.card{background:rgba(255,248,232,.06);border:1px solid rgba(212,168,67,.2);border-radius:16px;padding:16px 18px}
+.card-title{font-size:12px;font-weight:700;color:#d4a843;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.obtn{flex:1;padding:11px 0;border-radius:10px;border:1.5px solid rgba(212,168,67,.3);background:transparent;color:rgba(255,248,232,.6);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;gap:7px}
+.obtn.active{border-color:#d4a843;background:rgba(212,168,67,.12);color:#f6e09a}
+.frame-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.fbtn{border:1.5px solid rgba(212,168,67,.25);border-radius:10px;background:rgba(255,255,255,.05);cursor:pointer;padding:8px 4px;text-align:center;transition:.18s}
+.fbtn img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:6px;display:block;background:#2a0404}
+.fbtn span{display:block;font-size:11px;color:rgba(255,248,232,.55);margin-top:5px}
+.fbtn.active{border-color:#d4a843;background:rgba(212,168,67,.12)}
+.fbtn.active span{color:#f6e09a}
+.btn{border:none;border-radius:999px;padding:13px 14px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn:hover{transform:translateY(-2px)}
+.btn-gold{background:linear-gradient(160deg,#f6e09a,#d4a843 50%,#a07020);color:#3a1a00}
+.btn-ghost{background:rgba(255,255,255,.09);border:1px solid rgba(212,168,67,.3);color:#fff8e8}
+.btn-red{background:linear-gradient(160deg,#a02020,#4a0808);color:#ffe8c0}
+.btn-green{background:linear-gradient(160deg,#2a8a50,#145030);color:#c8ffe0}
+.flabel{display:block;font-size:12px;color:rgba(255,248,232,.5);margin-bottom:6px}
+input[type=file]{width:100%;padding:10px 12px;border:1px solid rgba(212,168,67,.2);border-radius:10px;background:rgba(255,255,255,.07);color:#fff8e8;font-family:inherit;font-size:13px;outline:none}
+.admin-section{width:100%;max-width:680px;border:1.5px dashed rgba(212,168,67,.2);border-radius:16px;padding:20px;display:none}
+.admin-section.open{display:block}
+.admin-section h3{font-size:13px;font-weight:700;color:#d4a843;letter-spacing:2px;margin-bottom:14px}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:500px){.admin-grid{grid-template-columns:1fr}}
+.field label{display:block;font-size:12px;color:rgba(212,168,67,.8);margin-bottom:5px}
+.field input{width:100%;padding:10px 12px;border:1px solid rgba(212,168,67,.2);border-radius:10px;background:rgba(255,255,255,.08);color:#fff8e8;font-family:inherit;font-size:14px;outline:none}
+.field input:focus{border-color:#d4a843}
+.anote{font-size:11px;color:rgba(255,248,232,.35);margin-top:3px}
+.savemsg{font-size:12px;color:#60e090;margin-top:8px;display:none}
+#video{display:none}
+#dbg{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.88);color:#00ff88;font-size:11px;padding:6px 10px;z-index:9999;max-height:100px;overflow-y:auto;font-family:monospace;display:none}
+</style>
+</head>
+<body>
+<div id="dbg"></div>
+<div class="topbar">
+  <span class="topbar-title">📸 กรอบภาพศาลเจ้า • สมาคมปึงเถ่ากงม่า</span>
+  <button class="topbar-btn" onclick="toggleAdmin()">⚙️ ตั้งค่าข้อความ (Admin)</button>
+</div>
+<video id="video" playsinline autoplay muted></video>
+<div class="page">
+  <canvas id="mainCanvas"></canvas>
+  <div class="controls">
+    <div class="card">
+      <div class="card-title">แนวภาพ</div>
+      <div class="row2">
+        <button class="obtn active" id="btnP" onclick="setOri('portrait')">📱 แนวตั้ง</button>
+        <button class="obtn" id="btnL" onclick="setOri('landscape')">🖼 แนวนอน</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">เลือกกรอบ</div>
+      <div class="frame-grid" id="frameGrid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">รูปถ่าย</div>
+      <div class="row2" style="margin-bottom:12px">
+        <button class="btn btn-gold" onclick="startCam()">📹 เปิดกล้อง</button>
+        <button class="btn btn-ghost" onclick="capPhoto()">📸 ถ่ายภาพ</button>
+      </div>
+      <label class="flabel">หรืออัปโหลดรูปจากเครื่อง</label>
+      <input type="file" id="photoUpload" accept="image/*">
+    </div>
+    <div class="card">
+      <div class="card-title">บันทึก</div>
+      <div class="row2">
+        <button class="btn btn-green" onclick="dlPhoto()">⬇️ ดาวน์โหลด</button>
+        <button class="btn btn-red" onclick="resetAll()">🗑 เริ่มใหม่</button>
+      </div>
+    </div>
+  </div>
+  <div class="admin-section" id="adminSec">
+    <h3>⚙️ ตั้งค่าข้อความบนกรอบ</h3>
+    <div class="admin-grid">
+      <div class="field">
+        <label>ชื่อกิจกรรม / งานพิธี</label>
+        <input type="text" id="aEvent" value="งานง่วนเซียว ๒๕๖๘">
+        <div class="anote">แสดงด้านบนกรอบ</div>
+      </div>
+      <div class="field">
+        <label>ข้อความด้านล่าง บรรทัด 1</label>
+        <input type="text" id="aBot1" value="ศาลเจ้า • ความทรงจำแห่งศรัทธา">
+      </div>
+      <div class="field">
+        <label>ข้อความด้านล่าง บรรทัด 2</label>
+        <input type="text" id="aBot2" value="สมาคมปึงเถ่ากงม่า ขอนแก่น">
+      </div>
+      <div class="field">
+        <label>ข้อความด้านล่าง บรรทัด 3 (ไม่บังคับ)</label>
+        <input type="text" id="aBot3" value="">
+      </div>
+    </div>
+    <button class="btn btn-gold" style="margin-top:14px" onclick="applyAdmin()">✅ บันทึก</button>
+    <div class="savemsg" id="savemsg">✓ อัปเดตแล้ว</div>
+  </div>
+</div>
+<script>
+// ══ DEBUG ══
+const dbgEl = document.getElementById('dbg');
+function dbg(msg){ dbgEl.style.display='block'; dbgEl.innerHTML += msg+'<br>'; dbgEl.scrollTop=9999; console.log(msg); }
+window.onerror = (m,s,l) => dbg('JS ERROR: '+m+' (line '+l+')');
+
+// ══ CONFIG ══════════════════════════════════════════════
+// แก้ตรงนี้เพื่อเพิ่มกรอบ
+// photo: พื้นที่โปร่งใสในกรอบ PNG (หน่วย px บน canvas ขนาด 1080x1440)
+// textTop: ตำแหน่ง Y ของข้อความบน
+// textBot: ตำแหน่ง Y ของข้อความล่าง
+const FRAMES = {
+  portrait: [
+    { id:'p1', label:'กรอบที่ 1', src:'frame/frame1.png',
+      photo:{ x:88, y:195, w:904, h:1048 },
+      textTop:{ assocY:85, eventY:128 },
+      textBot:{ y1:1320, y2:1360, y3:1395 }
+    },
+  ],
+  landscape: [
+    // เพิ่มกรอบแนวนอนตรงนี้
+  ],
+};
+const SIZES = { portrait:{w:1080,h:1440}, landscape:{w:1440,h:1080} };
+const ASSOC = 'สมาคมปึงเถ่ากงม่า';
+// ════════════════════════════════════════════════════════
+
+let admin = { event:'งานง่วนเซียว ๒๕๖๘', bot1:'ศาลเจ้า • ความทรงจำแห่งศรัทธา', bot2:'สมาคมปึงเถ่ากงม่า ขอนแก่น', bot3:'' };
+let ori = 'portrait', selId = 'p1', srcImg = null, camStream = null, camOn = false, cache = {};
+
+const canvas = document.getElementById('mainCanvas');
+const ctx = canvas.getContext('2d');
+const video = document.getElementById('video');
+
+// scale canvas display
+function setSize(){
+  const {w,h} = SIZES[ori];
+  canvas.width=w; canvas.height=h;
+  const s = Math.min(1, 560/h);
+  canvas.style.width=(w*s)+'px'; canvas.style.height=(h*s)+'px';
+}
+
+// load PNG with crossOrigin
+function loadImg(src){
+  if(cache[src]) return Promise.resolve(cache[src]);
+  return new Promise(res=>{
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = ()=>{ dbg('✅ '+src); cache[src]=img; res(img); };
+    img.onerror = (e)=>{ dbg('❌ '+src+' — ไม่พบไฟล์ หรือ CORS error'); res(null); };
+    dbg('⏳ กำลังโหลด: '+src);
+    img.src = src;
+  });
+}
+
+function getFrame(){ const list=FRAMES[ori]||[]; return list.find(f=>f.id===selId)||list[0]||null; }
+
+async function render(){
+  const {w,h}=SIZES[ori]; const fr=getFrame();
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle='#fffef8'; ctx.fillRect(0,0,w,h);
+
+  if(fr){
+    const pz=fr.photo;
+    ctx.save();
+    ctx.beginPath(); ctx.rect(pz.x,pz.y,pz.w,pz.h); ctx.clip();
+    const s = srcImg||(camStream&&video.readyState>=2?video:null);
+    if(s){
+      const sw=s.naturalWidth||s.videoWidth||pz.w, sh=s.naturalHeight||s.videoHeight||pz.h;
+      const sc=Math.max(pz.w/sw,pz.h/sh), nw=sw*sc, nh=sh*sc;
+      ctx.drawImage(s, pz.x+(pz.w-nw)/2, pz.y+(pz.h-nh)/2, nw, nh);
+    } else {
+      ctx.fillStyle='#f5ede0'; ctx.fillRect(pz.x,pz.y,pz.w,pz.h);
+      ctx.fillStyle='#b8956a'; ctx.font=`400 ${w*0.022}px Kanit`; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('เปิดกล้องหรืออัปโหลดรูป', pz.x+pz.w/2, pz.y+pz.h/2);
+    }
+    ctx.restore();
+
+    // overlay frame PNG
+    const fi = await loadImg(fr.src);
+    if(fi){ ctx.drawImage(fi,0,0,w,h); dbg('🖼 วาดกรอบแล้ว'); }
+    else { dbg('⚠️ ไม่สามารถวาดกรอบได้'); }
+
+    // text
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.font=`600 ${Math.round(w*0.025)}px Kanit`; ctx.fillStyle='#7a1010';
+    ctx.fillText(ASSOC, w/2, fr.textTop.assocY);
+    if(admin.event){ ctx.font=`700 ${Math.round(w*0.033)}px Kanit`; ctx.fillStyle='#4a0606'; ctx.fillText(admin.event,w/2,fr.textTop.eventY); }
+    [admin.bot1,admin.bot2,admin.bot3].filter(Boolean).forEach((l,i)=>{
+      ctx.font=`${i===0?600:400} ${Math.round(w*(i===0?.022:.019))}px Kanit`; ctx.fillStyle=i===0?'#7a1010':'#5a3010';
+      ctx.fillText(l, w/2, [fr.textBot.y1,fr.textBot.y2,fr.textBot.y3][i]);
+    });
+  }
+}
+
+// frame grid
+function buildGrid(){
+  const grid=document.getElementById('frameGrid'); grid.innerHTML='';
+  const list=FRAMES[ori]||[];
+  if(!list.length){ grid.innerHTML='<p style="color:rgba(255,248,232,.4);font-size:13px;padding:4px;grid-column:1/-1">ยังไม่มีกรอบสำหรับแนวนี้</p>'; return; }
+  list.forEach(f=>{
+    const d=document.createElement('div'); d.className='fbtn'+(f.id===selId?' active':'');
+    d.innerHTML=`<img src="${f.src}" alt="${f.label}" loading="lazy"><span>${f.label}</span>`;
+    d.onclick=()=>{ selId=f.id; document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active')); d.classList.add('active'); render(); };
+    grid.appendChild(d);
+  });
+}
+
+// camera
+async function startCam(){
+  try{
+    stopCam();
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});
+    video.srcObject=camStream; srcImg=null; camOn=true;
+    (function loop(){ if(camOn){render();requestAnimationFrame(loop);} })();
+  }catch(e){ alert('เปิดกล้องไม่ได้: '+e.message); }
+}
+function stopCam(){ camOn=false; if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;} video.srcObject=null; }
+function capPhoto(){ if(!camStream)return; const s=new Image(); s.onload=()=>{srcImg=s;stopCam();render();}; s.src=canvas.toDataURL('image/jpeg',.95); }
+
+// upload
+document.getElementById('photoUpload').addEventListener('change',e=>{
+  const file=e.target.files?.[0]; if(!file)return;
+  const r=new FileReader(); r.onload=()=>{ const i=new Image(); i.onload=()=>{srcImg=i;stopCam();render();}; i.src=r.result; }; r.readAsDataURL(file);
+});
+
+// download
+async function dlPhoto(){ await render(); const a=document.createElement('a'); a.download='shrine-'+Date.now()+'.png'; a.href=canvas.toDataURL('image/png'); a.click(); }
+
+// reset
+function resetAll(){ stopCam(); srcImg=null; document.getElementById('photoUpload').value=''; render(); }
+
+// orientation
+function setOri(o){
+  ori=o;
+  document.getElementById('btnP').classList.toggle('active',o==='portrait');
+  document.getElementById('btnL').classList.toggle('active',o==='landscape');
+  const list=FRAMES[o]||[]; selId=list[0]?.id||'';
+  setSize(); buildGrid(); render();
+}
+
+// admin
+function toggleAdmin(){ document.getElementById('adminSec').classList.toggle('open'); }
+['aEvent','aBot1','aBot2','aBot3'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    admin.event=document.getElementById('aEvent').value;
+    admin.bot1=document.getElementById('aBot1').value;
+    admin.bot2=document.getElementById('aBot2').value;
+    admin.bot3=document.getElementById('aBot3').value;
+    render();
+  });
+});
+function applyAdmin(){
+  admin.event=document.getElementById('aEvent').value;
+  admin.bot1=document.getElementById('aBot1').value;
+  admin.bot2=document.getElementById('aBot2').value;
+  admin.bot3=document.getElementById('aBot3').value;
+  render();
+  const m=document.getElementById('savemsg'); m.style.display='block'; setTimeout(()=>m.style.display='none',2000);
+}
+
+// init
+dbg('🚀 เริ่มต้น...');
+setSize(); buildGrid();
+(async()=>{ const fr=getFrame(); if(fr){ dbg('📂 src: '+fr.src); await loadImg(fr.src); } render(); })();
+</script>
+</body>
+</html>
