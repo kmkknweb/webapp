@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>กรอบภาพศาลเจ้า • สมาคมปึงเถ่ากงม่า</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a0a04;font-family:'Kanit',sans-serif;color:#fff8e8;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding-bottom:60px}
+.topbar{width:100%;background:#0e0404;border-bottom:1px solid rgba(212,168,67,.25);padding:10px 24px;display:flex;align-items:center;}
+.topbar-title{font-size:13px;font-weight:700;color:#d4a843}
+.page{width:100%;max-width:700px;padding:16px 12px 0;display:flex;flex-direction:column;align-items:center;gap:16px}
+.stage{position:relative;width:100%;line-height:0}
+#photoCanvas{display:block;width:100%;border-radius:6px;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+#frameCanvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;border-radius:6px}
+#textCanvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+.controls{width:100%;display:flex;flex-direction:column;gap:12px}
+.card{background:rgba(255,248,232,.06);border:1px solid rgba(212,168,67,.2);border-radius:14px;padding:14px 16px}
+.card-title{font-size:11px;font-weight:700;color:#d4a843;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.obtn{padding:10px 0;border-radius:10px;border:1.5px solid rgba(212,168,67,.3);background:transparent;color:rgba(255,248,232,.6);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;gap:6px}
+.obtn.active{border-color:#d4a843;background:rgba(212,168,67,.12);color:#f6e09a}
+.frame-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.fbtn{border:1.5px solid rgba(212,168,67,.25);border-radius:10px;background:rgba(255,255,255,.05);cursor:pointer;padding:6px 4px;text-align:center;transition:.18s}
+.fbtn img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:6px;display:block;background:#2a0404}
+.fbtn.land img{aspect-ratio:4/3}
+.fbtn span{display:block;font-size:10px;color:rgba(255,248,232,.55);margin-top:4px}
+.fbtn.active{border-color:#d4a843;background:rgba(212,168,67,.12)}
+.fbtn.active span{color:#f6e09a}
+.btn{border:none;border-radius:999px;padding:12px 14px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;gap:6px;width:100%}
+.btn:active{transform:scale(.97)}
+.btn-gold{background:linear-gradient(160deg,#f6e09a,#d4a843 50%,#a07020);color:#3a1a00}
+.btn-ghost{background:rgba(255,255,255,.09);border:1px solid rgba(212,168,67,.3);color:#fff8e8}
+.btn-red{background:linear-gradient(160deg,#a02020,#4a0808);color:#ffe8c0}
+.btn-green{background:linear-gradient(160deg,#2a8a50,#145030);color:#c8ffe0}
+.flabel{display:block;font-size:11px;color:rgba(255,248,232,.5);margin-bottom:5px}
+input[type=file]{width:100%;padding:9px 12px;border:1px solid rgba(212,168,67,.2);border-radius:10px;background:rgba(255,255,255,.07);color:#fff8e8;font-family:inherit;font-size:13px;outline:none}
+#video{display:none}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <span class="topbar-title">📸 กรอบภาพศาลเจ้า • สมาคมปึงเถ่ากงม่า</span>
+</div>
+<video id="video" playsinline autoplay muted></video>
+<div class="page">
+  <div class="stage" id="stage">
+    <canvas id="photoCanvas"></canvas>
+    <canvas id="frameCanvas"></canvas>
+    <canvas id="textCanvas"></canvas>
+  </div>
+  <div class="controls">
+    <div class="card">
+      <div class="card-title">แนวภาพ</div>
+      <div class="row2">
+        <button class="obtn active" id="btnP" onclick="setOri('portrait')">📱 แนวตั้ง</button>
+        <button class="obtn" id="btnL" onclick="setOri('landscape')">🖼 แนวนอน</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">เลือกกรอบ</div>
+      <div class="frame-grid" id="frameGrid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">รูปถ่าย</div>
+      <div class="row2" style="margin-bottom:10px">
+        <button class="btn btn-gold" onclick="startCam()">📹 เปิดกล้อง</button>
+        <button class="btn btn-ghost" onclick="capPhoto()">📸 ถ่ายภาพ</button>
+      </div>
+      <label class="flabel">หรืออัปโหลดรูปจากเครื่อง</label>
+      <input type="file" id="photoUpload" accept="image/*">
+    </div>
+    <div class="card">
+      <div class="card-title">บันทึก</div>
+      <div class="row2">
+        <button class="btn btn-green" onclick="dlPhoto()">⬇️ ดาวน์โหลด</button>
+        <button class="btn btn-red" onclick="resetAll()">🗑 เริ่มใหม่</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// ══ Firebase ══════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyCLr6yKfOOnR2IqBQc2ytCEpMuTTrgcZ9Q",
+  authDomain: "webapp-5a606.firebaseapp.com",
+  projectId: "webapp-5a606",
+  storageBucket: "webapp-5a606.firebasestorage.app",
+  messagingSenderId: "4647661737",
+  appId: "1:4647661737:web:5729d78923c3b5b53739b8"
+};
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ══ CONFIG — เพิ่มกรอบตรงนี้ ════════════════════════
+const FRAMES = {
+  portrait: [
+    { id:'p1', label:'กรอบที่ 1', src:'frame/frame1.png',
+      photo:{ x:88, y:195, w:904, h:1048 },
+      textBot:{ y1:1320, y2:1360, y3:1395 }
+    },
+    // { id:'p2', label:'กรอบที่ 2', src:'frame/frame2.png', photo:{x:88,y:195,w:904,h:1048}, textBot:{y1:1320,y2:1360,y3:1395} },
+  ],
+  landscape: [
+    // { id:'l1', label:'กรอบที่ 1', src:'frame/frame1_land.png', photo:{x:130,y:130,w:1180,h:760}, textBot:{y1:990,y2:1025,y3:1055} },
+  ],
+};
+const SIZES = { portrait:{w:1080,h:1440}, landscape:{w:1440,h:1080} };
+// ════════════════════════════════════════════════════
+
+// ข้อความ default (จะถูก Firestore override อัตโนมัติ)
+let BOT1 = 'ศาลเจ้า • ความทรงจำแห่งศรัทธา';
+let BOT2 = 'สมาคมปึงเถ่ากงม่า ขอนแก่น';
+let BOT3 = '';
+
+// โหลดข้อความจาก Firestore
+db.collection('settings').doc('photoFrame').get().then(snap => {
+  if (snap.exists) {
+    const d = snap.data();
+    BOT1 = d.bot1 || BOT1;
+    BOT2 = d.bot2 || BOT2;
+    BOT3 = d.bot3 || BOT3;
+    drawText(); // อัปเดตข้อความหลังโหลดค่าได้
+  }
+}).catch(() => {}); // ถ้าโหลดไม่ได้ใช้ค่า default
+
+// ══ State ════════════════════════════════════════════
+let ori='portrait', selId='p1', srcImg=null, camStream=null, camOn=false, imgCache={};
+
+const photoCanvas = document.getElementById('photoCanvas');
+const frameCanvas = document.getElementById('frameCanvas');
+const textCanvas  = document.getElementById('textCanvas');
+const pCtx = photoCanvas.getContext('2d');
+const fCtx = frameCanvas.getContext('2d');
+const tCtx = textCanvas.getContext('2d');
+const video = document.getElementById('video');
+
+function getFrame(){ const l=FRAMES[ori]||[]; return l.find(f=>f.id===selId)||l[0]||null; }
+
+function setSize(){
+  const {w,h}=SIZES[ori];
+  [photoCanvas,frameCanvas,textCanvas].forEach(c=>{ c.width=w; c.height=h; });
+  photoCanvas.style.aspectRatio=w+'/'+h;
+  frameCanvas.style.aspectRatio=w+'/'+h;
+  textCanvas.style.aspectRatio=w+'/'+h;
+}
+
+function loadImg(src){
+  if(imgCache[src]) return Promise.resolve(imgCache[src]);
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>{ imgCache[src]=img; res(img); };
+    img.onerror=()=>res(null);
+    img.src=src;
+  });
+}
+
+function drawPhoto(){
+  const {w,h}=SIZES[ori]; const fr=getFrame();
+  pCtx.clearRect(0,0,w,h);
+  pCtx.fillStyle='#fffef8'; pCtx.fillRect(0,0,w,h);
+  const src=srcImg||(camStream&&video.readyState>=2?video:null);
+  if(src && fr){
+    const pz=fr.photo;
+    pCtx.save();
+    const r=22;
+    pCtx.beginPath();
+    pCtx.moveTo(pz.x+r,pz.y); pCtx.lineTo(pz.x+pz.w-r,pz.y);
+    pCtx.quadraticCurveTo(pz.x+pz.w,pz.y,pz.x+pz.w,pz.y+r);
+    pCtx.lineTo(pz.x+pz.w,pz.y+pz.h-r);
+    pCtx.quadraticCurveTo(pz.x+pz.w,pz.y+pz.h,pz.x+pz.w-r,pz.y+pz.h);
+    pCtx.lineTo(pz.x+r,pz.y+pz.h);
+    pCtx.quadraticCurveTo(pz.x,pz.y+pz.h,pz.x,pz.y+pz.h-r);
+    pCtx.lineTo(pz.x,pz.y+r);
+    pCtx.quadraticCurveTo(pz.x,pz.y,pz.x+r,pz.y);
+    pCtx.closePath(); pCtx.clip();
+    const sw=src.naturalWidth||src.videoWidth||pz.w, sh=src.naturalHeight||src.videoHeight||pz.h;
+    const sc=Math.max(pz.w/sw,pz.h/sh), nw=sw*sc, nh=sh*sc;
+    pCtx.drawImage(src,pz.x+(pz.w-nw)/2,pz.y+(pz.h-nh)/2,nw,nh);
+    pCtx.restore();
+  } else if(src){
+    const sw=src.naturalWidth||src.videoWidth||w, sh=src.naturalHeight||src.videoHeight||h;
+    const sc=Math.max(w/sw,h/sh), nw=sw*sc, nh=sh*sc;
+    pCtx.drawImage(src,(w-nw)/2,(h-nh)/2,nw,nh);
+  } else {
+    pCtx.fillStyle='#f0e8d8'; pCtx.fillRect(0,0,w,h);
+    pCtx.fillStyle='rgba(180,140,80,.5)';
+    pCtx.font=`400 ${w*0.022}px Kanit`;
+    pCtx.textAlign='center'; pCtx.textBaseline='middle';
+    pCtx.fillText('เปิดกล้องหรืออัปโหลดรูป',w/2,h/2);
+  }
+}
+
+async function drawFrame(){
+  const {w,h}=SIZES[ori]; const fr=getFrame();
+  fCtx.clearRect(0,0,w,h);
+  if(!fr) return;
+  const img=await loadImg(fr.src);
+  if(img) fCtx.drawImage(img,0,0,w,h);
+}
+
+function drawText(){
+  const {w,h}=SIZES[ori]; const fr=getFrame();
+  tCtx.clearRect(0,0,w,h);
+  if(!fr) return;
+  const tb=fr.textBot;
+  tCtx.textAlign='center'; tCtx.textBaseline='middle';
+  [BOT1,BOT2,BOT3].filter(Boolean).forEach((l,i)=>{
+    tCtx.font=`${i===0?600:400} ${Math.round(w*(i===0?.022:.019))}px Kanit`;
+    tCtx.fillStyle=i===0?'#7a1010':'#5a3010';
+    tCtx.fillText(l,w/2,[tb.y1,tb.y2,tb.y3][i]);
+  });
+}
+
+function render(){ drawPhoto(); drawFrame(); drawText(); }
+
+function buildGrid(){
+  const grid=document.getElementById('frameGrid'); grid.innerHTML='';
+  const list=FRAMES[ori]||[];
+  if(!list.length){ grid.innerHTML='<p style="color:rgba(255,248,232,.4);font-size:12px;padding:4px;grid-column:1/-1">ยังไม่มีกรอบสำหรับแนวนี้</p>'; return; }
+  list.forEach(f=>{
+    const d=document.createElement('div'); d.className='fbtn'+(f.id===selId?' active':'');
+    if(ori==='landscape') d.classList.add('land');
+    d.innerHTML=`<img src="${f.src}" alt="${f.label}" loading="lazy"><span>${f.label}</span>`;
+    d.onclick=()=>{ selId=f.id; document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active')); d.classList.add('active'); drawFrame(); drawText(); };
+    grid.appendChild(d);
+  });
+}
+
+async function startCam(){
+  try{
+    stopCam();
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+    video.srcObject=camStream; srcImg=null; camOn=true;
+    (function loop(){ if(camOn){drawPhoto();requestAnimationFrame(loop);} })();
+  }catch(e){
+    try{
+      camStream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+      video.srcObject=camStream; srcImg=null; camOn=true;
+      (function loop(){ if(camOn){drawPhoto();requestAnimationFrame(loop);} })();
+    }catch(e2){ alert('เปิดกล้องไม่ได้: '+e2.message); }
+  }
+}
+function stopCam(){ camOn=false; if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;} video.srcObject=null; }
+function capPhoto(){
+  if(!camStream) return;
+  srcImg=new Image(); srcImg.onload=()=>{stopCam();drawPhoto();}; srcImg.src=photoCanvas.toDataURL('image/jpeg',.92);
+}
+
+document.getElementById('photoUpload').addEventListener('change',e=>{
+  const file=e.target.files?.[0]; if(!file)return;
+  const r=new FileReader(); r.onload=()=>{ srcImg=new Image(); srcImg.onload=()=>{stopCam();drawPhoto();}; srcImg.src=r.result; }; r.readAsDataURL(file);
+});
+
+function dlPhoto(){
+  const {w,h}=SIZES[ori];
+  const off=document.createElement('canvas'); off.width=w; off.height=h;
+  const ox=off.getContext('2d');
+  ox.drawImage(photoCanvas,0,0);
+  const fr=getFrame();
+  if(fr && imgCache[fr.src]) ox.drawImage(imgCache[fr.src],0,0,w,h);
+  ox.drawImage(textCanvas,0,0);
+  const a=document.createElement('a'); a.download='shrine-frame-'+Date.now()+'.png'; a.href=off.toDataURL('image/png'); a.click();
+}
+
+function resetAll(){ stopCam(); srcImg=null; document.getElementById('photoUpload').value=''; drawPhoto(); }
+
+function setOri(o){
+  ori=o; selId=(FRAMES[o]||[])[0]?.id||'';
+  document.getElementById('btnP').classList.toggle('active',o==='portrait');
+  document.getElementById('btnL').classList.toggle('active',o==='landscape');
+  setSize(); buildGrid(); render();
+}
+
+setSize(); buildGrid(); render();
+</script>
+</body>
+</html>
