@@ -463,20 +463,74 @@ button:hover { transform: translateY(-2px); }
   </div>
 
   <div class="result" id="resultBox">
-    <div>คำอธิษฐานของท่านถูกเก็บไว้แล้ว</div>
-    <div class="code" id="codeText">TC-2026-0000</div>
-    <div class="hint">โปรดแคปหน้าจอหรือจดรหัสนี้ไว้ เพื่อใช้เปิดคำอธิษฐานในอนาคต</div>
-  </div>
-</section>
+body>
 
+  <!-- 🔥 ของเดิมทั้งหมด -->
+  <div class="lantern one"></div>
+  <div class="lantern two"></div>
+  <div class="lantern three"></div>
 
+  <main class="page">
 
-<div class="footer-note">
-  โปรดเก็บรหัสของท่านไว้ เพื่อใช้เปิดคำอธิษฐานในอนาคต
-</div>
+    <section class="hero">
+      <div class="badge">🏮 Time Capsule คำอธิษฐาน</div>
+      <h1>โคมอธิษฐาน<br>Time Capsule</h1>
+      <p class="subtitle">
+        ฝากคำอธิษฐานไว้กับแสงแห่งศรัทธา แล้วเปิดข้อความนี้อีกครั้งในเทศกาลปีหน้า
+      </p>
+    </section>
+
+    <!-- 🔥 เพิ่ม EVENT BOX -->
+    <section class="event-box event-empty" id="eventBox">
+      <div class="event-label">คำอธิษฐานนี้ถูกฝากไว้ในงาน</div>
+      <div class="event-name" id="eventNameDisplay">-</div>
+      <div class="event-date" id="eventDateDisplay">-</div>
+    </section>
+
+    <section class="card">
+      <div class="card-top">
+        <h2>ฝากคำอธิษฐานของท่าน</h2>
+        <p>เขียนคำอธิษฐานของท่าน แล้วเก็บไว้เพื่อกลับมาเปิดอีกครั้งในอนาคต</p>
+      </div>
+
+      <div class="form">
+        <div class="grid">
+          <div>
+            <label>ชื่อ / ชื่อเล่น</label>
+            <input id="name">
+          </div>
+
+          <div>
+            <label>ระยะเวลาเปิดคำอธิษฐาน</label>
+            <select id="period">
+              <option value="year">🔒 เปิดในเทศกาลปีหน้า</option>
+              <option value="now">🔓 เปิดได้ตลอดเวลา</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label>คำอธิษฐาน</label>
+          <textarea id="wish"></textarea>
+        </div>
+
+        <div>
+          <label>อีเมล</label>
+          <input id="email">
+        </div>
+
+        <button onclick="saveWish()">ฝากคำอธิษฐาน</button>
+      </div>
+
+      <div class="result" id="resultBox">
+        <div>คำอธิษฐานของท่านถูกเก็บไว้แล้ว</div>
+        <div class="code" id="codeText"></div>
+      </div>
+    </section>
 
   </main>
 
+  <!-- 🔥 overlay เดิม -->
   <div class="saving-overlay" id="savingOverlay">
     <div class="seal-scene">
       <div class="seal-ring"></div>
@@ -484,82 +538,109 @@ button:hover { transform: translateY(-2px); }
       <div class="seal-lantern"></div>
       <div class="seal-text">กำลังเก็บคำอธิษฐานของท่าน...</div>
     </div>
-  </div>  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+  </div>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBkGyIgB-LJci9yRx-C--ahW4yDngUYpZI",
-    authDomain: "timecapsule-64914.firebaseapp.com",
-    projectId: "timecapsule-64914",
-    storageBucket: "timecapsule-64914.firebasestorage.app",
-    messagingSenderId: "296891105342",
-    appId: "1:296891105342:web:1c3ac75064023e90ba116f",
-    measurementId: "G-FVX1CC14P6"
-  };
+<script type="module">
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp, getDoc, doc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
-  function makeCode() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = '';
-    for (let i = 0; i < 5; i++) {
-      code += chars[Math.floor(Math.random() * chars.length)];
-    }
-    return 'TC-' + new Date().getFullYear() + '-' + code;
+const firebaseConfig = {
+  apiKey: "AIzaSyBkGyIgB-LJci9yRx-C--ahW4yDngUYpZI",
+  authDomain: "timecapsule-64914.firebaseapp.com",
+  projectId: "timecapsule-64914"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let currentEvent = null;
+
+function formatEventDate(dateValue) {
+  if (!dateValue) return '';
+  const date = new Date(dateValue + 'T00:00:00');
+  return new Intl.DateTimeFormat('th-TH', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date);
+}
+
+async function loadEvent() {
+  const snap = await getDoc(doc(db, "settings", "timeCapsuleEvent"));
+  if (!snap.exists()) return;
+
+  currentEvent = snap.data();
+
+  document.getElementById("eventNameDisplay").textContent = currentEvent.eventName || "-";
+  document.getElementById("eventDateDisplay").textContent =
+    currentEvent.eventDate ? "วันที่ " + formatEventDate(currentEvent.eventDate) : "";
+
+  document.getElementById("eventBox").classList.remove("event-empty");
+}
+
+function makeCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 5; i++) {
+    code += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return 'TC-' + new Date().getFullYear() + '-' + code;
+}
+
+async function saveWish() {
+
+  const name = document.getElementById('name').value.trim();
+  const wish = document.getElementById('wish').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const period = document.getElementById('period').value;
+  const overlay = document.getElementById('savingOverlay');
+
+  if (!wish) {
+    alert('กรุณาเขียนคำอธิษฐาน');
+    return;
   }
 
-  async function saveWish() {
-    const name = document.getElementById('name').value.trim();
-    const wish = document.getElementById('wish').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const period = document.getElementById('period').value;
-    const overlay = document.getElementById('savingOverlay');
-
-    if (!wish) {
-      alert('กรุณาเขียนคำอธิษฐานก่อนฝากไว้ใน Time Capsule');
-      return;
-    }
-
-    const code = makeCode();
-
-    let unlockAt = new Date();
-
-    if (period === "year") {
-      unlockAt.setFullYear(unlockAt.getFullYear() + 1);
-    } else if (period === "now") {
-      unlockAt = new Date();
-    }
-
-    try {
-      overlay.classList.add('show');
-
-      await addDoc(collection(db, "timeCapsules"), {
-        code,
-        name,
-        wish,
-        email,
-        period,
-        createdAt: serverTimestamp(),
-        unlockAt
-      });
-
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      const resultBox = document.getElementById('resultBox');
-      const codeText = document.getElementById('codeText');
-      codeText.textContent = code;
-      resultBox.style.display = 'block';
-      resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    } catch (error) {
-      console.error(error);
-      alert('บันทึกคำอธิษฐานไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตหรือ Firestore Rules');
-    } finally {
-      overlay.classList.remove('show');
-    }
+  let unlockAt = new Date();
+  if (period === "year") {
+    unlockAt.setFullYear(unlockAt.getFullYear() + 1);
   }
 
-  window.saveWish = saveWish;
-</script></body>
+  const code = makeCode();
+
+  try {
+    overlay.classList.add('show');
+
+    await addDoc(collection(db, "timeCapsules"), {
+      code,
+      name,
+      wish,
+      email,
+      period,
+      createdAt: serverTimestamp(),
+      unlockAt,
+
+      eventName: currentEvent?.eventName || "",
+      eventId: currentEvent?.eventId || "",
+      eventDate: currentEvent?.eventDate || ""
+    });
+
+    await new Promise(r => setTimeout(r, 1500));
+
+    document.getElementById('codeText').textContent = code;
+    document.getElementById('resultBox').style.display = 'block';
+
+  } catch (e) {
+    alert("บันทึกไม่สำเร็จ");
+  } finally {
+    overlay.classList.remove('show');
+  }
+}
+
+loadEvent();
+window.saveWish = saveWish;
+
+</script>
+
+  </body>
 </html>
