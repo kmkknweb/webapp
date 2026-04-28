@@ -1,0 +1,565 @@
+<!DOCTYPE html><html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Time Capsule คำอธิษฐาน</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Noto+Serif+Thai:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #f6c85f;
+      --deep-gold: #c9902e;
+      --red: #8f1d1d;
+      --dark-red: #4b1111;
+      --cream: #fff7df;
+      --ink: #39210f;
+      --muted: #7b6243;
+      --glass: rgba(255, 248, 224, 0.86);
+    }* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Kanit', sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(255, 219, 126, .55), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(170, 36, 36, .48), transparent 38%),
+    linear-gradient(135deg, #3b0d0d 0%, #7b1717 45%, #e3a83c 100%);
+  overflow-x: hidden;
+}
+
+.lantern {
+  position: fixed;
+  width: 72px;
+  height: 92px;
+  border-radius: 48% 48% 42% 42%;
+  background: linear-gradient(180deg, #ffdf79, #d82323 52%, #7e1111);
+  box-shadow: 0 0 36px rgba(255, 211, 93, .5);
+  opacity: .38;
+  animation: float 7s ease-in-out infinite;
+  z-index: 0;
+}
+
+.lantern::before, .lantern::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #f7c654;
+  border-radius: 999px;
+}
+
+.lantern::before { top: -9px; width: 34px; height: 10px; }
+.lantern::after { bottom: -16px; width: 4px; height: 22px; }
+
+.lantern.one { top: 52px; left: 24px; transform: rotate(-8deg); }
+.lantern.two { top: 110px; right: 28px; width: 52px; height: 70px; animation-delay: -2s; }
+.lantern.three { bottom: 48px; left: 34px; width: 46px; height: 62px; animation-delay: -4s; }
+
+@keyframes float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -18px; }
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 980px);
+  margin: 0 auto;
+  padding: 28px 18px 54px;
+}
+
+.hero {
+  text-align: center;
+  color: #fff7dc;
+  padding: 22px 6px 18px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 231, 155, .55);
+  border-radius: 999px;
+  background: rgba(70, 10, 10, .34);
+  backdrop-filter: blur(8px);
+  font-size: 14px;
+  letter-spacing: .2px;
+}
+
+h1 {
+  margin: 18px 0 8px;
+  font-family: 'Noto Serif Thai', serif;
+  font-size: clamp(34px, 7vw, 62px);
+  line-height: 1.08;
+  text-shadow: 0 8px 28px rgba(0,0,0,.35);
+}
+
+.subtitle {
+  margin: 0 auto;
+  max-width: 680px;
+  font-size: clamp(16px, 3.8vw, 21px);
+  line-height: 1.65;
+  color: rgba(255, 248, 224, .92);
+}
+
+.card {
+  margin: 24px auto 0;
+  max-width: 760px;
+  border: 1px solid rgba(255, 230, 150, .75);
+  border-radius: 30px;
+  background: var(--glass);
+  box-shadow: 0 24px 70px rgba(45, 6, 6, .35);
+  overflow: hidden;
+  backdrop-filter: blur(14px);
+}
+
+.card-top {
+  padding: 20px 22px;
+  background: linear-gradient(90deg, rgba(133, 26, 26, .98), rgba(195, 127, 31, .94));
+  color: #fff8dd;
+}
+
+.card-top h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.card-top p {
+  margin: 6px 0 0;
+  color: rgba(255,255,255,.82);
+  font-size: 15px;
+}
+
+.form {
+  padding: 24px;
+  display: grid;
+  gap: 16px;
+}
+
+label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #4d2d13;
+}
+
+input, textarea, select {
+  width: 100%;
+  border: 1px solid rgba(142, 93, 30, .22);
+  border-radius: 18px;
+  padding: 14px 16px;
+  font: inherit;
+  color: var(--ink);
+  background: rgba(255,255,255,.74);
+  outline: none;
+  transition: .2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--deep-gold);
+  box-shadow: 0 0 0 4px rgba(246, 200, 95, .26);
+  background: #fffdf4;
+}
+
+textarea {
+  min-height: 138px;
+  resize: vertical;
+  line-height: 1.75;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 6px;
+}
+
+button {
+  border: 0;
+  border-radius: 999px;
+  padding: 14px 22px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.primary {
+  color: #46150d;
+  background: linear-gradient(180deg, #ffe7a0, #f1b93f);
+  box-shadow: 0 12px 24px rgba(125, 54, 11, .25);
+}
+
+.secondary {
+  color: #6c3718;
+  background: rgba(255,255,255,.62);
+  border: 1px solid rgba(156, 105, 39, .24);
+}
+
+button:hover { transform: translateY(-2px); }
+
+.result {
+  display: none;
+  margin: 0 24px 24px;
+  padding: 22px;
+  border-radius: 24px;
+  border: 1px solid rgba(196, 145, 53, .45);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.82), rgba(255, 246, 212, .92));
+  text-align: center;
+  animation: rise .45s ease both;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.code {
+  display: inline-block;
+  margin: 10px 0;
+  padding: 10px 16px;
+  border-radius: 14px;
+  background: #4b1111;
+  color: #ffe39a;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.wish-card {
+  display: none;
+  max-width: 760px;
+  margin: 22px auto 0;
+  border-radius: 34px;
+  padding: 28px;
+  color: #fff7dd;
+  background:
+    radial-gradient(circle at top, rgba(255, 222, 126, .32), transparent 42%),
+    linear-gradient(160deg, #4a0f0f, #841b1b 55%, #b97822);
+  border: 1px solid rgba(255, 226, 143, .6);
+  box-shadow: 0 30px 80px rgba(40, 5, 5, .42);
+  animation: rise .5s ease both;
+}
+
+.wish-card .small-title {
+  color: #ffe4a4;
+  font-size: 14px;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+
+.wish-card h3 {
+  margin: 8px 0 14px;
+  font-family: 'Noto Serif Thai', serif;
+  font-size: 30px;
+}
+
+.quote {
+  margin: 16px 0;
+  padding: 20px;
+  border-radius: 24px;
+  background: rgba(255, 248, 220, .12);
+  border: 1px solid rgba(255, 234, 168, .22);
+  font-size: 21px;
+  line-height: 1.75;
+}
+
+.footer-note {
+  text-align: center;
+  color: rgba(255, 248, 224, .82);
+  font-size: 13px;
+  margin-top: 22px;
+}
+
+@media (max-width: 640px) {
+  .grid { grid-template-columns: 1fr; }
+  .form { padding: 20px; }
+  .card { border-radius: 24px; }
+  .button-row button { width: 100%; }
+  .wish-card { padding: 22px; border-radius: 26px; }
+}
+
+
+.saving-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at center, rgba(255, 227, 154, .22), rgba(35, 4, 4, .86) 54%, rgba(12, 1, 1, .94));
+  backdrop-filter: blur(9px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .35s ease;
+}
+
+.saving-overlay.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.seal-scene {
+  position: relative;
+  width: min(86vw, 360px);
+  height: 310px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.seal-lantern {
+  position: relative;
+  width: 120px;
+  height: 150px;
+  border-radius: 48% 48% 42% 42%;
+  background: linear-gradient(180deg, #fff0ad 0%, #df2e24 52%, #691010 100%);
+  box-shadow: 0 0 48px rgba(255, 211, 93, .85), 0 22px 54px rgba(0, 0, 0, .38);
+  animation: sealPulse 1.25s ease-in-out infinite;
+}
+
+.seal-lantern::before, .seal-lantern::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #f7c654;
+  border-radius: 999px;
+}
+
+.seal-lantern::before { top: -12px; width: 58px; height: 12px; }
+.seal-lantern::after { bottom: -28px; width: 5px; height: 34px; }
+
+.seal-ring {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 231, 155, .42);
+  box-shadow: 0 0 38px rgba(255, 211, 93, .32);
+  animation: ringSpin 4.5s linear infinite;
+}
+
+.seal-ring::before, .seal-ring::after {
+  content: '✦';
+  position: absolute;
+  color: #ffe39a;
+  font-size: 20px;
+}
+
+.seal-ring::before { top: 8px; left: 50%; transform: translateX(-50%); }
+.seal-ring::after { bottom: 8px; left: 50%; transform: translateX(-50%); }
+
+.seal-wish {
+  position: absolute;
+  top: 34px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 18px;
+  border-radius: 18px;
+  background: rgba(255, 248, 224, .94);
+  color: #6c3718;
+  box-shadow: 0 12px 32px rgba(0,0,0,.25);
+  animation: wishIntoLantern 1.35s ease-in-out infinite;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.seal-text {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  color: #fff7dc;
+  font-size: 18px;
+  text-shadow: 0 4px 16px rgba(0,0,0,.5);
+}
+
+@keyframes sealPulse {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.08); filter: brightness(1.25); }
+}
+
+@keyframes ringSpin {
+  from { transform: rotate(0); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes wishIntoLantern {
+  0% { opacity: 0; transform: translate(-50%, 0) scale(.92); }
+  35% { opacity: 1; transform: translate(-50%, 42px) scale(1); }
+  78% { opacity: .96; transform: translate(-50%, 116px) scale(.54); }
+  100% { opacity: 0; transform: translate(-50%, 126px) scale(.18); }
+}
+
+  </style>
+</head>
+<body>
+  <div class="lantern one"></div>
+  <div class="lantern two"></div>
+  <div class="lantern three"></div>  <main class="page">
+    <section class="hero">
+      <div class="badge">🏮 Time Capsule คำอธิษฐาน</div>
+      <h1>โคมอธิษฐาน<br>Time Capsule</h1>
+      <p class="subtitle">
+        ฝากคำอธิษฐานไว้กับแสงแห่งศรัทธา แล้วเปิดอ่านข้อความนี้อีกครั้งในเทศกาลปีหน้า
+      </p>
+    </section><section class="card">
+  <div class="card-top">
+    <h2>ฝากคำอธิษฐานของท่าน</h2>
+    <p>เขียนคำอธิษฐานของท่าน แล้วเก็บไว้เพื่อกลับมาเปิดอีกครั้งในอนาคต</p>
+  </div>
+
+  <div class="form">
+    <div class="grid">
+      <div>
+        <label for="name">ชื่อ / ชื่อเล่น</label>
+        <input id="name" type="text" placeholder="เช่น คุณสมพร" />
+      </div>
+
+      <div>
+        <label for="period">ระยะเวลาเปิดคำอธิษฐาน</label>
+        <select id="period">
+          <option value="year">🔒 เปิดในเทศกาลปีหน้า</option>
+          <option value="now">🔓 เปิดได้ตลอดเวลา</option>
+        </select>
+        <div class="hint">หากเลือกเปิดในปีหน้า จะไม่สามารถเปิดดูได้จนกว่าจะถึงกำหนด</div>
+      </div>
+    </div>
+
+    <div>
+      <label for="wish">คำอธิษฐาน</label>
+      <textarea id="wish" placeholder="ขอให้ปีนี้..."></textarea>
+      <div class="hint">ในระบบจริง ข้อความนี้จะถูกเก็บไว้และเปิดอีกครั้งเมื่อถึงเวลาที่กำหนด</div>
+    </div>
+
+    <div>
+      <label for="email">อีเมล (ไม่บังคับ)</label>
+      <input id="email" type="email" placeholder="ใส่เฉพาะกรณีต้องการรับการแจ้งเตือน" />
+      <div class="hint">ถ้าไม่ใส่อีเมล ระบบจริงจะให้รหัส Time Capsule ไว้กลับมาเปิดเอง</div>
+    </div>
+
+    <div class="button-row">
+      <button class="primary" onclick="saveWish()">ฝากคำอธิษฐาน</button>
+    </div>
+  </div>
+
+  <div class="result" id="resultBox">
+    <div>คำอธิษฐานของท่านถูกเก็บไว้แล้ว</div>
+    <div class="code" id="codeText">TC-2026-0000</div>
+    <div class="hint">โปรดแคปหน้าจอหรือจดรหัสนี้ไว้ เพื่อใช้เปิดคำอธิษฐานในอนาคต</div>
+  </div>
+</section>
+
+
+
+<div class="footer-note">
+  โปรดเก็บรหัสของท่านไว้ เพื่อใช้เปิดคำอธิษฐานในอนาคต
+</div>
+
+  </main>
+
+  <div class="saving-overlay" id="savingOverlay">
+    <div class="seal-scene">
+      <div class="seal-ring"></div>
+      <div class="seal-wish">คำอธิษฐาน</div>
+      <div class="seal-lantern"></div>
+      <div class="seal-text">กำลังเก็บคำอธิษฐานของท่าน...</div>
+    </div>
+  </div>  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBkGyIgB-LJci9yRx-C--ahW4yDngUYpZI",
+    authDomain: "timecapsule-64914.firebaseapp.com",
+    projectId: "timecapsule-64914",
+    storageBucket: "timecapsule-64914.firebasestorage.app",
+    messagingSenderId: "296891105342",
+    appId: "1:296891105342:web:1c3ac75064023e90ba116f",
+    measurementId: "G-FVX1CC14P6"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  function makeCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 5; i++) {
+      code += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return 'TC-' + new Date().getFullYear() + '-' + code;
+  }
+
+  async function saveWish() {
+    const name = document.getElementById('name').value.trim();
+    const wish = document.getElementById('wish').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const period = document.getElementById('period').value;
+    const overlay = document.getElementById('savingOverlay');
+
+    if (!wish) {
+      alert('กรุณาเขียนคำอธิษฐานก่อนฝากไว้ใน Time Capsule');
+      return;
+    }
+
+    const code = makeCode();
+
+    let unlockAt = new Date();
+
+    if (period === "year") {
+      unlockAt.setFullYear(unlockAt.getFullYear() + 1);
+    } else if (period === "now") {
+      unlockAt = new Date();
+    }
+
+    try {
+      overlay.classList.add('show');
+
+      await addDoc(collection(db, "timeCapsules"), {
+        code,
+        name,
+        wish,
+        email,
+        period,
+        createdAt: serverTimestamp(),
+        unlockAt
+      });
+
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      const resultBox = document.getElementById('resultBox');
+      const codeText = document.getElementById('codeText');
+      codeText.textContent = code;
+      resultBox.style.display = 'block';
+      resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch (error) {
+      console.error(error);
+      alert('บันทึกคำอธิษฐานไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตหรือ Firestore Rules');
+    } finally {
+      overlay.classList.remove('show');
+    }
+  }
+
+  window.saveWish = saveWish;
+</script></body>
+</html>
