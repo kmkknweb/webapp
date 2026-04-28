@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>กรอบภาพศาลเจ้า</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a0a04;font-family:'Kanit',sans-serif;color:#fff8e8;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding-bottom:60px}
+.topbar{width:100%;background:#0e0404;border-bottom:1px solid rgba(212,168,67,.25);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.topbar-title{font-size:13px;font-weight:700;color:#d4a843}
+.topbar-btn{font-size:12px;background:none;border:none;color:rgba(255,248,232,.45);font-family:inherit;cursor:pointer;text-decoration:underline}
+.topbar-btn:hover{color:#d4a843}
+.page{width:100%;max-width:1100px;padding:24px 16px 0;display:flex;flex-direction:column;align-items:center;gap:20px}
+
+/* ── Preview stage: canvas + frame img stacked ── */
+.stage{position:relative;display:inline-block;line-height:0}
+#photoCanvas{display:block;border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.7)}
+#frameImg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;border-radius:6px}
+#textCanvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+
+.controls{width:100%;max-width:680px;display:flex;flex-direction:column;gap:14px}
+.card{background:rgba(255,248,232,.06);border:1px solid rgba(212,168,67,.2);border-radius:16px;padding:16px 18px}
+.card-title{font-size:12px;font-weight:700;color:#d4a843;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.obtn{padding:11px 0;border-radius:10px;border:1.5px solid rgba(212,168,67,.3);background:transparent;color:rgba(255,248,232,.6);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;gap:7px}
+.obtn.active{border-color:#d4a843;background:rgba(212,168,67,.12);color:#f6e09a}
+.frame-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.fbtn{border:1.5px solid rgba(212,168,67,.25);border-radius:10px;background:rgba(255,255,255,.05);cursor:pointer;padding:8px 4px;text-align:center;transition:.18s}
+.fbtn img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:6px;display:block;background:#2a0404}
+.fbtn span{display:block;font-size:11px;color:rgba(255,248,232,.55);margin-top:5px}
+.fbtn.active{border-color:#d4a843;background:rgba(212,168,67,.12)}
+.fbtn.active span{color:#f6e09a}
+.btn{border:none;border-radius:999px;padding:13px 14px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn:hover{transform:translateY(-2px)}
+.btn-gold{background:linear-gradient(160deg,#f6e09a,#d4a843 50%,#a07020);color:#3a1a00}
+.btn-ghost{background:rgba(255,255,255,.09);border:1px solid rgba(212,168,67,.3);color:#fff8e8}
+.btn-red{background:linear-gradient(160deg,#a02020,#4a0808);color:#ffe8c0}
+.btn-green{background:linear-gradient(160deg,#2a8a50,#145030);color:#c8ffe0}
+.flabel{display:block;font-size:12px;color:rgba(255,248,232,.5);margin-bottom:6px}
+input[type=file]{width:100%;padding:10px 12px;border:1px solid rgba(212,168,67,.2);border-radius:10px;background:rgba(255,255,255,.07);color:#fff8e8;font-family:inherit;font-size:13px;outline:none}
+.admin-section{width:100%;max-width:680px;border:1.5px dashed rgba(212,168,67,.2);border-radius:16px;padding:20px;display:none}
+.admin-section.open{display:block}
+.admin-section h3{font-size:13px;font-weight:700;color:#d4a843;letter-spacing:2px;margin-bottom:14px}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:500px){.admin-grid{grid-template-columns:1fr}}
+.field label{display:block;font-size:12px;color:rgba(212,168,67,.8);margin-bottom:5px}
+.field input{width:100%;padding:10px 12px;border:1px solid rgba(212,168,67,.2);border-radius:10px;background:rgba(255,255,255,.08);color:#fff8e8;font-family:inherit;font-size:14px;outline:none}
+.field input:focus{border-color:#d4a843}
+.anote{font-size:11px;color:rgba(255,248,232,.35);margin-top:3px}
+.savemsg{font-size:12px;color:#60e090;margin-top:8px;display:none}
+#video{display:none}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <span class="topbar-title">📸 กรอบภาพศาลเจ้า • สมาคมปึงเถ่ากงม่า</span>
+  <button class="topbar-btn" onclick="toggleAdmin()">⚙️ ตั้งค่าข้อความ (Admin)</button>
+</div>
+<video id="video" playsinline autoplay muted></video>
+<div class="page">
+  <!-- 3-layer stage: photo canvas + frame img + text canvas -->
+  <div class="stage" id="stage">
+    <canvas id="photoCanvas"></canvas>
+    <img id="frameImg" src="" alt="">
+    <canvas id="textCanvas"></canvas>
+  </div>
+  <div class="controls">
+    <div class="card">
+      <div class="card-title">แนวภาพ</div>
+      <div class="row2">
+        <button class="obtn active" id="btnP" onclick="setOri('portrait')">📱 แนวตั้ง</button>
+        <button class="obtn" id="btnL" onclick="setOri('landscape')">🖼 แนวนอน</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">เลือกกรอบ</div>
+      <div class="frame-grid" id="frameGrid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">รูปถ่าย</div>
+      <div class="row2" style="margin-bottom:12px">
+        <button class="btn btn-gold" onclick="startCam()">📹 เปิดกล้อง</button>
+        <button class="btn btn-ghost" onclick="capPhoto()">📸 ถ่ายภาพ</button>
+      </div>
+      <label class="flabel">หรืออัปโหลดรูปจากเครื่อง</label>
+      <input type="file" id="photoUpload" accept="image/*">
+    </div>
+    <div class="card">
+      <div class="card-title">บันทึก</div>
+      <div class="row2">
+        <button class="btn btn-green" onclick="dlPhoto()">⬇️ ดาวน์โหลด</button>
+        <button class="btn btn-red" onclick="resetAll()">🗑 เริ่มใหม่</button>
+      </div>
+    </div>
+  </div>
+  <div class="admin-section" id="adminSec">
+    <h3>⚙️ ตั้งค่าข้อความบนกรอบ</h3>
+    <div class="admin-grid">
+      <div class="field">
+        <label>ชื่อกิจกรรม / งานพิธี</label>
+        <input type="text" id="aEvent" value="งานง่วนเซียว ๒๕๖๘">
+        <div class="anote">แสดงด้านบนกรอบ</div>
+      </div>
+      <div class="field">
+        <label>ข้อความด้านล่าง บรรทัด 1</label>
+        <input type="text" id="aBot1" value="ศาลเจ้า • ความทรงจำแห่งศรัทธา">
+      </div>
+      <div class="field">
+        <label>ข้อความด้านล่าง บรรทัด 2</label>
+        <input type="text" id="aBot2" value="สมาคมปึงเถ่ากงม่า ขอนแก่น">
+      </div>
+      <div class="field">
+        <label>ข้อความด้านล่าง บรรทัด 3 (ไม่บังคับ)</label>
+        <input type="text" id="aBot3" value="">
+      </div>
+    </div>
+    <button class="btn btn-gold" style="margin-top:14px" onclick="applyAdmin()">✅ บันทึก</button>
+    <div class="savemsg" id="savemsg">✓ อัปเดตแล้ว</div>
+  </div>
+</div>
+
+<script>
+// ══ CONFIG ══════════════════════════════════════════════
+const FRAMES = {
+  portrait: [
+    { id:'p1', label:'กรอบที่ 1', src:'frame/frame1.png',
+      photo:{ x:88, y:195, w:904, h:1048 },
+      textTop:{ assocY:85, eventY:128 },
+      textBot:{ y1:1320, y2:1360, y3:1395 }
+    },
+  ],
+  landscape: [],
+};
+const SIZES = { portrait:{w:1080,h:1440}, landscape:{w:1440,h:1080} };
+const ASSOC = 'สมาคมปึงเถ่ากงม่า';
+// ════════════════════════════════════════════════════════
+
+let admin = { event:'งานง่วนเซียว ๒๕๖๘', bot1:'ศาลเจ้า • ความทรงจำแห่งศรัทธา', bot2:'สมาคมปึงเถ่ากงม่า ขอนแก่น', bot3:'' };
+let ori='portrait', selId='p1', srcImg=null, camStream=null, camOn=false;
+
+const photoCanvas = document.getElementById('photoCanvas');
+const textCanvas  = document.getElementById('textCanvas');
+const frameImg    = document.getElementById('frameImg');
+const pCtx = photoCanvas.getContext('2d');
+const tCtx = textCanvas.getContext('2d');
+const video = document.getElementById('video');
+
+function getFrame(){ const l=FRAMES[ori]||[]; return l.find(f=>f.id===selId)||l[0]||null; }
+
+// ── Set canvas sizes ──────────────────────────────────
+function setSize(){
+  const {w,h}=SIZES[ori];
+  [photoCanvas,textCanvas].forEach(c=>{ c.width=w; c.height=h; });
+  const s=Math.min(1,560/h);
+  const sw=(w*s)+'px', sh=(h*s)+'px';
+  photoCanvas.style.width=sw; photoCanvas.style.height=sh;
+  textCanvas.style.width=sw;  textCanvas.style.height=sh;
+}
+
+// ── Update frame <img> — no CORS needed ──────────────
+function updateFrameImg(){
+  const fr=getFrame();
+  if(fr){ frameImg.src=fr.src; frameImg.style.display='block'; }
+  else   { frameImg.src='';    frameImg.style.display='none'; }
+}
+
+// ── Draw photo on photoCanvas ─────────────────────────
+function drawPhoto(){
+  const {w,h}=SIZES[ori]; const fr=getFrame();
+  pCtx.clearRect(0,0,w,h);
+  pCtx.fillStyle='#fffef8'; pCtx.fillRect(0,0,w,h);
+  if(!fr) return;
+  const pz=fr.photo;
+  pCtx.save();
+  pCtx.beginPath(); pCtx.rect(pz.x,pz.y,pz.w,pz.h); pCtx.clip();
+  const s=srcImg||(camStream&&video.readyState>=2?video:null);
+  if(s){
+    const sw=s.naturalWidth||s.videoWidth||pz.w, sh=s.naturalHeight||s.videoHeight||pz.h;
+    const sc=Math.max(pz.w/sw,pz.h/sh), nw=sw*sc, nh=sh*sc;
+    pCtx.drawImage(s, pz.x+(pz.w-nw)/2, pz.y+(pz.h-nh)/2, nw, nh);
+  } else {
+    pCtx.fillStyle='#f5ede0'; pCtx.fillRect(pz.x,pz.y,pz.w,pz.h);
+    pCtx.fillStyle='#b8956a'; pCtx.font=`400 ${w*0.022}px Kanit`;
+    pCtx.textAlign='center'; pCtx.textBaseline='middle';
+    pCtx.fillText('เปิดกล้องหรืออัปโหลดรูป', pz.x+pz.w/2, pz.y+pz.h/2);
+  }
+  pCtx.restore();
+}
+
+// ── Draw text on textCanvas ───────────────────────────
+function drawText(){
+  const {w,h}=SIZES[ori]; const fr=getFrame();
+  tCtx.clearRect(0,0,w,h);
+  if(!fr) return;
+  tCtx.textAlign='center'; tCtx.textBaseline='middle';
+  tCtx.font=`600 ${Math.round(w*0.025)}px Kanit`; tCtx.fillStyle='#7a1010';
+  tCtx.fillText(ASSOC, w/2, fr.textTop.assocY);
+  if(admin.event){
+    tCtx.font=`700 ${Math.round(w*0.033)}px Kanit`; tCtx.fillStyle='#4a0606';
+    tCtx.fillText(admin.event, w/2, fr.textTop.eventY);
+  }
+  [admin.bot1,admin.bot2,admin.bot3].filter(Boolean).forEach((l,i)=>{
+    tCtx.font=`${i===0?600:400} ${Math.round(w*(i===0?.022:.019))}px Kanit`;
+    tCtx.fillStyle=i===0?'#7a1010':'#5a3010';
+    tCtx.fillText(l, w/2, [fr.textBot.y1,fr.textBot.y2,fr.textBot.y3][i]);
+  });
+}
+
+function render(){ drawPhoto(); drawText(); }
+
+// ── Download: merge 3 layers onto offscreen canvas ───
+function dlPhoto(){
+  const {w,h}=SIZES[ori];
+  const off=document.createElement('canvas'); off.width=w; off.height=h;
+  const ox=off.getContext('2d');
+  // layer 1: photo
+  ox.drawImage(photoCanvas,0,0);
+  // layer 2: frame img (draw via Image object already loaded in <img> tag)
+  if(frameImg.complete && frameImg.naturalWidth>0){
+    ox.drawImage(frameImg,0,0,w,h);
+  }
+  // layer 3: text
+  ox.drawImage(textCanvas,0,0);
+  const a=document.createElement('a');
+  a.download='shrine-'+Date.now()+'.png';
+  a.href=off.toDataURL('image/png');
+  a.click();
+}
+
+// ── Frame grid ────────────────────────────────────────
+function buildGrid(){
+  const grid=document.getElementById('frameGrid'); grid.innerHTML='';
+  const list=FRAMES[ori]||[];
+  if(!list.length){ grid.innerHTML='<p style="color:rgba(255,248,232,.4);font-size:13px;padding:4px;grid-column:1/-1">ยังไม่มีกรอบสำหรับแนวนี้</p>'; return; }
+  list.forEach(f=>{
+    const d=document.createElement('div'); d.className='fbtn'+(f.id===selId?' active':'');
+    d.innerHTML=`<img src="${f.src}" alt="${f.label}" loading="lazy"><span>${f.label}</span>`;
+    d.onclick=()=>{ selId=f.id; document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active')); d.classList.add('active'); updateFrameImg(); render(); };
+    grid.appendChild(d);
+  });
+}
+
+// ── Camera ────────────────────────────────────────────
+async function startCam(){
+  try{
+    stopCam();
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});
+    video.srcObject=camStream; srcImg=null; camOn=true;
+    (function loop(){ if(camOn){render();requestAnimationFrame(loop);} })();
+  }catch(e){ alert('เปิดกล้องไม่ได้: '+e.message); }
+}
+function stopCam(){ camOn=false; if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;} video.srcObject=null; }
+function capPhoto(){
+  if(!camStream) return;
+  // snapshot photo layer only
+  srcImg=new Image();
+  srcImg.onload=()=>{ stopCam(); render(); };
+  srcImg.src=photoCanvas.toDataURL('image/jpeg',.95);
+}
+
+// ── Upload ────────────────────────────────────────────
+document.getElementById('photoUpload').addEventListener('change',e=>{
+  const file=e.target.files?.[0]; if(!file)return;
+  const r=new FileReader();
+  r.onload=()=>{ srcImg=new Image(); srcImg.onload=()=>{stopCam();render();}; srcImg.src=r.result; };
+  r.readAsDataURL(file);
+});
+
+// ── Reset ─────────────────────────────────────────────
+function resetAll(){ stopCam(); srcImg=null; document.getElementById('photoUpload').value=''; render(); }
+
+// ── Orientation ───────────────────────────────────────
+function setOri(o){
+  ori=o;
+  document.getElementById('btnP').classList.toggle('active',o==='portrait');
+  document.getElementById('btnL').classList.toggle('active',o==='landscape');
+  const list=FRAMES[o]||[]; selId=list[0]?.id||'';
+  setSize(); buildGrid(); updateFrameImg(); render();
+}
+
+// ── Admin ─────────────────────────────────────────────
+function toggleAdmin(){ document.getElementById('adminSec').classList.toggle('open'); }
+['aEvent','aBot1','aBot2','aBot3'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    admin.event=document.getElementById('aEvent').value;
+    admin.bot1=document.getElementById('aBot1').value;
+    admin.bot2=document.getElementById('aBot2').value;
+    admin.bot3=document.getElementById('aBot3').value;
+    drawText();
+  });
+});
+function applyAdmin(){
+  admin.event=document.getElementById('aEvent').value;
+  admin.bot1=document.getElementById('aBot1').value;
+  admin.bot2=document.getElementById('aBot2').value;
+  admin.bot3=document.getElementById('aBot3').value;
+  drawText();
+  const m=document.getElementById('savemsg'); m.style.display='block'; setTimeout(()=>m.style.display='none',2000);
+}
+
+// ── Init ──────────────────────────────────────────────
+setSize();
+buildGrid();
+updateFrameImg();
+render();
+</script>
+</body>
+</html>
