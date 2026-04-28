@@ -1,13 +1,9 @@
-<!DOCTYPE html>
-<html lang="th">
+<!DOCTYPE html><html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>เปิดคำอธิษฐาน</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<style>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>
 body{
   margin:0;
   font-family:'Kanit',sans-serif;
@@ -16,14 +12,6 @@ body{
   overflow:hidden;
 }
 
-/* ฉากหลัง particle */
-canvas{
-  position:fixed;
-  top:0;
-  left:0;
-}
-
-/* layout */
 .container{
   position:relative;
   height:100vh;
@@ -34,19 +22,23 @@ canvas{
   text-align:center;
 }
 
-/* อากง */
 .agong{
-  width:150px;
+  width:140px;
+  transition:.6s;
   animation:float 3s infinite ease-in-out;
-  filter:drop-shadow(0 0 40px gold);
+}
+
+.agong.top{
+  position:absolute;
+  top:40px;
+  width:90px;
 }
 
 @keyframes float{
   0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-15px)}
+  50%{transform:translateY(-12px)}
 }
 
-/* input */
 input{
   padding:15px;
   border-radius:15px;
@@ -57,23 +49,27 @@ input{
   text-transform:uppercase;
 }
 
-/* ปุ่ม */
 button{
-  margin-top:15px;
+  margin-top:12px;
   padding:15px 30px;
   border:none;
   border-radius:999px;
   font-size:18px;
   background:linear-gradient(#fff0b3,#f1b93f);
-  box-shadow:0 0 30px rgba(255,200,100,.8);
+  box-shadow:0 0 25px rgba(255,200,100,.7);
   cursor:pointer;
   transition:.3s;
 }
+
 button:hover{
-  transform:scale(1.1);
+  transform:scale(1.08);
 }
 
-/* overlay */
+.secondary{
+  background:rgba(255,255,255,0.2);
+  color:#fff;
+}
+
 .overlay{
   position:fixed;
   inset:0;
@@ -85,8 +81,8 @@ button:hover{
 }
 
 .light{
-  width:200px;
-  height:200px;
+  width:150px;
+  height:150px;
   border-radius:50%;
   background:radial-gradient(circle,gold,transparent);
   animation:pulse 1.5s infinite;
@@ -94,10 +90,9 @@ button:hover{
 
 @keyframes pulse{
   0%,100%{transform:scale(1)}
-  50%{transform:scale(1.4)}
+  50%{transform:scale(1.3)}
 }
 
-/* card */
 .card{
   position:fixed;
   top:50%;
@@ -110,6 +105,7 @@ button:hover{
   width:90%;
   max-width:420px;
   transition:.6s;
+  text-align:center;
 }
 
 .card.show{
@@ -119,35 +115,28 @@ button:hover{
 .quote{
   font-size:22px;
   margin-top:20px;
-  line-height:1.6;
 }
 
-</style>
-</head>
+.close{
+  margin-top:15px;
+  background:#8f1d1d;
+  color:#fff;
+}
 
-<body>
+</style></head><body><div class="container">
+  <img src="images/agong.png" class="agong" id="agong">
+  <h1>เปิดคำอธิษฐาน</h1>  <input id="codeInput" placeholder="TC-2026-XXXXX"><button onclick="openCapsule()">✨ เปิดโคม</button>
 
-<canvas id="bg"></canvas>
+<button class="secondary" onclick="goRecover()">🔍 ค้นหารหัสเดิม</button>
 
-<div class="container">
-  <img src="./agong.png" class="agong">
-  <h1>เปิดคำอธิษฐาน</h1>
-
-  <input id="codeInput" placeholder="TC-2026-XXXXX">
-  <button onclick="openCapsule()">✨ เปิดโคม</button>
-</div>
-
-<div class="overlay" id="overlay">
+</div><div class="overlay" id="overlay">
   <div class="light"></div>
   <h2>กำลังเปิดคำอธิษฐาน...</h2>
-</div>
-
-<div class="card" id="card">
+</div><div class="card" id="card">
   <h2>คำอธิษฐานของคุณ</h2>
   <div class="quote" id="wish"></div>
-</div>
-
-<audio id="gong" src="gong.mp3"></audio>
+  <button class="close" onclick="closeCard()">ปิด</button>
+</div><audio id="gong" src="gong.mp3"></audio>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
@@ -162,7 +151,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* type effect */
 function typeText(text, el){
   let i=0;
   el.innerHTML="";
@@ -176,14 +164,15 @@ function typeText(text, el){
   t();
 }
 
-/* main */
 window.openCapsule = async function(){
   const code = document.getElementById("codeInput").value.toUpperCase();
   const overlay = document.getElementById("overlay");
   const card = document.getElementById("card");
+  const agong = document.getElementById("agong");
+  const audio = document.getElementById("gong");
 
   overlay.style.display="flex";
-  document.getElementById("gong").play();
+  audio.pause(); audio.currentTime=0; audio.play();
 
   const q = query(collection(db,"timeCapsules"),where("code","==",code));
   const snap = await getDocs(q);
@@ -206,40 +195,23 @@ window.openCapsule = async function(){
   setTimeout(()=>{
     overlay.style.display="none";
     card.classList.add("show");
+    agong.classList.add("top");
     typeText(data.wish,document.getElementById("wish"));
-  },1500);
+  },1200);
 }
 
-/* particle background */
-const canvas = document.getElementById("bg");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+window.closeCard = function(){
+  document.getElementById("card").classList.remove("show");
+  document.getElementById("agong").classList.remove("top");
 
-let particles = [];
-for(let i=0;i<80;i++){
-  particles.push({
-    x:Math.random()*canvas.width,
-    y:Math.random()*canvas.height,
-    r:Math.random()*2+1,
-    dy:Math.random()*1
-  });
+  const audio = document.getElementById("gong");
+  audio.pause();
+  audio.currentTime=0;
 }
 
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle="rgba(255,200,100,0.5)";
-  particles.forEach(p=>{
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fill();
-    p.y-=p.dy;
-    if(p.y<0) p.y=canvas.height;
-  });
-  requestAnimationFrame(draw);
+window.goRecover = function(){
+  window.location.href = "recover.html";
 }
-draw();
-</script>
 
-</body>
+</script></body>
 </html>
