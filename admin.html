@@ -360,13 +360,37 @@ button {
     </div>
   </div>
 </section>
-
-
-        
+   
       </section>
 
+      <!-- ════ PHOTO FRAME SETTINGS ════ -->
+<section class="card full" style="margin-top:14px">
+  <h2>7) ตั้งค่ากรอบภาพ (photo-frame.html)</h2>
+  <p class="hint">ข้อความด้านล่างกรอบภาพ แก้แล้วกด "บันทึก" — photo-frame.html จะอัปเดตอัตโนมัติทันที</p>
+  <div class="grid">
+    <div>
+      <label>ข้อความด้านล่าง บรรทัด 1</label>
+      <input type="text" id="pfBot1" placeholder="เช่น ศาลเจ้า • ความทรงจำแห่งศรัทธา">
+    </div>
+    <div>
+      <label>ข้อความด้านล่าง บรรทัด 2</label>
+      <input type="text" id="pfBot2" placeholder="เช่น สมาคมปึงเถ่ากงม่า ขอนแก่น">
+    </div>
+    <div>
+      <label>ข้อความด้านล่าง บรรทัด 3 (ไม่บังคับ)</label>
+      <input type="text" id="pfBot3" placeholder="เว้นว่างได้">
+    </div>
+  </div>
+  <div class="btn-row" style="margin-top:14px">
+    <button id="savePfBtn">💾 บันทึกข้อความกรอบ</button>
+    <button id="loadPfBtn" class="secondary">🔄 โหลดค่าปัจจุบัน</button>
+  </div>
+  <p class="status" id="pfStatus">พร้อมใช้งาน</p>
+</section>
+<!-- ════ END PHOTO FRAME SETTINGS ════ -->
+
       <section class="card full">
-        <h2>7) วิธีทดสอบหลังอัปโหลดไฟล์</h2>
+        <h2>8) วิธีทดสอบหลังอัปโหลดไฟล์</h2>
 
         <p class="small">เปิด admin ไฟล์นี้ → บันทึก Notice / Popup → เปิด index ที่แก้แล้ว → ทดสอบเปิด/ปิด, maxShow, version, startAt/endAt</p>
       </section>
