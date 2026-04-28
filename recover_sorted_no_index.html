@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ค้นหารหัส Time Capsule</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  font-family:'Kanit',sans-serif;
+  background:radial-gradient(circle,#8f1d1d,#1a0303);
+  color:#fff;
+  overflow:hidden;
+}
+
+/* layout */
+.container{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:20px;
+}
+
+/* agong */
+.agong{
+  width:140px;
+  animation:float 3s infinite ease-in-out;
+  filter:drop-shadow(0 0 30px gold);
+}
+
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-12px)}
+}
+
+/* input */
+input{
+  margin-top:20px;
+  padding:15px;
+  border-radius:15px;
+  border:none;
+  text-align:center;
+  font-size:18px;
+  width:260px;
+  font-family:'Kanit',sans-serif;
+}
+
+/* button */
+button{
+  margin-top:12px;
+  padding:14px 26px;
+  border:none;
+  border-radius:999px;
+  font-size:16px;
+  font-family:'Kanit',sans-serif;
+  cursor:pointer;
+  background:linear-gradient(#fff0b3,#f1b93f);
+  box-shadow:0 0 25px rgba(255,200,100,.6);
+  transition:.3s;
+}
+
+button:hover{
+  transform:scale(1.05);
+}
+
+/* result box */
+.result{
+  margin-top:20px;
+  max-height:320px;
+  overflow:auto;
+  width:100%;
+  max-width:370px;
+  padding-right:2px;
+}
+
+/* item */
+.item{
+  background:#fff4cf;
+  color:#4b220b;
+  padding:15px;
+  border-radius:15px;
+  margin-top:10px;
+  text-align:center;
+  box-shadow:0 10px 24px rgba(0,0,0,.22);
+}
+
+/* code */
+.code{
+  font-size:20px;
+  font-weight:bold;
+  color:#8f1d1d;
+  letter-spacing:.5px;
+}
+
+.meta{
+  font-size:13px;
+  margin-top:7px;
+  color:#7b4b18;
+  line-height:1.7;
+}
+
+.event-name{
+  font-weight:600;
+  color:#5e2607;
+}
+
+/* mini buttons */
+.mini{
+  margin-top:8px;
+  padding:8px 12px;
+  font-size:14px;
+}
+
+/* back */
+.back{
+  background:rgba(255,255,255,0.2);
+  color:#fff;
+}
+
+.empty-note{
+  margin-top:10px;
+  color:#fff0b8;
+  line-height:1.7;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <img src="agong.png" class="agong">
+  <h1>ค้นหารหัสคำอธิษฐาน</h1>
+
+  <input id="emailInput" placeholder="กรอกอีเมล">
+
+  <button onclick="findCapsules()">🔍 ค้นหา</button>
+  <button class="back" onclick="goBack()">← กลับ</button>
+
+  <div class="result" id="result"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBkGyIgB-LJci9yRx-C--ahW4yDngUYpZI",
+  authDomain: "timecapsule-64914.firebaseapp.com",
+  projectId: "timecapsule-64914"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+function dateToMillis(value){
+  if(!value) return 0;
+  if(value.toDate) return value.toDate().getTime();
+  const d = new Date(value);
+  return isNaN(d.getTime()) ? 0 : d.getTime();
+}
+
+function formatThaiDate(value){
+  if(!value) return "";
+  const date = value.toDate ? value.toDate() : new Date(value);
+  if(isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat('th-TH',{
+    year:'numeric',
+    month:'short',
+    day:'numeric',
+    hour:'2-digit',
+    minute:'2-digit'
+  }).format(date);
+}
+
+function formatEventDate(value){
+  if(!value) return "";
+  const date = new Date(value + 'T00:00:00');
+  if(isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat('th-TH',{
+    year:'numeric',
+    month:'long',
+    day:'numeric'
+  }).format(date);
+}
+
+function escapeHtml(text){
+  return String(text || '')
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'",'&#039;');
+}
+
+window.findCapsules = async function(){
+  const email = document.getElementById("emailInput").value.trim().toLowerCase();
+  const result = document.getElementById("result");
+
+  if(!email){
+    result.innerHTML = '<div class="empty-note">กรุณากรอกอีเมลก่อนค้นหา</div>';
+    return;
+  }
+
+  result.innerHTML = "กำลังค้นหา...";
+
+  try{
+    // ไม่ใช้ orderBy เพื่อหลีกเลี่ยงปัญหา Firestore composite index
+    const q = query(collection(db,"timeCapsules"), where("email","==",email));
+    const snap = await getDocs(q);
+
+    if(snap.empty){
+      result.innerHTML = '<div class="empty-note">ไม่พบข้อมูลจากอีเมลนี้</div>';
+      return;
+    }
+
+    const rows = [];
+    snap.forEach(docSnap => {
+      rows.push(docSnap.data());
+    });
+
+    // เรียงใหม่ → เก่า ด้วย JavaScript แทน Firestore orderBy
+    rows.sort((a,b) => dateToMillis(b.createdAt) - dateToMillis(a.createdAt));
+
+    result.innerHTML = "";
+
+    rows.forEach(data => {
+      const div = document.createElement("div");
+      div.className = "item";
+
+      const eventName = data.eventName ? escapeHtml(data.eventName) : "ไม่ระบุชื่องาน";
+      const eventDate = data.eventDate ? formatEventDate(data.eventDate) : "";
+      const createdAt = data.createdAt ? formatThaiDate(data.createdAt) : "";
+      const code = escapeHtml(data.code || "");
+
+      div.innerHTML = `
+        <div class="code">${code}</div>
+        <div class="meta">
+          <div class="event-name">${eventName}</div>
+          ${eventDate ? `<div>วันที่งาน: ${eventDate}</div>` : ""}
+          ${createdAt ? `<div>ฝากเมื่อ: ${createdAt}</div>` : ""}
+        </div>
+        <button class="mini" onclick="copyCode('${code}')">คัดลอก</button>
+        <button class="mini" onclick="openCode('${code}')">เปิด</button>
+      `;
+
+      result.appendChild(div);
+    });
+  }catch(e){
+    console.error(e);
+    result.innerHTML = '<div class="empty-note">ค้นหาไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตหรือสิทธิ์ Firestore</div>';
+  }
+}
+
+window.copyCode = function(code){
+  navigator.clipboard.writeText(code);
+  alert("คัดลอกแล้ว");
+}
+
+window.openCode = function(code){
+  window.location.href = "open_time_capsule.html?code=" + encodeURIComponent(code);
+}
+
+window.goBack = function(){
+  window.location.href = "open_time_capsule.html";
+}
+</script>
+
+</body>
+</html>
