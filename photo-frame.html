@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>กรอบภาพศาลเจ้า</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a0a04;font-family:'Kanit',sans-serif;color:#fff8e8;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding-bottom:60px}
+.topbar{width:100%;background:#0e0404;border-bottom:1px solid rgba(212,168,67,.25);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.topbar-title{font-size:13px;font-weight:700;color:#d4a843}
+.topbar-btn{font-size:12px;background:none;border:none;color:rgba(255,248,232,.45);font-family:inherit;cursor:pointer;text-decoration:underline}
+.topbar-btn:hover{color:#d4a843}
+.page{width:100%;max-width:1100px;padding:24px 16px 0;display:flex;flex-direction:column;align-items:center;gap:20px}
+.stage{position:relative;display:inline-block;line-height:0}
+#photoCanvas{display:block;border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.7)}
+#frameLayer{position:absolute;top:0;left:0;pointer-events:none;border-radius:6px}
+#textCanvas{position:absolute;top:0;left:0;pointer-events:none}
+.controls{width:100%;max-width:680px;display:flex;flex-direction:column;gap:14px}
+.card{background:rgba(255,248,232,.06);border:1px solid rgba(212,168,67,.2);border-radius:16px;padding:16px 18px}
+.card-title{font-size:12px;font-weight:700;color:#d4a843;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.obtn{padding:11px 0;border-radius:10px;border:1.5px solid rgba(212,168,67,.3);background:transparent;color:rgba(255,248,232,.6);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;gap:7px}
+.obtn.active{border-color:#d4a843;background:rgba(212,168,67,.12);color:#f6e09a}
+.frame-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.fbtn{border:1.5px solid rgba(212,168,67,.25);border-radius:10px;background:rgba(255,255,255,.05);cursor:pointer;padding:8px 4px;text-align:center;transition:.18s;position:relative}
+.fbtn img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:6px;display:block;background:#2a0404}
+.fbtn.landscape img{aspect-ratio:4/3}
+.fbtn span{display:block;font-size:11px;color:rgba(255,248,232,.55);margin-top:5px}
+.fbtn.active{border-color:#d4a843;background:rgba(212,168,67,.12)}
+.fbtn.active span{color:#f6e09a}
+.del-btn{position:absolute;top:4px;right:4px;background:rgba(160,20,20,.85);border:none;border-radius:50%;width:20px;height:20px;color:#fff;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.btn{border:none;border-radius:999px;padding:13px 14px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn:hover{transform:translateY(-2px)}
+.btn-gold{background:linear-gradient(160deg,#f6e09a,#d4a843 50%,#a07020);color:#3a1a00}
+.btn-ghost{background:rgba(255,255,255,.09);border:1px solid rgba(212,168,67,.3);color:#fff8e8}
+.btn-red{background:linear-gradient(160deg,#a02020,#4a0808);color:#ffe8c0}
+.btn-green{background:linear-gradient(160deg,#2a8a50,#145030);color:#c8ffe0}
+.btn-purple{background:linear-gradient(160deg,#6a20a0,#3a0870);color:#e8c8ff}
+.flabel{display:block;font-size:12px;color:rgba(255,248,232,.5);margin-bottom:6px}
+input[type=file]{width:100%;padding:10px 12px;border:1px solid rgba(212,168,67,.2);border-radius:10px;background:rgba(255,255,255,.07);color:#fff8e8;font-family:inherit;font-size:13px;outline:none}
+.admin-section{width:100%;max-width:680px;border:1.5px dashed rgba(212,168,67,.2);border-radius:16px;padding:20px;display:none}
+.admin-section.open{display:block}
+.admin-section h3{font-size:13px;font-weight:700;color:#d4a843;letter-spacing:2px;margin-bottom:14px}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:500px){.admin-grid{grid-template-columns:1fr}}
+.field label{display:block;font-size:12px;color:rgba(212,168,67,.8);margin-bottom:5px}
+.field input{width:100%;padding:10px 12px;border:1px solid rgba(212,168,67,.2);border-radius:10px;background:rgba(255,255,255,.08);color:#fff8e8;font-family:inherit;font-size:14px;outline:none}
+.field input:focus{border-color:#d4a843}
+.anote{font-size:11px;color:rgba(255,248,232,.35);margin-top:3px}
+.savemsg{font-size:12px;color:#60e090;margin-top:8px;display:none}
+.orient-tag{font-size:10px;background:rgba(212,168,67,.2);color:#d4a843;border-radius:4px;padding:1px 5px;margin-left:4px}
+#video{display:none}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <span class="topbar-title">📸 กรอบภาพศาลเจ้า • สมาคมปึงเถ่ากงม่า</span>
+  <button class="topbar-btn" onclick="toggleAdmin()">⚙️ ตั้งค่า (Admin)</button>
+</div>
+<video id="video" playsinline autoplay muted></video>
+<div class="page">
+  <div class="stage" id="stage">
+    <canvas id="photoCanvas"></canvas>
+    <canvas id="frameLayer"></canvas>
+    <canvas id="textCanvas"></canvas>
+  </div>
+  <div class="controls">
+    <div class="card">
+      <div class="card-title">แนวภาพ</div>
+      <div class="row2">
+        <button class="obtn active" id="btnP" onclick="setOri('portrait')">📱 แนวตั้ง</button>
+        <button class="obtn" id="btnL" onclick="setOri('landscape')">🖼 แนวนอน</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">เลือกกรอบ</div>
+      <div class="frame-grid" id="frameGrid"></div>
+      <div style="margin-top:10px">
+        <label class="flabel">➕ เพิ่มกรอบใหม่ (Admin อัปโหลด PNG)</label>
+        <input type="file" id="frameUpload" accept="image/png,image/jpeg" multiple>
+        <div style="font-size:11px;color:rgba(255,248,232,.3);margin-top:4px">กรอบจะถูกบันทึกในเครื่องนี้ ใช้งานได้ทันที ไม่ต้อง upload ขึ้น server</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">รูปถ่าย</div>
+      <div class="row2" style="margin-bottom:12px">
+        <button class="btn btn-gold" onclick="startCam()">📹 เปิดกล้อง</button>
+        <button class="btn btn-ghost" onclick="capPhoto()">📸 ถ่ายภาพ</button>
+      </div>
+      <label class="flabel">หรืออัปโหลดรูปจากเครื่อง</label>
+      <input type="file" id="photoUpload" accept="image/*">
+    </div>
+    <div class="card">
+      <div class="card-title">บันทึก</div>
+      <div class="row2">
+        <button class="btn btn-green" onclick="dlPhoto()">⬇️ ดาวน์โหลด</button>
+        <button class="btn btn-red" onclick="resetAll()">🗑 เริ่มใหม่</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-section" id="adminSec">
+    <h3>⚙️ ตั้งค่าข้อความบนกรอบ</h3>
+    <div class="admin-grid">
+      <div class="field">
+        <label>ชื่อกิจกรรม / งานพิธี</label>
+        <input type="text" id="aEvent" value="งานง่วนเซียว ๒๕๖๘">
+        <div class="anote">แสดงด้านบนกรอบ</div>
+      </div>
+      <div class="field">
+        <label>ข้อความด้านล่าง บรรทัด 1</label>
+        <input type="text" id="aBot1" value="ศาลเจ้า • ความทรงจำแห่งศรัทธา">
+      </div>
+      <div class="field">
+        <label>ข้อความด้านล่าง บรรทัด 2</label>
+        <input type="text" id="aBot2" value="สมาคมปึงเถ่ากงม่า ขอนแก่น">
+      </div>
+      <div class="field">
+        <label>ข้อความด้านล่าง บรรทัด 3 (ไม่บังคับ)</label>
+        <input type="text" id="aBot3" value="">
+      </div>
+    </div>
+    <button class="btn btn-gold" style="margin-top:14px" onclick="applyAdmin()">✅ บันทึก</button>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(212,168,67,.15)">
+      <div style="font-size:12px;color:rgba(212,168,67,.7);font-weight:700;margin-bottom:8px">ตำแหน่งข้อความบนกรอบ (px)</div>
+      <div class="admin-grid">
+        <div class="field"><label>ชื่อสมาคม Y</label><input type="number" id="aAssocY" value="85"></div>
+        <div class="field"><label>ชื่องาน Y</label><input type="number" id="aEventY" value="128"></div>
+        <div class="field"><label>ข้อความล่าง Y1</label><input type="number" id="aY1" value="1320"></div>
+        <div class="field"><label>ข้อความล่าง Y2</label><input type="number" id="aY2" value="1360"></div>
+        <div class="field"><label>ข้อความล่าง Y3</label><input type="number" id="aY3" value="1395"></div>
+      </div>
+      <div class="anote" style="margin-top:4px">ปรับค่า Y เพื่อให้ข้อความตรงกับตำแหน่งในกรอบ</div>
+    </div>
+    <div class="savemsg" id="savemsg">✓ อัปเดตแล้ว</div>
+  </div>
+</div>
+
+<script>
+// ══ CONFIG ══════════════════════════════════════════════
+const ASSOC = 'สมาคมปึงเถ่ากงม่า';
+const SIZES = { portrait:{w:1080,h:1440}, landscape:{w:1440,h:1080} };
+const LS_KEY = 'shrine_frames_v2';
+// ════════════════════════════════════════════════════════
+
+let admin = {
+  event:'งานง่วนเซียว ๒๕๖๘',
+  bot1:'ศาลเจ้า • ความทรงจำแห่งศรัทธา',
+  bot2:'สมาคมปึงเถ่ากงม่า ขอนแก่น',
+  bot3:'',
+  assocY:85, eventY:128, y1:1320, y2:1360, y3:1395
+};
+
+// frames stored as {id, label, ori, dataUrl}
+let frames = [];
+let ori = 'portrait';
+let selId = null;
+let srcImg = null, camStream = null, camOn = false;
+
+const photoCanvas = document.getElementById('photoCanvas');
+const frameLayer  = document.getElementById('frameLayer');
+const textCanvas  = document.getElementById('textCanvas');
+const pCtx = photoCanvas.getContext('2d');
+const fCtx = frameLayer.getContext('2d');
+const tCtx = textCanvas.getContext('2d');
+const video = document.getElementById('video');
+
+// ── LocalStorage ──────────────────────────────────────
+function saveFrames(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(frames.map(f=>({id:f.id,label:f.label,ori:f.ori,dataUrl:f.dataUrl})))); }
+  catch(e){ alert('พื้นที่จัดเก็บเต็ม ลองลบกรอบเก่าออกก่อน'); }
+}
+function loadFrames(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return;
+    const arr = JSON.parse(raw);
+    frames = arr.map(f=>({ ...f, img: null }));
+    // preload images
+    frames.forEach(f=>{
+      const img = new Image();
+      img.onload = ()=>{ f.img=img; if(f.id===selId) drawFrame(); };
+      img.src = f.dataUrl;
+    });
+  }catch(e){}
+}
+
+// ── Canvas sizing ─────────────────────────────────────
+function setSize(){
+  const {w,h} = SIZES[ori];
+  [photoCanvas,frameLayer,textCanvas].forEach(c=>{ c.width=w; c.height=h; });
+  const s = Math.min(1, Math.min(window.innerWidth-32, 560) / (ori==='portrait'?h:w));
+  const sw=(ori==='portrait'?w:w)*s, sh=(ori==='portrait'?h:h)*s;
+  const dw = (w*s)+'px', dh = (h*s)+'px';
+  [photoCanvas,frameLayer,textCanvas].forEach(c=>{ c.style.width=dw; c.style.height=dh; });
+  document.getElementById('stage').style.width=dw;
+  document.getElementById('stage').style.height=dh;
+}
+
+function getFrame(){ return frames.find(f=>f.id===selId && f.ori===ori) || frames.find(f=>f.ori===ori) || null; }
+
+// ── Draw photo layer ──────────────────────────────────
+function drawPhoto(){
+  const {w,h}=SIZES[ori];
+  pCtx.clearRect(0,0,w,h);
+  pCtx.fillStyle='#fffef8'; pCtx.fillRect(0,0,w,h);
+  const src = srcImg||(camStream&&video.readyState>=2?video:null);
+  if(src){
+    const sw=src.naturalWidth||src.videoWidth||w, sh=src.naturalHeight||src.videoHeight||h;
+    const sc=Math.max(w/sw,h/sh), nw=sw*sc, nh=sh*sc;
+    pCtx.drawImage(src,(w-nw)/2,(h-nh)/2,nw,nh);
+  } else {
+    pCtx.fillStyle='#f0e8d8';
+    pCtx.fillRect(0,0,w,h);
+    pCtx.fillStyle='rgba(180,140,80,.5)';
+    pCtx.font=`400 ${w*0.022}px Kanit`;
+    pCtx.textAlign='center'; pCtx.textBaseline='middle';
+    pCtx.fillText('เปิดกล้องหรืออัปโหลดรูป', w/2, h/2);
+  }
+}
+
+// ── Draw frame layer ──────────────────────────────────
+function drawFrame(){
+  const {w,h}=SIZES[ori];
+  fCtx.clearRect(0,0,w,h);
+  const fr=getFrame();
+  if(fr && fr.img){ fCtx.drawImage(fr.img,0,0,w,h); }
+}
+
+// ── Draw text layer ───────────────────────────────────
+function drawText(){
+  const {w,h}=SIZES[ori];
+  tCtx.clearRect(0,0,w,h);
+  const scale = ori==='landscape' ? 1440/1080 : 1;
+  const ay=admin.assocY, ey=admin.eventY, y1=admin.y1, y2=admin.y2, y3=admin.y3;
+  tCtx.textAlign='center'; tCtx.textBaseline='middle';
+  tCtx.font=`600 ${Math.round(w*0.025)}px Kanit`; tCtx.fillStyle='#7a1010';
+  tCtx.fillText(ASSOC, w/2, ay);
+  if(admin.event){
+    tCtx.font=`700 ${Math.round(w*0.033)}px Kanit`; tCtx.fillStyle='#4a0606';
+    tCtx.fillText(admin.event, w/2, ey);
+  }
+  [admin.bot1,admin.bot2,admin.bot3].filter(Boolean).forEach((l,i)=>{
+    tCtx.font=`${i===0?600:400} ${Math.round(w*(i===0?.022:.019))}px Kanit`;
+    tCtx.fillStyle=i===0?'#7a1010':'#5a3010';
+    tCtx.fillText(l, w/2, [y1,y2,y3][i]);
+  });
+}
+
+function render(){ drawPhoto(); drawFrame(); drawText(); }
+
+// ── Frame grid UI ─────────────────────────────────────
+function buildGrid(){
+  const grid=document.getElementById('frameGrid'); grid.innerHTML='';
+  const list=frames.filter(f=>f.ori===ori);
+  if(!list.length){
+    grid.innerHTML='<p style="color:rgba(255,248,232,.4);font-size:12px;padding:4px;grid-column:1/-1">ยังไม่มีกรอบ<br>อัปโหลด PNG ด้านล่าง</p>';
+    return;
+  }
+  list.forEach(f=>{
+    const d=document.createElement('div');
+    d.className='fbtn'+(f.id===selId?' active':'');
+    if(ori==='landscape') d.classList.add('landscape');
+    d.innerHTML=`<img src="${f.dataUrl}" alt="${f.label}"><span>${f.label}</span><button class="del-btn" title="ลบกรอบนี้">✕</button>`;
+    d.querySelector('.del-btn').onclick=(e)=>{ e.stopPropagation(); deleteFrame(f.id); };
+    d.onclick=()=>{ selId=f.id; buildGrid(); drawFrame(); drawText(); };
+    grid.appendChild(d);
+  });
+  // auto-select first if none selected
+  if(!frames.find(f=>f.id===selId && f.ori===ori) && list.length){
+    selId=list[0].id; buildGrid();
+  }
+}
+
+// ── Add frames from file upload ───────────────────────
+document.getElementById('frameUpload').addEventListener('change', e=>{
+  const files=[...e.target.files]; if(!files.length)return;
+  let loaded=0;
+  files.forEach((file,i)=>{
+    const r=new FileReader();
+    r.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        // detect orientation from image aspect ratio
+        const isPortrait = img.naturalHeight >= img.naturalWidth;
+        const frameOri = isPortrait ? 'portrait' : 'landscape';
+        const id='f'+Date.now()+'_'+i;
+        const label='กรอบที่ '+(frames.filter(f=>f.ori===frameOri).length+1);
+        frames.push({id, label, ori:frameOri, dataUrl:r.result, img});
+        loaded++;
+        if(loaded===files.length){
+          saveFrames(); buildGrid(); drawFrame(); drawText();
+          e.target.value='';
+        }
+      };
+      img.src=r.result;
+    };
+    r.readAsDataURL(file);
+  });
+});
+
+function deleteFrame(id){
+  if(!confirm('ลบกรอบนี้ออกจากเครื่องนี้?')) return;
+  frames=frames.filter(f=>f.id!==id);
+  if(selId===id) selId=null;
+  saveFrames(); buildGrid(); drawFrame(); drawText();
+}
+
+// ── Camera ────────────────────────────────────────────
+async function startCam(){
+  try{
+    stopCam();
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+    video.srcObject=camStream; srcImg=null; camOn=true;
+    (function loop(){ if(camOn){drawPhoto();requestAnimationFrame(loop);} })();
+  }catch(e){
+    try{
+      camStream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+      video.srcObject=camStream; srcImg=null; camOn=true;
+      (function loop(){ if(camOn){drawPhoto();requestAnimationFrame(loop);} })();
+    }catch(e2){ alert('เปิดกล้องไม่ได้: '+e2.message); }
+  }
+}
+function stopCam(){ camOn=false; if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;} video.srcObject=null; }
+function capPhoto(){
+  if(!camStream) return;
+  srcImg=new Image();
+  srcImg.onload=()=>{ stopCam(); drawPhoto(); };
+  srcImg.src=photoCanvas.toDataURL('image/jpeg',.92);
+}
+
+// ── Photo upload ──────────────────────────────────────
+document.getElementById('photoUpload').addEventListener('change',e=>{
+  const file=e.target.files?.[0]; if(!file)return;
+  const r=new FileReader();
+  r.onload=()=>{ srcImg=new Image(); srcImg.onload=()=>{stopCam();drawPhoto();}; srcImg.src=r.result; };
+  r.readAsDataURL(file);
+});
+
+// ── Download ──────────────────────────────────────────
+function dlPhoto(){
+  const {w,h}=SIZES[ori];
+  const off=document.createElement('canvas'); off.width=w; off.height=h;
+  const ox=off.getContext('2d');
+  ox.drawImage(photoCanvas,0,0);
+  const fr=getFrame();
+  if(fr && fr.img) ox.drawImage(fr.img,0,0,w,h);
+  ox.drawImage(textCanvas,0,0);
+  const a=document.createElement('a');
+  a.download='shrine-frame-'+Date.now()+'.png';
+  a.href=off.toDataURL('image/png');
+  a.click();
+}
+
+// ── Reset ─────────────────────────────────────────────
+function resetAll(){ stopCam(); srcImg=null; document.getElementById('photoUpload').value=''; drawPhoto(); }
+
+// ── Orientation ───────────────────────────────────────
+function setOri(o){
+  ori=o; selId=null;
+  document.getElementById('btnP').classList.toggle('active',o==='portrait');
+  document.getElementById('btnL').classList.toggle('active',o==='landscape');
+  setSize(); buildGrid(); render();
+}
+
+// ── Admin ─────────────────────────────────────────────
+function toggleAdmin(){ document.getElementById('adminSec').classList.toggle('open'); }
+
+function applyAdmin(){
+  admin.event=document.getElementById('aEvent').value;
+  admin.bot1=document.getElementById('aBot1').value;
+  admin.bot2=document.getElementById('aBot2').value;
+  admin.bot3=document.getElementById('aBot3').value;
+  admin.assocY=+document.getElementById('aAssocY').value||85;
+  admin.eventY=+document.getElementById('aEventY').value||128;
+  admin.y1=+document.getElementById('aY1').value||1320;
+  admin.y2=+document.getElementById('aY2').value||1360;
+  admin.y3=+document.getElementById('aY3').value||1395;
+  drawText();
+  const m=document.getElementById('savemsg'); m.style.display='block'; setTimeout(()=>m.style.display='none',2000);
+}
+
+['aEvent','aBot1','aBot2','aBot3','aAssocY','aEventY','aY1','aY2','aY3'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', applyAdmin);
+});
+
+// ── Init ──────────────────────────────────────────────
+loadFrames();
+setSize();
+buildGrid();
+render();
+</script>
+</body>
+</html>
