@@ -582,59 +582,160 @@ async function loadEvent() {
 function makeCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code = '';
-  for (let i = 0; i < 5; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)];
+<body>
+
+<div class="lantern one"></div>
+<div class="lantern two"></div>
+<div class="lantern three"></div>
+
+<main class="page">
+
+<section class="hero">
+  <div class="badge">🏮 Time Capsule คำอธิษฐาน</div>
+  <h1>โคมอธิษฐาน<br>Time Capsule</h1>
+  <p class="subtitle">
+    ฝากคำอธิษฐานไว้กับแสงแห่งศรัทธา แล้วเปิดข้อความนี้อีกครั้งในเทศกาลปีหน้า
+  </p>
+</section>
+
+<!-- 🔥 EVENT (เพิ่มใหม่) -->
+<section class="event-box event-empty" id="eventBox">
+  <div class="event-label">คำอธิษฐานนี้ถูกฝากไว้ในงาน</div>
+  <div class="event-name" id="eventNameDisplay">-</div>
+  <div class="event-date" id="eventDateDisplay">-</div>
+</section>
+
+<section class="card">
+  <div class="card-top">
+    <h2>ฝากคำอธิษฐานของท่าน</h2>
+    <p>เขียนคำอธิษฐานของท่าน แล้วเก็บไว้เพื่อกลับมาเปิดอีกครั้งในอนาคต</p>
+  </div>
+
+  <div class="form">
+    <div class="grid">
+      <div>
+        <label>ชื่อ / ชื่อเล่น</label>
+        <input id="name">
+      </div>
+
+      <div>
+        <label>ระยะเวลาเปิดคำอธิษฐาน</label>
+        <select id="period">
+          <option value="year">🔒 เปิดในเทศกาลปีหน้า</option>
+          <option value="now">🔓 เปิดได้ตลอดเวลา</option>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label>คำอธิษฐาน</label>
+      <textarea id="wish"></textarea>
+    </div>
+
+    <div>
+      <label>อีเมล</label>
+      <input id="email">
+    </div>
+
+    <button onclick="saveWish()">ฝากคำอธิษฐาน</button>
+  </div>
+
+  <div class="result" id="resultBox">
+    <div>คำอธิษฐานของท่านถูกเก็บไว้แล้ว</div>
+    <div class="code" id="codeText"></div>
+  </div>
+</section>
+
+</main>
+
+<div class="saving-overlay" id="savingOverlay">
+  <div class="seal-scene">
+    <div class="seal-ring"></div>
+    <div class="seal-wish">คำอธิษฐาน</div>
+    <div class="seal-lantern"></div>
+    <div class="seal-text">กำลังเก็บคำอธิษฐานของท่าน...</div>
+  </div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp, getDoc, doc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey: "AIzaSyBkGyIgB-LJci9yRx-C--ahW4yDngUYpZI",
+  authDomain: "timecapsule-64914.firebaseapp.com",
+  projectId: "timecapsule-64914"
+});
+
+const db = getFirestore(app);
+
+let currentEvent = null;
+
+function formatEventDate(dateValue) {
+  if (!dateValue) return '';
+  const date = new Date(dateValue + 'T00:00:00');
+  return new Intl.DateTimeFormat('th-TH', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date);
+}
+
+async function loadEvent() {
+  try {
+    const snap = await getDoc(doc(db, "settings", "timeCapsuleEvent"));
+    if (!snap.exists()) return;
+
+    currentEvent = snap.data();
+
+    document.getElementById("eventNameDisplay").textContent = currentEvent.eventName;
+    document.getElementById("eventDateDisplay").textContent =
+      currentEvent.eventDate ? "วันที่ " + formatEventDate(currentEvent.eventDate) : "";
+
+    document.getElementById("eventBox").classList.remove("event-empty");
+
+  } catch (e) {
+    console.error(e);
   }
-  return 'TC-' + new Date().getFullYear() + '-' + code;
+}
+
+function makeCode() {
+  return "TC-" + Math.random().toString(36).substring(2,7).toUpperCase();
 }
 
 async function saveWish() {
 
-  const name = document.getElementById('name').value.trim();
-  const wish = document.getElementById('wish').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const period = document.getElementById('period').value;
-  const overlay = document.getElementById('savingOverlay');
+  const wish = document.getElementById("wish").value;
+  if (!wish) return alert("กรอกคำอธิษฐาน");
 
-  if (!wish) {
-    alert('กรุณาเขียนคำอธิษฐาน');
-    return;
-  }
+  const overlay = document.getElementById("savingOverlay");
+  overlay.classList.add("show");
 
   let unlockAt = new Date();
-  if (period === "year") {
+  if (document.getElementById("period").value === "year") {
     unlockAt.setFullYear(unlockAt.getFullYear() + 1);
   }
 
   const code = makeCode();
 
-  try {
-    overlay.classList.add('show');
+  await addDoc(collection(db, "timeCapsules"), {
+    code,
+    wish,
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    unlockAt,
+    createdAt: serverTimestamp(),
 
-    await addDoc(collection(db, "timeCapsules"), {
-      code,
-      name,
-      wish,
-      email,
-      period,
-      createdAt: serverTimestamp(),
-      unlockAt,
+    eventName: currentEvent?.eventName || "",
+    eventId: currentEvent?.eventId || "",
+    eventDate: currentEvent?.eventDate || ""
+  });
 
-      eventName: currentEvent?.eventName || "",
-      eventId: currentEvent?.eventId || "",
-      eventDate: currentEvent?.eventDate || ""
-    });
+  overlay.classList.remove("show");
 
-    await new Promise(r => setTimeout(r, 1500));
-
-    document.getElementById('codeText').textContent = code;
-    document.getElementById('resultBox').style.display = 'block';
-
-  } catch (e) {
-    alert("บันทึกไม่สำเร็จ");
-  } finally {
-    overlay.classList.remove('show');
-  }
+  document.getElementById("resultBox").style.display = "block";
+  document.getElementById("codeText").textContent = code;
 }
 
 loadEvent();
