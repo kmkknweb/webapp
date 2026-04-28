@@ -813,7 +813,41 @@ async function exportEmails(){
   }
 }
 
+// ════ PHOTO FRAME CONFIG ════
+async function savePf(){
+  try{
+    setStatus('pfStatus','กำลังบันทึก...');
+    await db.collection('settings').doc('photoFrame').set({
+      bot1: document.getElementById('pfBot1').value.trim(),
+      bot2: document.getElementById('pfBot2').value.trim(),
+      bot3: document.getElementById('pfBot3').value.trim(),
+      updatedAt: new Date().toISOString()
+    });
+    setStatus('pfStatus','✓ บันทึกสำเร็จ — photo-frame.html จะอัปเดตอัตโนมัติ');
+  }catch(e){
+    setStatus('pfStatus','บันทึกไม่สำเร็จ: '+e.message);
+  }
+}
 
+async function loadPf(){
+  try{
+    setStatus('pfStatus','กำลังโหลด...');
+    const snap = await db.collection('settings').doc('photoFrame').get();
+    if(!snap.exists){ setStatus('pfStatus','ยังไม่มีข้อมูล กรอกแล้วกดบันทึก'); return; }
+    const d = snap.data();
+    document.getElementById('pfBot1').value = d.bot1 || '';
+    document.getElementById('pfBot2').value = d.bot2 || '';
+    document.getElementById('pfBot3').value = d.bot3 || '';
+    setStatus('pfStatus','โหลดสำเร็จ • อัปเดต: '+(d.updatedAt ? new Date(d.updatedAt).toLocaleString('th-TH') : '-'));
+  }catch(e){
+    setStatus('pfStatus','โหลดไม่สำเร็จ: '+e.message);
+  }
+}
+
+document.getElementById('savePfBtn').addEventListener('click', savePf);
+document.getElementById('loadPfBtn').addEventListener('click', loadPf);
+loadPf();
+// ════ END PHOTO FRAME CONFIG ════
     </script>
 </body>
 
