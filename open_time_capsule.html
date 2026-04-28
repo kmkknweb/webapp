@@ -2,216 +2,605 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>เปิดคำอธิษฐาน</title>
+<title>เปิดคำอธิษฐาน Time Capsule</title>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>
-body{
-  margin:0;
-  font-family:'Kanit',sans-serif;
-  background:radial-gradient(circle,#8f1d1d,#1a0303);
-  color:#fff;
-  overflow:hidden;
+*{
+  box-sizing:border-box;
 }
 
-.container{
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:'Kanit',sans-serif;
+  background:
+    radial-gradient(circle at top,rgba(255,220,120,.36),transparent 32%),
+    radial-gradient(circle at bottom right,rgba(255,190,80,.22),transparent 36%),
+    linear-gradient(145deg,#160202,#4b0808 52%,#8f1d1d);
+  color:#fff;
+  overflow-x:hidden;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background-image:radial-gradient(circle,rgba(255,225,140,.22) 1px,transparent 1.8px);
+  background-size:34px 34px;
+  opacity:.35;
+  pointer-events:none;
+  z-index:0;
+}
+
+.page{
   position:relative;
-  height:100vh;
+  z-index:1;
+  min-height:100vh;
   display:flex;
-  flex-direction:column;
   align-items:center;
   justify-content:center;
+  padding:22px 16px;
+}
+
+.panel{
+  position:relative;
+  width:min(100%,520px);
+  padding:28px 22px;
+  border-radius:34px;
   text-align:center;
+  background:rgba(255,248,224,.10);
+  border:1px solid rgba(255,230,150,.34);
+  box-shadow:0 32px 100px rgba(0,0,0,.58);
+  backdrop-filter:blur(18px);
+  transition:.55s ease;
+}
+
+.panel.result-open{
+  transform:translateY(170px) scale(.92);
+  opacity:.32;
+  pointer-events:none;
+}
+
+.agong-wrap{
+  position:relative;
+  width:154px;
+  height:154px;
+  margin:0 auto 10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:.7s cubic-bezier(.2,1,.2,1);
+}
+
+.agong-wrap.float-top{
+  position:fixed;
+  top:22px;
+  left:50%;
+  transform:translateX(-50%);
+  width:108px;
+  height:108px;
+  z-index:30;
+}
+
+.agong-wrap::before{
+  content:"";
+  position:absolute;
+  width:150px;
+  height:150px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,235,165,.92),rgba(246,200,91,.28) 50%,transparent 72%);
+  filter:blur(9px);
+  animation:aura 2.6s ease-in-out infinite;
+}
+
+.agong-wrap.float-top::before{
+  width:108px;
+  height:108px;
 }
 
 .agong{
-  width:140px;
-  transition:.6s;
-  animation:float 3s infinite ease-in-out;
+  position:relative;
+  z-index:2;
+  width:120px;
+  height:120px;
+  object-fit:contain;
+  animation:float 3.2s ease-in-out infinite;
+  filter:drop-shadow(0 18px 26px rgba(0,0,0,.42));
+  transition:.7s cubic-bezier(.2,1,.2,1);
 }
 
-.agong.top{
-  position:absolute;
-  top:40px;
-  width:90px;
+.agong-wrap.float-top .agong{
+  width:82px;
+  height:82px;
+}
+
+@keyframes aura{
+  0%,100%{transform:scale(.92);opacity:.65;}
+  50%{transform:scale(1.12);opacity:1;}
 }
 
 @keyframes float{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-12px)}
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-9px);}
+}
+
+.badge{
+  display:inline-block;
+  padding:7px 15px;
+  border-radius:999px;
+  background:rgba(34,4,4,.38);
+  border:1px solid rgba(255,226,143,.36);
+  color:#ffe7a0;
+  font-size:14px;
+  margin-bottom:10px;
+}
+
+h1{
+  margin:6px 0 8px;
+  font-size:clamp(31px,8vw,46px);
+  line-height:1.12;
+  font-weight:700;
+  text-shadow:0 10px 26px rgba(0,0,0,.46);
+}
+
+.subtitle{
+  margin:0 auto 22px;
+  max-width:390px;
+  color:rgba(255,248,224,.88);
+  font-size:16px;
+  line-height:1.7;
+}
+
+.input-card{
+  padding:18px;
+  border-radius:26px;
+  background:rgba(33,4,4,.38);
+  border:1px solid rgba(255,226,143,.24);
 }
 
 input{
-  padding:15px;
-  border-radius:15px;
+  width:100%;
+  height:58px;
   border:none;
-  margin-top:20px;
+  border-radius:18px;
+  padding:0 18px;
+  font-family:'Kanit',sans-serif;
+  font-size:17px;
   text-align:center;
-  font-size:18px;
+  color:#4b1f08;
+  background:rgba(255,250,232,.97);
+  outline:none;
   text-transform:uppercase;
+  box-shadow:inset 0 2px 8px rgba(88,40,5,.14);
+}
+
+input:focus{
+  box-shadow:0 0 0 4px rgba(246,200,91,.28), inset 0 2px 8px rgba(88,40,5,.14);
 }
 
 button{
-  margin-top:12px;
-  padding:15px 30px;
+  font-family:'Kanit',sans-serif;
+}
+
+.btn{
+  position:relative;
+  width:100%;
+  margin-top:15px;
   border:none;
   border-radius:999px;
+  padding:16px 22px;
   font-size:18px;
-  background:linear-gradient(#fff0b3,#f1b93f);
-  box-shadow:0 0 25px rgba(255,200,100,.7);
+  font-weight:700;
   cursor:pointer;
-  transition:.3s;
+  transition:.18s ease;
+  overflow:hidden;
 }
 
-button:hover{
-  transform:scale(1.08);
+.btn-primary{
+  color:#421404;
+  background:linear-gradient(180deg,#fff3bd 0%,#f6c85b 45%,#c77a19 100%);
+  box-shadow:0 12px 0 #733509,0 24px 42px rgba(0,0,0,.36),0 0 38px rgba(255,210,96,.42);
 }
 
-.secondary{
-  background:rgba(255,255,255,0.2);
-  color:#fff;
+.btn-primary::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(110deg,transparent 0%,rgba(255,255,255,.68) 45%,transparent 62%);
+  transform:translateX(-120%);
+  animation:shine 2.7s ease-in-out infinite;
+}
+
+.btn-primary:active{
+  transform:translateY(8px);
+  box-shadow:0 4px 0 #733509,0 14px 26px rgba(0,0,0,.36);
+}
+
+.btn-secondary{
+  color:#fff7df;
+  background:rgba(255,255,255,.16);
+  border:1px solid rgba(255,226,143,.26);
+}
+
+.btn-secondary:hover{
+  background:rgba(255,255,255,.24);
+}
+
+.btn:disabled{
+  opacity:.65;
+  cursor:wait;
+}
+
+@keyframes shine{
+  0%,45%{transform:translateX(-120%);}
+  70%,100%{transform:translateX(120%);}
+}
+
+.msg{
+  min-height:30px;
+  margin-top:18px;
+  color:#fff0b8;
+  line-height:1.6;
+  font-size:15px;
 }
 
 .overlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.9);
+  z-index:20;
   display:none;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
   flex-direction:column;
+  background:rgba(12,1,1,.84);
+  backdrop-filter:blur(9px);
+  text-align:center;
+  padding:20px;
+}
+
+.overlay.show{
+  display:flex;
 }
 
 .light{
   width:150px;
   height:150px;
   border-radius:50%;
-  background:radial-gradient(circle,gold,transparent);
-  animation:pulse 1.5s infinite;
+  background:radial-gradient(circle,#fff8d5,#f6c85b 35%,rgba(246,200,91,.12) 72%,transparent 74%);
+  box-shadow:0 0 74px rgba(246,200,91,.95);
+  animation:pulse 1.25s ease-in-out infinite;
+  margin-bottom:18px;
 }
 
 @keyframes pulse{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.3)}
+  0%,100%{transform:scale(.9);opacity:.75;}
+  50%{transform:scale(1.12);opacity:1;}
 }
 
-.card{
+.result-layer{
   position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%) scale(0);
-  background:#fff4cf;
-  color:#4b220b;
-  padding:30px;
-  border-radius:25px;
-  width:90%;
-  max-width:420px;
-  transition:.6s;
+  inset:0;
+  z-index:25;
+  display:none;
+  align-items:flex-start;
+  justify-content:center;
+  padding:140px 16px 28px;
+  pointer-events:none;
+}
+
+.result-layer.show{
+  display:flex;
+}
+
+.wish-card{
+  position:relative;
+  width:min(100%,540px);
+  color:#4b1f08;
   text-align:center;
+  border-radius:30px;
+  padding:32px 24px 26px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.82),rgba(255,255,255,0) 18%),
+    linear-gradient(180deg,#fff8df,#f2d28a 100%);
+  border:2px solid rgba(255,230,160,.95);
+  box-shadow:0 30px 88px rgba(0,0,0,.66),0 0 76px rgba(247,200,91,.38);
+  animation:cardRise .8s cubic-bezier(.2,1,.22,1) both;
+  overflow:hidden;
+  pointer-events:auto;
 }
 
-.card.show{
-  transform:translate(-50%,-50%) scale(1);
+.wish-card::before,
+.wish-card::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  height:18px;
+  background:linear-gradient(90deg,#8f1d1d,#e6b84c,#8f1d1d);
 }
 
-.quote{
-  font-size:22px;
-  margin-top:20px;
+.wish-card::before{top:0;}
+.wish-card::after{bottom:0;}
+
+.wish-card .corner{
+  position:absolute;
+  width:60px;
+  height:60px;
+  border:2px solid rgba(143,29,29,.22);
 }
 
-.close{
-  margin-top:15px;
-  background:#8f1d1d;
-  color:#fff;
+.corner.tl{top:28px;left:16px;border-right:none;border-bottom:none;border-radius:18px 0 0 0;}
+.corner.tr{top:28px;right:16px;border-left:none;border-bottom:none;border-radius:0 18px 0 0;}
+.corner.bl{bottom:28px;left:16px;border-right:none;border-top:none;border-radius:0 0 0 18px;}
+.corner.br{bottom:28px;right:16px;border-left:none;border-top:none;border-radius:0 0 18px 0;}
+
+@keyframes cardRise{
+  from{opacity:0;transform:translateY(70px) scale(.86);filter:blur(8px);}
+  to{opacity:1;transform:translateY(0) scale(1);filter:blur(0);}
 }
 
-</style></head><body><div class="container">
-  <img src="./agong.png" class="agong" id="agong">
-  <h1>เปิดคำอธิษฐาน</h1>  <input id="codeInput" placeholder="TC-2026-XXXXX"><button onclick="openCapsule()">✨ เปิดโคม</button>
+.card-symbol{
+  width:58px;
+  height:58px;
+  display:grid;
+  place-items:center;
+  margin:2px auto 8px;
+  border-radius:50%;
+  color:#fff7df;
+  background:linear-gradient(180deg,#9b1717,#4b0808);
+  box-shadow:0 12px 22px rgba(75,8,8,.28),0 0 26px rgba(246,200,91,.32);
+  font-size:28px;
+  font-weight:700;
+}
 
-<button class="secondary" onclick="goRecover()">🔍 ค้นหารหัสเดิม</button>
+.card-title{
+  margin:4px 0 4px;
+  font-size:clamp(25px,6vw,34px);
+  line-height:1.25;
+  color:#7b1414;
+  font-weight:700;
+}
 
-</div><div class="overlay" id="overlay">
+.card-subtitle{
+  margin:0 auto 16px;
+  max-width:390px;
+  color:#8a5a22;
+  font-size:15px;
+  line-height:1.65;
+}
+
+.wish-text{
+  min-height:120px;
+  padding:20px 18px;
+  border-radius:22px;
+  background:rgba(255,255,255,.44);
+  border:1px solid rgba(151,89,20,.18);
+  box-shadow:inset 0 2px 14px rgba(120,70,12,.09);
+  font-size:clamp(20px,5vw,24px);
+  line-height:1.78;
+  white-space:pre-wrap;
+}
+
+.name-text{
+  margin-top:16px;
+  color:#8a5a22;
+  font-size:15px;
+  line-height:1.6;
+}
+
+.close-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:18px;
+}
+
+.small-btn{
+  border:none;
+  border-radius:999px;
+  padding:12px 14px;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.close-btn{
+  color:#fff7df;
+  background:linear-gradient(180deg,#8f1d1d,#4b0909);
+}
+
+.copy-btn{
+  color:#421404;
+  background:linear-gradient(180deg,#fff3bd,#f6c85b);
+}
+
+@media(max-width:480px){
+  .page{align-items:flex-start;padding-top:34px;}
+  .panel{padding:23px 18px;border-radius:28px;}
+  .panel.result-open{transform:translateY(175px) scale(.92);}
+  .agong-wrap{width:132px;height:132px;}
+  .agong{width:104px;height:104px;}
+  .agong-wrap.float-top{top:18px;width:92px;height:92px;}
+  .agong-wrap.float-top .agong{width:70px;height:70px;}
+  .result-layer{padding-top:114px;}
+  .wish-card{padding:29px 18px 24px;border-radius:26px;}
+  .close-row{grid-template-columns:1fr;}
+}
+</style></head><body>
+<main class="page">
+  <section class="panel" id="mainPanel">
+    <div class="agong-wrap" id="agongWrap">
+      <img src="./agong.png" alt="อากงอาม่า" class="agong">
+    </div><div class="badge">Time Capsule คำอธิษฐาน</div>
+<h1>เปิดคำอธิษฐาน</h1>
+<p class="subtitle">ใส่รหัส Time Capsule เพื่อเปิดข้อความที่เคยฝากไว้กับแสงแห่งศรัทธา</p>
+
+<div class="input-card">
+  <input id="codeInput" type="text" placeholder="TC-2026-XXXXX" autocomplete="off">
+  <button class="btn btn-primary" id="openButton" onclick="openCapsule()">✨ เปิดโคมคำอธิษฐาน</button>
+  <button class="btn btn-secondary" onclick="goRecover()">🔍 ค้นหารหัสเดิม</button>
+  <div class="msg" id="msg"></div>
+</div>
+
+  </section>
+</main><div class="overlay" id="overlay">
   <div class="light"></div>
   <h2>กำลังเปิดคำอธิษฐาน...</h2>
-</div><div class="card" id="card">
-  <h2>คำอธิษฐานของคุณ</h2>
-  <div class="quote" id="wish"></div>
-  <button class="close" onclick="closeCard()">ปิด</button>
-</div><audio id="gong" src="gong.mp3"></audio>
+  <div style="margin-top:8px;color:#fff0b8;font-size:15px;">ขอให้ความตั้งใจในวันนั้น ส่งแสงมาถึงวันนี้</div>
+</div><div class="result-layer" id="resultLayer">
+  <section class="wish-card" id="wishCard">
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div><div class="card-symbol">福</div>
+<div class="card-title">คำอธิษฐานของคุณ<br>เมื่อ 1 ปีที่ผ่านมา</div>
+<p class="card-subtitle">ข้อความเล็กๆ ที่เคยฝากไว้ในวันแห่งศรัทธา วันนี้ได้เดินทางกลับมาหาคุณอีกครั้ง</p>
+<div class="wish-text" id="wishText"></div>
+<div class="name-text" id="nameText"></div>
+
+<div class="close-row">
+  <button class="small-btn copy-btn" onclick="copyCurrentCode()">คัดลอกรหัส</button>
+  <button class="small-btn close-btn" onclick="closeResult()">ปิดการ์ด</button>
+</div>
+
+  </section>
+</div><audio id="gong" src="gong.mp3" preload="auto"></audio>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSy...",
+  apiKey: "AIzaSyBkGyIgB-LJci9yRx-C--ahW4yDngUYpZI",
   authDomain: "timecapsule-64914.firebaseapp.com",
-  projectId: "timecapsule-64914"
+  projectId: "timecapsule-64914",
+  storageBucket: "timecapsule-64914.firebasestorage.app",
+  messagingSenderId: "296891105342",
+  appId: "1:296891105342:web:1c3ac75064023e90ba116f"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+let currentCode = '';
+let typingTimer = null;
 
-function typeText(text, el){
-  let i=0;
-  el.innerHTML="";
-  function t(){
-    if(i<text.length){
-      el.innerHTML+=text[i];
-      i++;
-      setTimeout(t,40);
-    }
-  }
-  t();
+function showMessage(text){
+  document.getElementById('msg').textContent = text;
+}
+
+function playGong(){
+  const audio = document.getElementById('gong');
+  audio.pause();
+  audio.currentTime = 0;
+  audio.play().catch(()=>{});
+}
+
+function stopGong(){
+  const audio = document.getElementById('gong');
+  audio.pause();
+  audio.currentTime = 0;
+}
+
+function typeText(text, el, speed = 36){
+  if(typingTimer) clearInterval(typingTimer);
+  el.textContent = '';
+  let i = 0;
+  typingTimer = setInterval(()=>{
+    el.textContent += text.charAt(i);
+    i++;
+    if(i >= text.length) clearInterval(typingTimer);
+  }, speed);
+}
+
+function formatThaiDate(value){
+  const date = value?.toDate ? value.toDate() : new Date(value);
+  return new Intl.DateTimeFormat('th-TH', {
+    year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'
+  }).format(date);
 }
 
 window.openCapsule = async function(){
-  const code = document.getElementById("codeInput").value.toUpperCase();
-  const overlay = document.getElementById("overlay");
-  const card = document.getElementById("card");
-  const agong = document.getElementById("agong");
-  const audio = document.getElementById("gong");
+  const code = document.getElementById('codeInput').value.trim().toUpperCase();
+  const overlay = document.getElementById('overlay');
+  const button = document.getElementById('openButton');
 
-  overlay.style.display="flex";
-  audio.pause(); audio.currentTime=0; audio.play();
-
-  const q = query(collection(db,"timeCapsules"),where("code","==",code));
-  const snap = await getDocs(q);
-
-  if(snap.empty){
-    overlay.style.display="none";
-    alert("ไม่พบรหัส");
+  if(!code){
+    showMessage('กรุณาใส่รหัส Time Capsule ก่อน');
     return;
   }
 
-  const data = snap.docs[0].data();
-  const unlockAt = data.unlockAt.toDate();
+  currentCode = code;
+  button.disabled = true;
+  showMessage('กำลังค้นหารหัส...');
 
-  if(new Date() < unlockAt){
-    overlay.style.display="none";
-    alert("ยังไม่ถึงเวลา");
-    return;
+  try{
+    const q = query(collection(db,'timeCapsules'), where('code','==',code));
+    const snap = await getDocs(q);
+
+    if(snap.empty){
+      showMessage('ไม่พบรหัสนี้ กรุณาตรวจสอบอีกครั้ง');
+      return;
+    }
+
+    const data = snap.docs[0].data();
+    const unlockAt = data.unlockAt?.toDate ? data.unlockAt.toDate() : new Date(data.unlockAt);
+
+    if(new Date() < unlockAt){
+      showMessage('ยังไม่ถึงเวลาเปิดคำอธิษฐาน เปิดได้หลัง ' + formatThaiDate(unlockAt));
+      return;
+    }
+
+    showMessage('');
+    overlay.classList.add('show');
+    playGong();
+
+    setTimeout(()=>{
+      overlay.classList.remove('show');
+      document.getElementById('mainPanel').classList.add('result-open');
+      document.getElementById('agongWrap').classList.add('float-top');
+      document.getElementById('resultLayer').classList.add('show');
+
+      document.getElementById('nameText').textContent = data.name ? 'จาก ' + data.name + ' • รหัส ' + data.code : 'รหัส ' + data.code;
+      typeText(data.wish || '', document.getElementById('wishText'));
+    }, 1200);
+
+  }catch(error){
+    console.error(error);
+    showMessage('เปิดคำอธิษฐานไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตหรือ Firestore Rules');
+  }finally{
+    setTimeout(()=>{ button.disabled = false; }, 1300);
   }
+};
 
-  setTimeout(()=>{
-    overlay.style.display="none";
-    card.classList.add("show");
-    agong.classList.add("top");
-    typeText(data.wish,document.getElementById("wish"));
-  },1200);
-}
+window.closeResult = function(){
+  document.getElementById('resultLayer').classList.remove('show');
+  document.getElementById('mainPanel').classList.remove('result-open');
+  document.getElementById('agongWrap').classList.remove('float-top');
+  document.getElementById('wishText').textContent = '';
+  stopGong();
+};
 
-window.closeCard = function(){
-  document.getElementById("card").classList.remove("show");
-  document.getElementById("agong").classList.remove("top");
-
-  const audio = document.getElementById("gong");
-  audio.pause();
-  audio.currentTime=0;
-}
+window.copyCurrentCode = async function(){
+  if(!currentCode) return;
+  try{
+    await navigator.clipboard.writeText(currentCode);
+    alert('คัดลอกรหัสแล้ว: ' + currentCode);
+  }catch(e){
+    prompt('คัดลอกรหัสนี้:', currentCode);
+  }
+};
 
 window.goRecover = function(){
-  window.location.href = "recover.html";
-}
+  stopGong();
+  window.location.href = 'recover.html';
+};
 
+window.addEventListener('beforeunload', stopGong);
+
+const params = new URLSearchParams(window.location.search);
+const codeFromUrl = params.get('code');
+if(codeFromUrl){
+  document.getElementById('codeInput').value = codeFromUrl.toUpperCase();
+  setTimeout(()=>window.openCapsule(), 600);
+}
 </script></body>
 </html>
