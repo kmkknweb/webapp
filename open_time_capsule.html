@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เปิด Time Capsule</title>
+
+<style>
+body {
+  font-family: sans-serif;
+  background: #7b1717;
+  color: #fff;
+  text-align: center;
+  padding: 30px;
+}
+
+input {
+  padding: 12px;
+  width: 250px;
+  border-radius: 10px;
+  border: none;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+button {
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: none;
+  background: gold;
+  cursor: pointer;
+}
+
+.card {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 20px;
+  background: #fff;
+  color: #000;
+  display: none;
+}
+
+.msg {
+  margin-top: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔓 เปิด Time Capsule</h1>
+
+<input id="codeInput" placeholder="TC-2026-XXXXX"><br>
+<button onclick="openCapsule()">เปิดคำอธิษฐาน</button>
+
+<div class="msg" id="msg"></div>
+
+<div class="card" id="card">
+  <h2>คำอธิษฐานของคุณ</h2>
+  <p id="wish"></p>
+  <p id="name"></p>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBkGyIgB-LJci9yRx-C--ahW4yDngUYpZI",
+  authDomain: "timecapsule-64914.firebaseapp.com",
+  projectId: "timecapsule-64914",
+  storageBucket: "timecapsule-64914.firebasestorage.app",
+  messagingSenderId: "296891105342",
+  appId: "1:296891105342:web:1c3ac75064023e90ba116f"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.openCapsule = async function() {
+  const code = document.getElementById("codeInput").value.trim().toUpperCase();
+  const msg = document.getElementById("msg");
+  const card = document.getElementById("card");
+
+  msg.innerText = "กำลังค้นหา...";
+  card.style.display = "none";
+
+  const q = query(collection(db, "timeCapsules"), where("code", "==", code));
+  const snap = await getDocs(q);
+
+  if (snap.empty) {
+    msg.innerText = "❌ ไม่พบรหัส";
+    return;
+  }
+
+  const data = snap.docs[0].data();
+  const unlockAt = data.unlockAt.toDate();
+  const now = new Date();
+
+  if (now < unlockAt) {
+    msg.innerText = "⏳ ยังไม่ถึงเวลาเปิด";
+    return;
+  }
+
+  document.getElementById("wish").innerText = data.wish;
+  document.getElementById("name").innerText = data.name || "";
+
+  card.style.display = "block";
+  msg.innerText = "";
+};
+</script>
+
+</body>
+</html>
