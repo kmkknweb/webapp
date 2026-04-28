@@ -24,44 +24,108 @@ input {
 }
 
 button {
-  padding: 12px 20px;
-  border-radius: 999px;
-  border: none;
-  background: gold;
-  cursor: pointer;
+<!DOCTYPE html><html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เปิด Time Capsule</title><link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>
+body {
+  margin:0;
+  font-family: 'Kanit', sans-serif;
+  background: linear-gradient(135deg,#4b1111,#b97822);
+  color:#fff;
+  text-align:center;
+  padding:30px;
 }
 
-.card {
-  margin-top: 20px;
-  padding: 20px;
-  border-radius: 20px;
-  background: #fff;
-  color: #000;
-  display: none;
+h1{
+  font-size:38px;
+  margin-bottom:10px;
 }
 
-.msg {
-  margin-top: 20px;
+.subtitle{
+  opacity:.85;
+  margin-bottom:30px;
 }
-</style>
-</head>
 
-<body>
+.container{
+  max-width:420px;
+  margin:auto;
+  background:rgba(255,255,255,0.1);
+  padding:25px;
+  border-radius:20px;
+  backdrop-filter:blur(10px);
+  box-shadow:0 10px 40px rgba(0,0,0,0.4);
+}
 
-<h1>🔓 เปิด Time Capsule</h1>
+input{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  margin-bottom:15px;
+  font-size:16px;
+  text-transform:uppercase;
+}
 
-<input id="codeInput" placeholder="TC-2026-XXXXX"><br>
-<button onclick="openCapsule()">เปิดคำอธิษฐาน</button>
+button{
+  width:100%;
+  padding:14px;
+  border-radius:999px;
+  border:none;
+  background:linear-gradient(180deg,#ffe7a0,#f1b93f);
+  font-weight:600;
+  font-size:16px;
+  cursor:pointer;
+}
 
-<div class="msg" id="msg"></div>
+button:hover{
+  transform:scale(1.03);
+}
 
-<div class="card" id="card">
+.msg{
+  margin-top:20px;
+  font-size:15px;
+}
+
+.card{
+  display:none;
+  margin-top:25px;
+  padding:25px;
+  border-radius:20px;
+  background:linear-gradient(160deg,#4a0f0f,#841b1b 60%,#b97822);
+  box-shadow:0 15px 50px rgba(0,0,0,0.5);
+}
+
+.quote{
+  font-size:20px;
+  line-height:1.7;
+  margin:15px 0;
+}
+
+.name{
+  opacity:.85;
+}
+
+.glow{
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes glow{
+  from{box-shadow:0 0 10px rgba(255,200,100,.3)}
+  to{box-shadow:0 0 30px rgba(255,200,100,.9)}
+}
+
+</style></head><body><h1>🔓 เปิดคำอธิษฐาน</h1>
+<div class="subtitle">จากอดีต…สู่วันนี้</div><div class="container">
+  <input id="codeInput" placeholder="TC-2026-XXXXX">
+  <button onclick="openCapsule()">เปิด Time Capsule</button>
+  <div class="msg" id="msg"></div>
+</div><div class="card glow" id="card">
   <h2>คำอธิษฐานของคุณ</h2>
-  <p id="wish"></p>
-  <p id="name"></p>
-</div>
-
-<script type="module">
+  <div class="quote" id="wish"></div>
+  <div class="name" id="name"></div>
+</div><script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
@@ -77,7 +141,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-window.openCapsule = async function() {
+window.openCapsule = async function(){
   const code = document.getElementById("codeInput").value.trim().toUpperCase();
   const msg = document.getElementById("msg");
   const card = document.getElementById("card");
@@ -85,10 +149,10 @@ window.openCapsule = async function() {
   msg.innerText = "กำลังค้นหา...";
   card.style.display = "none";
 
-  const q = query(collection(db, "timeCapsules"), where("code", "==", code));
+  const q = query(collection(db, "timeCapsules"), where("code","==",code));
   const snap = await getDocs(q);
 
-  if (snap.empty) {
+  if(snap.empty){
     msg.innerText = "❌ ไม่พบรหัส";
     return;
   }
@@ -97,7 +161,7 @@ window.openCapsule = async function() {
   const unlockAt = data.unlockAt.toDate();
   const now = new Date();
 
-  if (now < unlockAt) {
+  if(now < unlockAt){
     msg.innerText = "⏳ ยังไม่ถึงเวลาเปิด";
     return;
   }
@@ -108,7 +172,5 @@ window.openCapsule = async function() {
   card.style.display = "block";
   msg.innerText = "";
 };
-</script>
-
-</body>
+</script></body>
 </html>
