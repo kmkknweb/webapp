@@ -3,289 +3,185 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>เปิด Time Capsule</title>
+<title>เปิดคำอธิษฐาน</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-body {
-  font-family: sans-serif;
-  background: #7b1717;
-  color: #fff;
-  text-align: center;
-  padding: 30px;
-}
-
-input {
-  padding: 12px;
-  width: 250px;
-  border-radius: 10px;
-  border: none;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-}
-
-button {
-<!DOCTYPE html><html lang="th">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>เปิด Time Capsule</title><link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>
-body {
-  margin:0;
-  font-family: 'Kanit', sans-serif;
-  background: linear-gradient(135deg,#4b1111,#b97822);
-  color:#fff;
-  text-align:center;
-  padding:30px;
-}
-
-h1{
-  font-size:38px;
-  margin-bottom:10px;
-}
-
-.subtitle{
-  opacity:.85;
-  margin-bottom:30px;
-}
-
-.container{
-  max-width:420px;
-  margin:auto;
-  background:rgba(255,255,255,0.1);
-  padding:25px;
-  border-radius:20px;
-  backdrop-filter:blur(10px);
-  box-shadow:0 10px 40px rgba(0,0,0,0.4);
-}
-
-input{
-  width:100%;
-  padding:14px;
-  border-radius:12px;
-  border:none;
-  margin-bottom:15px;
-  font-size:16px;
-  text-transform:uppercase;
-}
-
-button{
-  width:100%;
-  padding:14px;
-  border-radius:999px;
-  border:none;
-  background:linear-gradient(180deg,#ffe7a0,#f1b93f);
-  font-weight:600;
-  font-size:16px;
-  cursor:pointer;
-}
-
-button:hover{
-  transform:scale(1.03);
-}
-
-.msg{
-  margin-top:20px;
-  font-size:15px;
-}
-
-.card{
-  display:none;
-  margin-top:25px;
-  padding:25px;
-  border-radius:20px;
-  background:linear-gradient(160deg,#4a0f0f,#841b1b 60%,#b97822);
-  box-shadow:0 15px 50px rgba(0,0,0,0.5);
-}
-
-.quote{
-  font-size:20px;
-  line-height:1.7;
-  margin:15px 0;
-}
-
-.name{
-  opacity:.85;
-}
-
-.glow{
-  animation: glow 2s infinite alternate;
-}
-
-@keyframes glow{
-<!DOCTYPE html><html lang="th">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>เปิดคำอธิษฐาน</title><link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>
 body{
   margin:0;
   font-family:'Kanit',sans-serif;
-  background: radial-gradient(circle at center,#8f1d1d,#1a0505);
+  background:radial-gradient(circle,#8f1d1d,#1a0303);
   color:#fff;
+  text-align:center;
   overflow:hidden;
 }
 
-.wrap{
+/* ฉาก */
+.container{
   height:100vh;
   display:flex;
   flex-direction:column;
-  align-items:center;
   justify-content:center;
-  text-align:center;
-  padding:20px;
+  align-items:center;
 }
 
-h1{
-  font-size:44px;
-  margin-bottom:10px;
-  letter-spacing:1px;
+/* อากง */
+.agong{
+  width:140px;
+  animation:float 3s infinite ease-in-out;
+  filter:drop-shadow(0 0 30px gold);
 }
 
-.subtitle{
-  opacity:.8;
-  margin-bottom:30px;
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-15px)}
 }
 
-.input-box{
-  background:rgba(255,255,255,0.08);
-  padding:25px;
-  border-radius:25px;
-  backdrop-filter:blur(10px);
-  box-shadow:0 20px 80px rgba(0,0,0,0.7);
-}
-
+/* input */
 input{
-  width:260px;
-  padding:16px;
-  border:none;
+  margin-top:20px;
+  padding:15px;
   border-radius:15px;
-  margin-bottom:15px;
-  font-size:16px;
+  border:none;
   text-align:center;
+  font-size:18px;
   text-transform:uppercase;
 }
 
-.btn{
-  padding:16px 30px;
+/* ปุ่ม */
+button{
+  margin-top:15px;
+  padding:15px 30px;
   border:none;
   border-radius:999px;
   font-size:18px;
-  font-weight:600;
+  background:linear-gradient(#fff0b3,#f1b93f);
+  box-shadow:0 0 30px rgba(255,200,100,.6);
   cursor:pointer;
-  background:linear-gradient(180deg,#fff0b3,#f1b93f);
-  box-shadow:0 0 20px rgba(255,200,100,.5);
   transition:.3s;
 }
-
-.btn:hover{
-  transform:scale(1.08);
-  box-shadow:0 0 40px rgba(255,200,100,1);
+button:hover{
+  transform:scale(1.1);
 }
 
-.msg{
-  margin-top:20px;
-  font-size:16px;
+/* overlay */
+.overlay{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  background:rgba(0,0,0,.9);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
 }
 
+.light{
+  width:150px;
+  height:150px;
+  border-radius:50%;
+  background:radial-gradient(circle,gold,transparent);
+  animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.3)}
+}
+
+/* การ์ด */
 .card{
-  position:absolute;
+  position:fixed;
   top:50%;
   left:50%;
   transform:translate(-50%,-50%) scale(0);
-  width:90%;
-  max-width:420px;
-  background:linear-gradient(160deg,#4a0f0f,#841b1b 60%,#b97822);
-  border-radius:30px;
+  background:#fff4cf;
+  color:#4b220b;
   padding:30px;
-  box-shadow:0 30px 120px rgba(0,0,0,0.9);
-  text-align:center;
-  transition:.6s ease;
+  border-radius:25px;
+  width:90%;
+  max-width:400px;
+  transition:.6s;
 }
 
 .card.show{
   transform:translate(-50%,-50%) scale(1);
 }
 
-.agong{
-  width:140px;
-  margin-bottom:10px;
-  animation:float 3s ease-in-out infinite;
-  filter:drop-shadow(0 0 25px rgba(255,200,100,.7));
-}
-
-@keyframes float{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-12px)}
-}
-
 .quote{
   font-size:22px;
-  margin:20px 0;
-  line-height:1.7;
+  margin-top:20px;
 }
 
-.name{
-  opacity:.85;
-}
+</style>
+</head>
 
-.glow{
-  position:absolute;
-  width:200px;
-  height:200px;
-  background:radial-gradient(circle,#ffd27a,transparent);
-  border-radius:50%;
-  filter:blur(40px);
-  animation:pulse 2s infinite;
-  z-index:-1;
-}
+<body>
 
-@keyframes pulse{
-  0%{transform:scale(1);opacity:.6}
-  50%{transform:scale(1.3);opacity:1}
-  100%{transform:scale(1);opacity:.6}
-}
-
-</style></head><body><div class="wrap">
-  <h1>🔮 เปิดคำอธิษฐาน</h1>
-  <div class="subtitle">เมื่อเวลามาถึง...คำอธิษฐานจะปรากฏ</div>  <div class="input-box">
-    <input id="codeInput" placeholder="TC-2026-XXXXX">
-    <br>
-    <button class="btn" onclick="openCapsule()">✨ เปิดโคม</button>
-    <div class="msg" id="msg"></div>
-  </div>
-</div><div class="card" id="card">
-  <div class="glow"></div>
+<div class="container">
   <img src="images/agong.png" class="agong">
+  <h1>เปิดคำอธิษฐาน</h1>
+
+  <input id="codeInput" placeholder="TC-2026-XXXXX">
+  <button onclick="openCapsule()">✨ เปิดโคม</button>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="light"></div>
+  <h2>กำลังเปิดคำอธิษฐาน...</h2>
+</div>
+
+<div class="card" id="card">
+  <h2>คำอธิษฐานของคุณ</h2>
   <div class="quote" id="wish"></div>
-  <div class="name" id="name"></div>
-</div><script type="module">
+</div>
+
+<audio id="gong" src="gong.mp3"></audio>
+
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBkGyIgB-LJci9yRx-C--ahW4yDngUYpZI",
+  apiKey: "AIzaSy...",
   authDomain: "timecapsule-64914.firebaseapp.com",
-  projectId: "timecapsule-64914",
-  storageBucket: "timecapsule-64914.firebasestorage.app",
-  messagingSenderId: "296891105342",
-  appId: "1:296891105342:web:1c3ac75064023e90ba116f"
+  projectId: "timecapsule-64914"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+/* พิมพ์ทีละตัว */
+function typeText(text, el){
+  let i=0;
+  el.innerHTML="";
+  function t(){
+    if(i<text.length){
+      el.innerHTML+=text[i];
+      i++;
+      setTimeout(t,40);
+    }
+  }
+  t();
+}
+
 window.openCapsule = async function(){
-  const code = document.getElementById("codeInput").value.trim().toUpperCase();
-  const msg = document.getElementById("msg");
+  const code = document.getElementById("codeInput").value.toUpperCase();
+  const overlay = document.getElementById("overlay");
   const card = document.getElementById("card");
 
-  msg.innerText = "กำลังเปิด...";
+  overlay.style.display="flex";
+  document.getElementById("gong").play();
 
-  const q = query(collection(db, "timeCapsules"), where("code","==",code));
+  const q = query(collection(db,"timeCapsules"),where("code","==",code));
   const snap = await getDocs(q);
 
   if(snap.empty){
-    msg.innerText = "❌ ไม่พบรหัส";
+    overlay.style.display="none";
+    alert("ไม่พบรหัส");
     return;
   }
 
@@ -293,17 +189,18 @@ window.openCapsule = async function(){
   const unlockAt = data.unlockAt.toDate();
 
   if(new Date() < unlockAt){
-    msg.innerText = "⏳ ยังไม่ถึงเวลา";
+    overlay.style.display="none";
+    alert("ยังไม่ถึงเวลา");
     return;
   }
 
-  msg.innerText = "";
-
   setTimeout(()=>{
-    document.getElementById("wish").innerText = data.wish;
-    document.getElementById("name").innerText = data.name || "";
+    overlay.style.display="none";
     card.classList.add("show");
-  },800);
-};
-</script></body>
+    typeText(data.wish,document.getElementById("wish"));
+  },1200);
+}
+</script>
+
+</body>
 </html>
