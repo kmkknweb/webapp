@@ -240,7 +240,7 @@ function loadImg(src){
 
   return new Promise(res=>{
     const img = new Image();
-   img.crossOrigin = 'anonymous'; 
+  /* img.crossOrigin = 'anonymous'; */
 
     img.onload = ()=>{
       imgCache[src]=img;
