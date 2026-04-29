@@ -240,7 +240,7 @@ function loadImg(src){
 
   return new Promise(res=>{
     const img = new Image();
-   /* img.crossOrigin = 'anonymous'; */
+   img.crossOrigin = 'anonymous'; 
 
     img.onload = ()=>{
       imgCache[src]=img;
@@ -488,34 +488,27 @@ document.getElementById('photoUpload').addEventListener('change',e=>{
   r.readAsDataURL(file);
 });
 
-function dlPhoto(){
+async function dlPhoto(){
   try{
     const {w,h}=SIZES[ori];
-
     const off=document.createElement('canvas');
-    off.width=w;
-    off.height=h;
-
+    off.width=w; off.height=h;
     const ox=off.getContext('2d');
-
     ox.drawImage(photoCanvas,0,0);
 
     const fr=getFrame();
-
-    if(fr && imgCache[fr.src]){
-      ox.drawImage(imgCache[fr.src],0,0,w,h);
+    if(fr && fr.src){
+      const frameImg = await loadImg(fr.src); // await ให้โหลดเสร็จ
+      if(frameImg) ox.drawImage(frameImg,0,0,w,h);
     }
 
     ox.drawImage(textCanvas,0,0);
-
     const a=document.createElement('a');
     a.download='shrine-frame-'+Date.now()+'.png';
     a.href=off.toDataURL('image/png');
     a.click();
-
   }catch(e){
-    console.error(e);
-    alert('ดาวน์โหลดไม่ได้ อาจเกิดจากสิทธิ์รูปภาพใน Google Drive หรือ CORS');
+    alert('ดาวน์โหลดไม่ได้: ' + e.message);
   }
 }
 
