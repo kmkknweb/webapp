@@ -456,7 +456,10 @@ button {
     <label>ข้อความด้านล่าง บรรทัด 3</label>
     <input type="text" id="pfBot3">
   </div>
+
+      <button onclick="savePfText()">💾 บันทึกข้อความ</button>
   </div>
+
 </section>
 !-- ════ END PHOTO FRAME SETTINGS ════ -->
       
@@ -1084,6 +1087,21 @@ function pfClearSelection(){
 
 /* โหลดอัตโนมัติเมื่อเปิดหน้า admin */
 pfLoadAllFrames().then(() => pfLoadActiveFrames());
+
+
+    function savePfText(){
+  db.collection('settings').doc('photoFrame').set({
+    bot1: document.getElementById('pfBot1').value.trim(),
+    bot2: document.getElementById('pfBot2').value.trim(),
+    bot3: document.getElementById('pfBot3').value.trim(),
+    updatedAt: new Date().toISOString()
+  }).then(()=>{
+    alert('บันทึกข้อความสำเร็จ');
+  }).catch(e=>{
+    alert('บันทึกไม่สำเร็จ');
+    console.error(e);
+  });
+    }
 
 /* ════ END PHOTO FRAME ADMIN ONLY ════ */
     </script>
