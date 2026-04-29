@@ -816,7 +816,7 @@
     // ── โหลดข้อมูลเดือนนี้จาก Apps Script ──
     async function loadMonthData() {
       try {
-        const res = await fetch(SCRIPT_URL + "?action=getMonthData");
+        const res = await fetch(SCRIPT_URL + "?action=progress");
         if (!res.ok) return;
         const data = await res.json();
 
