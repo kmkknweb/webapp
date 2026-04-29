@@ -458,14 +458,17 @@ function stopCam(){
 function capPhoto(){
   if(!camStream) return;
 
-  srcImg=new Image();
+  const tmp = document.createElement('canvas');
+  tmp.width = video.videoWidth;
+  tmp.height = video.videoHeight;
+  tmp.getContext('2d').drawImage(video, 0, 0);
 
-  srcImg.onload=()=>{
+  srcImg = new Image();
+  srcImg.onload = () => {
     stopCam();
     drawPhoto();
   };
-
-  srcImg.src=photoCanvas.toDataURL('image/jpeg',.92);
+  srcImg.src = tmp.toDataURL('image/jpeg', .92);
 }
 
 document.getElementById('photoUpload').addEventListener('change',e=>{
