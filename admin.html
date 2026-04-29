@@ -163,7 +163,69 @@ button {
   font-size:10px;
   color:#9ff0c1;
 }
-
+ .rotan-admin {
+  background: #1a1209;
+  border: 1px solid rgba(244,199,107,.3);
+  border-radius: 18px;
+  padding: 22px;
+  font-family: 'Kanit', sans-serif;
+  color: white;
+  max-width: 560px;
+}
+.rotan-admin h3 {
+  margin: 0 0 18px;
+  color: #ffe7a3;
+  font-size: 18px;
+  border-bottom: 1px solid rgba(244,199,107,.2);
+  padding-bottom: 10px;
+}
+.rotan-admin label {
+  display: block;
+  font-size: 13px;
+  color: rgba(255,255,255,.7);
+  margin-bottom: 5px;
+  margin-top: 12px;
+}
+.rotan-admin input,
+.rotan-admin textarea {
+  width: 100%;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(244,199,107,.25);
+  border-radius: 10px;
+  color: white;
+  padding: 10px 12px;
+  font-family: 'Kanit', sans-serif;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+}
+.rotan-admin textarea { resize: vertical; min-height: 70px; }
+.rotan-admin .rotan-btn {
+  margin-top: 18px;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffe8a4, #e2a73c);
+  color: #261400;
+  font-family: 'Kanit', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.rotan-admin .rotan-btn:disabled { opacity: .5; cursor: not-allowed; }
+.rotan-status {
+  margin-top: 10px;
+  font-size: 13px;
+  text-align: center;
+  color: #ffe7a3;
+  min-height: 20px;
+}
+.rotan-admin .hint {
+  font-size: 11px;
+  color: rgba(255,255,255,.4);
+  margin-top: 4px;
+}
     
   </style>
 </head>
@@ -462,6 +524,35 @@ button {
 
 </section>
 !-- ════ END PHOTO FRAME SETTINGS ════ -->
+
+      
+!-- ════ CHARITY SETTINGS ════ -->
+      <section class="card full">
+<div class="rotan-admin">
+  <h2>8) ตั้งค่าโรงทานเสมือนจริง — เดือนนี้</h3>
+
+  <label>ป้ายกำกับบนวีดีโอ (tag)</label>
+  <input id="ra-tag" type="text" placeholder="เช่น ร่วมบุญโรงทานประจำเดือนพฤษภาคม" value="ร่วมบุญโรงทานประจำเดือน">
+
+  <label>ข้อความอธิบายใต้หัวข้อ</label>
+  <textarea id="ra-message" placeholder="เช่น ร่วมเติมกำลังให้โรงทานของศาลเจ้า...">ร่วมเติมกำลังให้โรงทานของศาลเจ้า เพื่อส่งต่ออาหารและน้ำใจ ในวันที่ผู้คนมารอรับความช่วยเหลือจากแรงศรัทธาของทุกท่าน</textarea>
+
+  <label>เป้าหมายจำนวนชุด (เดือนนี้)</label>
+  <input id="ra-goal" type="number" min="1" placeholder="เช่น 300" value="300">
+  <div class="hint">* 1 แท่งเทียน = 20 ชุด จะแสดงบนวีดีโออัตโนมัติ</div>
+
+  <label>URL วีดีโอประจำเดือน (ถ้าเปลี่ยน)</label>
+  <input id="ra-video" type="text" placeholder="https://... (เว้นว่างถ้าไม่เปลี่ยน)">
+  <div class="hint">* ใส่ URL ตรงของไฟล์วีดีโอ หรือ Google Drive direct link</div>
+
+  <button class="rotan-btn" id="ra-btn" onclick="saveRotanConfig()">บันทึกการตั้งค่า</button>
+  <div class="rotan-status" id="ra-status"></div>
+</div>
+      </section>
+!-- ════ END OF CHARITY SETTINGS ════ -->
+
+
+        
       
 
       <section class="card full">
@@ -1104,7 +1195,51 @@ pfLoadAllFrames().then(() => pfLoadActiveFrames());
     }
 
 /* ════ END PHOTO FRAME ADMIN ONLY ════ */
+
+          
+/* ════ CHARITY SETTINGS ════ */
+
+    const ROTAN_SCRIPT_URL = "ใส่ URL Apps Script ใหม่ที่ได้หลัง Deploy";
+
+async function saveRotanConfig() {
+  const btn    = document.getElementById("ra-btn");
+  const status = document.getElementById("ra-status");
+
+  const goal    = document.getElementById("ra-goal").value.trim();
+  const message = document.getElementById("ra-message").value.trim();
+  const video   = document.getElementById("ra-video").value.trim();
+
+  if (!goal || isNaN(parseInt(goal))) {
+    status.textContent = "⚠️ กรุณาใส่เป้าหมายจำนวนชุด";
+    return;
+  }
+
+  btn.disabled = true;
+  status.textContent = "กำลังบันทึก...";
+
+  try {
+    const params = new URLSearchParams();
+    params.append("action",  "saveSettings");
+    params.append("goal",    goal);
+    params.append("message", message);
+    params.append("video",   video);
+
+    await fetch(ROTAN_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      body: params
+    });
+
+    status.textContent = "✅ บันทึกแล้ว — เว็บโรงทานจะอัพเดตอัตโนมัติ";
+  } catch (err) {
+    status.textContent = "❌ บันทึกไม่สำเร็จ กรุณาลองใหม่";
+  } finally {
+    btn.disabled = false;
+  }
+}
     </script>
+
+  
 </body>
 
 </html>
