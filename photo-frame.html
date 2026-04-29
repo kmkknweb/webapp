@@ -193,7 +193,7 @@ function defaultTextBot(orientation){
 
 async function loadActiveFrames(){
   try{
-    const res = await fetch(PHOTO_FRAME_API + '?action=active');
+    const res = await fetch(PHOTO_FRAME_API + '?action=active&v=' + Date.now());
     const data = await res.json();
 
     if(data.status !== 'success'){
