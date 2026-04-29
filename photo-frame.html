@@ -74,6 +74,9 @@ input[type=file]{width:100%;padding:9px 12px;border:1px solid rgba(212,168,67,.2
       <div class="row2" style="margin-bottom:10px">
         <button class="btn btn-gold" onclick="startCam()">📹 เปิดกล้อง</button>
         <button class="btn btn-ghost" onclick="capPhoto()">📸 ถ่ายภาพ</button>
+        <button class="btn btn-ghost" onclick="switchCam()" style="margin-top:8px">
+  🔄 สลับกล้องหน้า/หลัง
+        </button>
       </div>
       <label class="flabel">หรืออัปโหลดรูปจากเครื่อง</label>
       <input type="file" id="photoUpload" accept="image/*">
@@ -386,61 +389,69 @@ function buildGrid(){
   });
 }
 
+let currentFacingMode = 'environment';
+
 async function startCam(){
   try{
     stopCam();
 
-    camStream=await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:'environment'},
+    let constraints = {
+      video:{
+        facingMode:{ ideal: currentFacingMode }
+      },
       audio:false
-    });
+    };
 
-    video.srcObject=camStream;
-    srcImg=null;
-    camOn=true;
+    try{
+      camStream = await navigator.mediaDevices.getUserMedia(constraints);
+    }catch(e){
+      camStream = await navigator.mediaDevices.getUserMedia({
+        video:true,
+        audio:false
+      });
+    }
 
-    (function loop(){
+    video.srcObject = camStream;
+
+    await video.play();
+
+    srcImg = null;
+    camOn = true;
+
+    function loop(){
       if(camOn){
         drawPhoto();
         requestAnimationFrame(loop);
       }
-    })();
+    }
+
+    loop();
 
   }catch(e){
-    try{
-      camStream=await navigator.mediaDevices.getUserMedia({
-        video:true,
-        audio:false
-      });
-
-      video.srcObject=camStream;
-      srcImg=null;
-      camOn=true;
-
-      (function loop(){
-        if(camOn){
-          drawPhoto();
-          requestAnimationFrame(loop);
-        }
-      })();
-
-    }catch(e2){
-      alert('เปิดกล้องไม่ได้: '+e2.message);
-    }
+    alert('เปิดกล้องไม่ได้: ' + e.message);
   }
+}
+
+async function switchCam(){
+  currentFacingMode =
+    currentFacingMode === 'environment' ? 'user' : 'environment';
+
+  await startCam();
 }
 
 function stopCam(){
-  camOn=false;
+  camOn = false;
 
   if(camStream){
-    camStream.getTracks().forEach(t=>t.stop());
-    camStream=null;
+    camStream.getTracks().forEach(t => t.stop());
+    camStream = null;
   }
 
-  video.srcObject=null;
+  video.srcObject = null;
 }
 
+
+  
 function capPhoto(){
   if(!camStream) return;
 
