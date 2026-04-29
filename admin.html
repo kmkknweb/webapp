@@ -117,6 +117,52 @@ button {
   min-width: 0 !important;
   box-sizing: border-box;
 }
+    
+/* css photo frame*/
+    .pf-frame-list{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
+  gap:12px;
+  margin-top:10px;
+}
+.pf-frame-card{
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.06);
+  border-radius:14px;
+  padding:8px;
+  cursor:pointer;
+  transition:.18s;
+}
+.pf-frame-card:hover{
+  border-color:rgba(242,196,107,.55);
+}
+.pf-frame-card.selected{
+  border-color:#f2c46b;
+  background:rgba(242,196,107,.16);
+}
+.pf-frame-card img{
+  width:100%;
+  aspect-ratio:3/4;
+  object-fit:contain;
+  background:#111;
+  border-radius:10px;
+  display:block;
+}
+.pf-frame-card.landscape img{
+  aspect-ratio:4/3;
+}
+.pf-frame-name{
+  margin-top:6px;
+  font-size:11px;
+  color:#ffe5b1;
+  line-height:1.4;
+  word-break:break-word;
+}
+.pf-frame-badge{
+  margin-top:4px;
+  font-size:10px;
+  color:#9ff0c1;
+}
   </style>
 </head>
 
@@ -362,32 +408,38 @@ button {
 </section>
    
       </section>
-
-      <!-- ════ PHOTO FRAME SETTINGS ════ -->
+!-- ════ PHOTO FRAME SETTINGS ════ -->
 <section class="card full" style="margin-top:14px">
   <h2>7) ตั้งค่ากรอบภาพ (photo-frame.html)</h2>
-  <p class="hint">ข้อความด้านล่างกรอบภาพ แก้แล้วกด "บันทึก" — photo-frame.html จะอัปเดตอัตโนมัติทันที</p>
-  <div class="grid">
-    <div>
-      <label>ข้อความด้านล่าง บรรทัด 1</label>
-      <input type="text" id="pfBot1" placeholder="เช่น ศาลเจ้า • ความทรงจำแห่งศรัทธา">
-    </div>
-    <div>
-      <label>ข้อความด้านล่าง บรรทัด 2</label>
-      <input type="text" id="pfBot2" placeholder="เช่น สมาคมปึงเถ่ากงม่า ขอนแก่น">
-    </div>
-    <div>
-      <label>ข้อความด้านล่าง บรรทัด 3 (ไม่บังคับ)</label>
-      <input type="text" id="pfBot3" placeholder="เว้นว่างได้">
-    </div>
+  <p class="hint">
+    ดึงรูปกรอบจาก Google Drive ผ่าน Apps Script แล้วเลือกให้แสดงใน photo-frame:
+    แนวตั้ง 3 รูป / แนวนอน 3 รูป
+  </p>
+
+  <div class="btn-row" style="margin-top:10px">
+    <button type="button" onclick="pfLoadAllFrames()">🔄 โหลดรูปจาก Drive</button>
+    <button type="button" class="secondary" onclick="pfLoadActiveFrames()">📌 โหลดกรอบที่ใช้อยู่</button>
   </div>
-  <div class="btn-row" style="margin-top:14px">
-    <button id="savePfBtn">💾 บันทึกข้อความกรอบ</button>
-    <button id="loadPfBtn" class="secondary">🔄 โหลดค่าปัจจุบัน</button>
-  </div>
+
   <p class="status" id="pfStatus">พร้อมใช้งาน</p>
+
+  <div class="preview">
+    <div class="preview-title">เลือกกรอบแนวตั้ง 3 รูป</div>
+    <div id="pfPortraitList" class="pf-frame-list"></div>
+  </div>
+
+  <div class="preview">
+    <div class="preview-title">เลือกกรอบแนวนอน 3 รูป</div>
+    <div id="pfLandscapeList" class="pf-frame-list"></div>
+  </div>
+
+  <div class="btn-row" style="margin-top:14px">
+    <button type="button" onclick="pfSaveActiveFrames()">💾 บันทึกกรอบที่เลือก</button>
+    <button type="button" class="secondary" onclick="pfClearSelection()">ล้างการเลือก</button>
+  </div>
 </section>
-<!-- ════ END PHOTO FRAME SETTINGS ════ -->
+!-- ════ END PHOTO FRAME SETTINGS ════ -->
+      
 
       <section class="card full">
         <h2>8) วิธีทดสอบหลังอัปโหลดไฟล์</h2>
@@ -837,41 +889,183 @@ async function exportEmails(){
   }
 }
 
-// ════ PHOTO FRAME CONFIG ════
-async function savePf(){
+/* ════ PHOTO FRAME ADMIN ONLY ════ */
+
+const PHOTO_FRAME_API =
+  'https://script.google.com/macros/s/AKfycbz2p5dCTM8hByL4JXeUZVppKCOD9gXUT_CgeU6MZzmVBer3qmb12LnosQNGdsCyTD8tSQ/exec';
+
+let pfAllFrames = [];
+let pfSelectedPortrait = [];
+let pfSelectedLandscape = [];
+
+function pfSetStatus(text){
+  const el = document.getElementById('pfStatus');
+  if(el) el.textContent = text;
+}
+
+async function pfLoadAllFrames(){
   try{
-    setStatus('pfStatus','กำลังบันทึก...');
-    await db.collection('settings').doc('photoFrame').set({
-      bot1: document.getElementById('pfBot1').value.trim(),
-      bot2: document.getElementById('pfBot2').value.trim(),
-      bot3: document.getElementById('pfBot3').value.trim(),
-      updatedAt: new Date().toISOString()
+    pfSetStatus('กำลังโหลดรูปจาก Google Drive...');
+
+    const res = await fetch(PHOTO_FRAME_API + '?action=list');
+    const data = await res.json();
+
+    if(data.status !== 'success'){
+      pfSetStatus('โหลดรูปไม่สำเร็จ');
+      return;
+    }
+
+    pfAllFrames = data.frames || [];
+
+    pfRenderFrameLists();
+
+    pfSetStatus('โหลดรูปสำเร็จ พบทั้งหมด ' + pfAllFrames.length + ' รูป');
+
+  }catch(e){
+    console.error(e);
+    pfSetStatus('โหลดรูปไม่สำเร็จ: ' + e.message);
+  }
+}
+
+async function pfLoadActiveFrames(){
+  try{
+    pfSetStatus('กำลังโหลดกรอบที่ใช้งานอยู่...');
+
+    const res = await fetch(PHOTO_FRAME_API + '?action=active');
+    const data = await res.json();
+
+    if(data.status !== 'success'){
+      pfSetStatus('โหลดกรอบที่ใช้อยู่ไม่สำเร็จ');
+      return;
+    }
+
+    pfSelectedPortrait = (data.portrait || []).map(x => x.id);
+    pfSelectedLandscape = (data.landscape || []).map(x => x.id);
+
+    if(!pfAllFrames.length){
+      await pfLoadAllFrames();
+    }else{
+      pfRenderFrameLists();
+    }
+
+    pfSetStatus('โหลดกรอบที่ใช้อยู่สำเร็จ');
+
+  }catch(e){
+    console.error(e);
+    pfSetStatus('โหลดกรอบที่ใช้อยู่ไม่สำเร็จ: ' + e.message);
+  }
+}
+
+function pfRenderFrameLists(){
+  const portraitBox = document.getElementById('pfPortraitList');
+  const landscapeBox = document.getElementById('pfLandscapeList');
+
+  const portraits = pfAllFrames.filter(f => f.orientation === 'portrait');
+  const landscapes = pfAllFrames.filter(f => f.orientation === 'landscape');
+
+  portraitBox.innerHTML = portraits.map(f => pfFrameCardHtml(f, 'portrait')).join('');
+  landscapeBox.innerHTML = landscapes.map(f => pfFrameCardHtml(f, 'landscape')).join('');
+}
+
+function pfFrameCardHtml(frame, orientation){
+  const selected =
+    orientation === 'portrait'
+      ? pfSelectedPortrait.includes(frame.id)
+      : pfSelectedLandscape.includes(frame.id);
+
+  const order =
+    orientation === 'portrait'
+      ? pfSelectedPortrait.indexOf(frame.id) + 1
+      : pfSelectedLandscape.indexOf(frame.id) + 1;
+
+  return `
+    <div class="pf-frame-card ${selected ? 'selected' : ''} ${orientation === 'landscape' ? 'landscape' : ''}"
+         onclick="pfToggleFrame('${frame.id}','${orientation}')">
+      <img src="${frame.url}" alt="${frame.name}">
+      <div class="pf-frame-name">${frame.name}</div>
+      ${selected ? `<div class="pf-frame-badge">เลือกแล้ว ลำดับที่ ${order}</div>` : ''}
+    </div>
+  `;
+}
+
+function pfToggleFrame(id, orientation){
+  if(orientation === 'portrait'){
+    if(pfSelectedPortrait.includes(id)){
+      pfSelectedPortrait = pfSelectedPortrait.filter(x => x !== id);
+    }else{
+      if(pfSelectedPortrait.length >= 3){
+        alert('เลือกกรอบแนวตั้งได้สูงสุด 3 รูป');
+        return;
+      }
+      pfSelectedPortrait.push(id);
+    }
+  }
+
+  if(orientation === 'landscape'){
+    if(pfSelectedLandscape.includes(id)){
+      pfSelectedLandscape = pfSelectedLandscape.filter(x => x !== id);
+    }else{
+      if(pfSelectedLandscape.length >= 3){
+        alert('เลือกกรอบแนวนอนได้สูงสุด 3 รูป');
+        return;
+      }
+      pfSelectedLandscape.push(id);
+    }
+  }
+
+  pfRenderFrameLists();
+}
+
+async function pfSaveActiveFrames(){
+  try{
+    if(pfSelectedPortrait.length !== 3){
+      alert('กรุณาเลือกกรอบแนวตั้งให้ครบ 3 รูป');
+      return;
+    }
+
+    if(pfSelectedLandscape.length !== 3){
+      alert('กรุณาเลือกกรอบแนวนอนให้ครบ 3 รูป');
+      return;
+    }
+
+    pfSetStatus('กำลังบันทึกกรอบที่เลือก...');
+
+    const portrait = pfSelectedPortrait.map(id => pfAllFrames.find(f => f.id === id)).filter(Boolean);
+    const landscape = pfSelectedLandscape.map(id => pfAllFrames.find(f => f.id === id)).filter(Boolean);
+
+    await fetch(PHOTO_FRAME_API, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify({
+        action: 'saveActiveFrames',
+        portrait,
+        landscape
+      })
     });
-    setStatus('pfStatus','✓ บันทึกสำเร็จ — photo-frame.html จะอัปเดตอัตโนมัติ');
+
+    pfSetStatus('ส่งคำสั่งบันทึกแล้ว กรุณากด “โหลดกรอบที่ใช้อยู่” เพื่อตรวจสอบ');
+    alert('บันทึกกรอบที่เลือกแล้ว');
+
   }catch(e){
-    setStatus('pfStatus','บันทึกไม่สำเร็จ: '+e.message);
+    console.error(e);
+    pfSetStatus('บันทึกไม่สำเร็จ: ' + e.message);
   }
 }
 
-async function loadPf(){
-  try{
-    setStatus('pfStatus','กำลังโหลด...');
-    const snap = await db.collection('settings').doc('photoFrame').get();
-    if(!snap.exists){ setStatus('pfStatus','ยังไม่มีข้อมูล กรอกแล้วกดบันทึก'); return; }
-    const d = snap.data();
-    document.getElementById('pfBot1').value = d.bot1 || '';
-    document.getElementById('pfBot2').value = d.bot2 || '';
-    document.getElementById('pfBot3').value = d.bot3 || '';
-    setStatus('pfStatus','โหลดสำเร็จ • อัปเดต: '+(d.updatedAt ? new Date(d.updatedAt).toLocaleString('th-TH') : '-'));
-  }catch(e){
-    setStatus('pfStatus','โหลดไม่สำเร็จ: '+e.message);
-  }
+function pfClearSelection(){
+  pfSelectedPortrait = [];
+  pfSelectedLandscape = [];
+  pfRenderFrameLists();
+  pfSetStatus('ล้างการเลือกแล้ว');
 }
 
-document.getElementById('savePfBtn').addEventListener('click', savePf);
-document.getElementById('loadPfBtn').addEventListener('click', loadPf);
-loadPf();
-// ════ END PHOTO FRAME CONFIG ════
+/* โหลดอัตโนมัติเมื่อเปิดหน้า admin */
+pfLoadAllFrames().then(() => pfLoadActiveFrames());
+
+/* ════ END PHOTO FRAME ADMIN ONLY ════ */
     </script>
 </body>
 
