@@ -56,14 +56,8 @@ input[type=file]{width:100%;padding:9px 12px;border:1px solid rgba(212,168,67,.2
   </div>
 
   <div class="controls">
-    <div class="card">
-      <div class="card-title">แนวภาพ</div>
-      <div class="row2">
-        <button class="obtn active" id="btnP" onclick="setOri('portrait')">📱 แนวตั้ง</button>
-        <button class="obtn" id="btnL" onclick="setOri('landscape')">🖼 แนวนอน</button>
-      </div>
-    </div>
 
+    
     <div class="card">
           <div class="card">
       <div class="card-title">รูปถ่าย</div>
@@ -77,6 +71,14 @@ input[type=file]{width:100%;padding:9px 12px;border:1px solid rgba(212,168,67,.2
       <label class="flabel">หรืออัปโหลดรูปจากเครื่อง</label>
       <input type="file" id="photoUpload" accept="image/*">
           </div>
+    <div class="card">
+      <div class="card-title">แนวภาพ</div>
+      <div class="row2">
+        <button class="obtn active" id="btnP" onclick="setOri('portrait')">📱 แนวตั้ง</button>
+        <button class="obtn" id="btnL" onclick="setOri('landscape')">🖼 แนวนอน</button>
+      </div>
+    </div>
+
       
       <div class="card-title">เลือกกรอบ</div>
       <div class="frame-grid" id="frameGrid"></div>
