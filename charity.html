@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>โรงทานเสมือนจริง</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --gold: #f4c76b;
+      --gold2: #ffe7a3;
+      --dark: #110c08;
+      --muted: rgba(255,255,255,.76);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Kanit', sans-serif;
+      background: radial-gradient(circle at top, #3b2717 0%, #110c08 46%, #050302 100%);
+      color: white;
+      min-height: 100vh;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+    }
+
+    .shell {
+      width: min(1080px, 100%);
+      display: grid;
+      grid-template-columns: .94fr 1.06fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .visual-card,
+    .form-card {
+      border: 1px solid rgba(244,199,107,.28);
+      border-radius: 28px;
+      overflow: hidden;
+      background: rgba(18, 12, 7, .72);
+      box-shadow: 0 24px 70px rgba(0,0,0,.42);
+      backdrop-filter: blur(12px);
+    }
+
+    .visual-card {
+      position: sticky;
+      top: 22px;
+      height: min(68vh, 560px);
+      min-height: 440px;
+    }
+
+    .hero-video,
+    .hero-fallback {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .hero-fallback { display: none; }
+
+    .shade {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(0,0,0,.05), rgba(0,0,0,.62)),
+        radial-gradient(circle at 50% 35%, rgba(255,201,105,.05), rgba(0,0,0,.35));
+      pointer-events: none;
+    }
+
+    .brand {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 2;
+    }
+
+    .brand img {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+      border-radius: 50%;
+      background: rgba(255,255,255,.88);
+      padding: 5px;
+    }
+
+    .brand-title {
+      line-height: 1.22;
+      text-shadow: 0 2px 12px rgba(0,0,0,.6);
+    }
+
+    .brand-title strong {
+      display: block;
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .brand-title span {
+      font-size: 13px;
+      color: rgba(255,255,255,.76);
+    }
+
+    .message {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 24px;
+      z-index: 2;
+    }
+
+    .message .tag {
+      display: inline-block;
+      border: 1px solid rgba(244,199,107,.42);
+      color: var(--gold2);
+      padding: 6px 13px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.34);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .message h1 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.1;
+      font-weight: 700;
+      letter-spacing: -.4px;
+      text-shadow: 0 3px 20px rgba(0,0,0,.72);
+    }
+
+    .message p {
+      margin: 0;
+      color: rgba(255,255,255,.84);
+      font-size: 15px;
+      line-height: 1.7;
+      max-width: 620px;
+      text-shadow: 0 2px 14px rgba(0,0,0,.75);
+    }
+
+    .form-card { padding: 24px; }
+
+    .section-title {
+      margin: 0 0 6px;
+      font-size: 26px;
+      font-weight: 650;
+      color: var(--gold2);
+    }
+
+    .section-subtitle {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 15px;
+    }
+
+    .field { margin-bottom: 15px; }
+
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 7px;
+      color: rgba(255,255,255,.84);
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      border: 1px solid rgba(244,199,107,.28);
+      background: rgba(255,255,255,.08);
+      color: white;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 16px;
+      font-family: 'Kanit', sans-serif;
+      outline: none;
+    }
+
+    input::placeholder { color: rgba(255,255,255,.42); }
+
+    .quick {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin-top: 9px;
+    }
+
+    .quick button {
+      border: 1px solid rgba(244,199,107,.34);
+      background: rgba(255,255,255,.07);
+      color: white;
+      border-radius: 13px;
+      padding: 10px 6px;
+      font-family: 'Kanit', sans-serif;
+      cursor: pointer;
+    }
+
+    .quick button:hover {
+      background: rgba(244,199,107,.2);
+      color: var(--gold2);
+    }
+
+    .summary {
+      margin: 15px 0;
+      border-radius: 18px;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(244,199,107,.18), rgba(255,255,255,.06));
+      border: 1px solid rgba(244,199,107,.26);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 7px 0;
+      color: rgba(255,255,255,.84);
+    }
+
+    .summary-row strong {
+      color: var(--gold2);
+      font-weight: 600;
+    }
+
+    .payment {
+      margin-top: 14px;
+      padding: 15px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .payment-grid {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .qr {
+      width: 130px;
+      height: 130px;
+      border-radius: 14px;
+      background: white;
+      object-fit: cover;
+      padding: 7px;
+    }
+
+    .account {
+      font-size: 14px;
+      line-height: 1.7;
+      color: rgba(255,255,255,.78);
+    }
+
+    .account strong {
+      color: white;
+      font-size: 16px;
+    }
+
+    .slip-box {
+      margin-top: 14px;
+      border: 1px dashed rgba(244,199,107,.5);
+      border-radius: 16px;
+      padding: 14px;
+      text-align: center;
+      background: rgba(255,255,255,.045);
+    }
+
+    input[type="file"] {
+      width: 100%;
+      color: rgba(255,255,255,.72);
+      font-family: 'Kanit', sans-serif;
+      font-size: 14px;
+    }
+
+    .slip-preview-wrap {
+      display: none;
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    .slip-preview-wrap.show { display: block; }
+
+    .slip-preview {
+      max-width: 100%;
+      max-height: 230px;
+      border-radius: 14px;
+      border: 1px solid rgba(244,199,107,.28);
+      object-fit: contain;
+      background: rgba(0,0,0,.2);
+    }
+
+    .slip-caption {
+      font-size: 12px;
+      color: rgba(255,255,255,.58);
+      margin-top: 6px;
+    }
+
+    .submit {
+      width: 100%;
+      border: 0;
+      border-radius: 999px;
+      padding: 15px 18px;
+      font-size: 17px;
+      font-weight: 600;
+      font-family: 'Kanit', sans-serif;
+      cursor: pointer;
+      background: linear-gradient(135deg, #ffe8a4, #e2a73c);
+      color: #261400;
+      box-shadow: 0 12px 26px rgba(244,199,107,.25);
+      margin-top: 16px;
+    }
+
+    .submit:disabled {
+      opacity: .58;
+      cursor: not-allowed;
+    }
+
+    .note {
+      margin-top: 12px;
+      color: rgba(255,255,255,.55);
+      font-size: 12px;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .status {
+      min-height: 22px;
+      color: var(--gold2);
+      font-size: 13px;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,.82);
+      padding: 18px;
+      z-index: 50;
+    }
+
+    .modal.show { display: flex; }
+
+    .thanks-card {
+      width: min(470px, 100%);
+      border-radius: 28px;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top, rgba(255,226,156,.18), transparent 42%),
+        #130d08;
+      border: 1px solid rgba(244,199,107,.36);
+      text-align: center;
+      box-shadow: 0 30px 90px rgba(0,0,0,.65);
+    }
+
+    .thanks-card h2 {
+      margin: 0 0 8px;
+      color: var(--gold2);
+      font-size: 30px;
+    }
+
+    .thanks-card p {
+      color: rgba(255,255,255,.78);
+      line-height: 1.65;
+      margin: 6px 0;
+    }
+
+    .merit-badge {
+      margin: 18px auto;
+      padding: 22px 18px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, #fff8df, #f3d894);
+      color: #3a2107;
+      border: 2px solid #f5c966;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.65);
+    }
+
+    .merit-badge .small {
+      font-size: 14px;
+      color: #7a4c13;
+    }
+
+    .merit-badge .name {
+      margin-top: 8px;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.25;
+      word-break: break-word;
+    }
+
+    .merit-badge .detail {
+      margin-top: 7px;
+      font-size: 15px;
+      color: #6a4212;
+    }
+
+    .close {
+      border: 1px solid rgba(244,199,107,.38);
+      background: rgba(255,255,255,.08);
+      color: white;
+      border-radius: 999px;
+      padding: 11px 20px;
+      font-family: 'Kanit', sans-serif;
+      cursor: pointer;
+    }
+
+    @media (max-width: 880px) {
+      .page { padding: 12px; align-items: flex-start; }
+      .shell { grid-template-columns: 1fr; gap: 14px; }
+      .visual-card {
+        position: relative;
+        top: auto;
+        height: 42vh;
+        min-height: 330px;
+        border-radius: 22px;
+      }
+      .message { left: 18px; right: 18px; bottom: 20px; }
+      .message h1 { font-size: 30px; }
+      .message p { font-size: 14px; }
+      .brand img { width: 46px; height: 46px; }
+      .brand-title strong { font-size: 15px; }
+      .form-card { border-radius: 22px; padding: 18px; }
+    }
+
+    @media (max-width: 430px) {
+      .payment-grid { grid-template-columns: 1fr; }
+      .qr { margin: auto; }
+      .quick { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <section class="shell">
+
+      <div class="visual-card">
+        <video class="hero-video" id="heroVideo" autoplay muted loop playsinline poster="images/charity-pot.jpg">
+          <source src="videos/charity-pot.mp4" type="video/mp4">
+        </video>
+        <img class="hero-fallback" id="heroFallback" src="images/charity-pot.jpg" alt="โรงทาน">
+
+        <div class="shade"></div>
+
+        <div class="brand">
+          <img src="logo.png" alt="logo">
+          <div class="brand-title">
+            <strong>สมาคมปึงเถ่ากงม่าขอนแก่น</strong>
+            <span>โรงทานเสมือนจริง</span>
+          </div>
+        </div>
+
+        <div class="message">
+          <div class="tag">ร่วมบุญโรงทานประจำเดือน</div>
+          <h1>หนึ่งชุดอาหาร<br>คือหนึ่งความอิ่มใจ</h1>
+          <p>
+            ร่วมเติมกำลังให้โรงทานของศาลเจ้า เพื่อส่งต่ออาหารและน้ำใจ
+            ในวันที่ผู้คนมารอรับความช่วยเหลือจากแรงศรัทธาของทุกท่าน
+          </p>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h2 class="section-title">ร่วมเติมโรงทาน</h2>
+        <p class="section-subtitle">
+          กรอกชื่อและจำนวนชุดอาหารที่ต้องการร่วมบุญ ระบบจะคำนวณยอดโดยอัตโนมัติ
+          และแสดงป้ายอนุโมทนาหลังยืนยันข้อมูล
+        </p>
+
+        <div class="field">
+          <label for="name">ชื่อที่ต้องการแสดงบนป้ายบุญ</label>
+          <input id="name" type="text" placeholder="เช่น ครอบครัวเตชะเรืองอัมพร">
+        </div>
+
+        <div class="field">
+          <label for="amount">จำนวนชุดอาหาร</label>
+          <input id="amount" type="number" min="1" inputmode="numeric" placeholder="ใส่จำนวนชุดตามต้องการ">
+          <div class="quick">
+            <button type="button" onclick="setAmount(10)">10 ชุด</button>
+            <button type="button" onclick="setAmount(30)">30 ชุด</button>
+            <button type="button" onclick="setAmount(50)">50 ชุด</button>
+          </div>
+        </div>
+
+        <div class="summary">
+          <div class="summary-row">
+            <span>ราคาต่อชุด</span>
+            <strong><span id="priceText">39</span> บาท</strong>
+          </div>
+          <div class="summary-row">
+            <span>จำนวนที่ร่วมบุญ</span>
+            <strong><span id="amountText">0</span> ชุด</strong>
+          </div>
+          <div class="summary-row">
+            <span>ยอดโอนทั้งหมด</span>
+            <strong><span id="moneyText">0</span> บาท</strong>
+          </div>
+        </div>
+
+        <div class="payment">
+          <div class="payment-grid">
+            <img class="qr" src="qr.png" alt="QR Code">
+            <div class="account">
+              <strong>ช่องทางโอนร่วมบุญ</strong><br>
+              ธนาคาร: กรุณาแก้ไขชื่อธนาคาร<br>
+              เลขบัญชี: <strong>000-0-00000-0</strong><br>
+              ชื่อบัญชี: สมาคมปึงเถ่ากงม่าขอนแก่น
+            </div>
+          </div>
+
+          <div class="slip-box">
+            <label for="slip">แนบสลิปการโอน</label>
+            <input id="slip" type="file" accept="image/*">
+            <div class="slip-preview-wrap" id="slipPreviewWrap">
+              <img class="slip-preview" id="slipPreview" alt="ตัวอย่างสลิป">
+              <div class="slip-caption">แนบสลิปแล้ว</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="submit" id="submitBtn" type="button" onclick="submitDonation()">ยืนยันการร่วมบุญ</button>
+        <div class="status" id="status"></div>
+
+        <div class="note">
+          หมายเหตุ: ระบบนี้บันทึกชื่อ จำนวนชุด ยอดเงิน และลิงก์สลิปลง Google Sheet
+          โดยไม่ได้ตรวจสอบความถูกต้องของสลิปอัตโนมัติ
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <div class="modal" id="thanksModal">
+    <div class="thanks-card">
+      <h2>ขออนุโมทนาบุญ 🙏</h2>
+      <p id="thanksStatus">ระบบได้รับข้อมูลการร่วมเติมโรงทานแล้ว</p>
+
+      <div class="merit-badge">
+        <div class="small">ป้ายอนุโมทนาบุญโรงทาน</div>
+        <div class="name" id="badgeName">-</div>
+        <div class="detail" id="badgeDetail">ร่วมอาหาร 0 ชุด รวม 0 บาท</div>
+      </div>
+
+      <p>
+        ชื่อนี้สามารถนำไปจัดทำป้ายรายนามผู้ร่วมบุญ
+        หรือใช้ประกอบการพิมพ์ติดหน้างานโรงทานจริงได้
+      </p>
+
+      <button class="close" onclick="closeThanks()">กลับสู่หน้าโรงทาน</button>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7Vfy3Egy6c8itFLIBoBMszCTz-xP4ffQGOQtA2J6GvGgutmwGIZPQu9JFb1Ew8hfnOg/exec";
+    const PRICE_PER_SET = 39;
+
+    const amountInput = document.getElementById("amount");
+    const nameInput = document.getElementById("name");
+    const slipInput = document.getElementById("slip");
+    const submitBtn = document.getElementById("submitBtn");
+    const statusBox = document.getElementById("status");
+
+    document.getElementById("priceText").textContent = PRICE_PER_SET.toLocaleString("th-TH");
+    amountInput.addEventListener("input", updateSummary);
+    slipInput.addEventListener("change", previewSlip);
+
+    function showFallbackImage() {
+      const video = document.getElementById("heroVideo");
+      const img = document.getElementById("heroFallback");
+      video.style.display = "none";
+      img.style.display = "block";
+    }
+
+    document.getElementById("heroVideo").addEventListener("error", showFallbackImage);
+
+    function setAmount(value) {
+      amountInput.value = value;
+      updateSummary();
+    }
+
+    function getAmount() {
+      const amount = parseInt(amountInput.value, 10);
+      return Number.isFinite(amount) && amount > 0 ? amount : 0;
+    }
+
+    function updateSummary() {
+      const amount = getAmount();
+      const money = amount * PRICE_PER_SET;
+      document.getElementById("amountText").textContent = amount.toLocaleString("th-TH");
+      document.getElementById("moneyText").textContent = money.toLocaleString("th-TH");
+    }
+
+    function previewSlip() {
+      const file = slipInput.files && slipInput.files[0];
+      const wrap = document.getElementById("slipPreviewWrap");
+      const img = document.getElementById("slipPreview");
+
+      if (!file) {
+        wrap.classList.remove("show");
+        img.removeAttribute("src");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        img.src = reader.result;
+        wrap.classList.add("show");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function readSlipAsBase64() {
+      return new Promise((resolve, reject) => {
+        const file = slipInput.files && slipInput.files[0];
+
+        if (!file) {
+          resolve("");
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result || "";
+          const base64 = String(result).split(",")[1] || "";
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function submitDonation() {
+      statusBox.textContent = "🔵 ฟังก์ชันทำงานแล้ว...";
+      const name = nameInput.value.trim();
+      const amount = getAmount();
+      statusBox.textContent = "🔵 ชื่อ: [" + name + "] จำนวน: [" + amount + "]";
+      const money = amount * PRICE_PER_SET;
+
+      if (!name) {
+        statusBox.textContent = "⚠️ กรุณากรอกชื่อที่ต้องการแสดงบนป้ายบุญ";
+        nameInput.style.borderColor = "rgba(244,100,100,.8)";
+        return;
+      }
+      nameInput.style.borderColor = "";
+
+      if (!amount) {
+        statusBox.textContent = "⚠️ กรุณาใส่จำนวนชุดอาหาร";
+        amountInput.style.borderColor = "rgba(244,100,100,.8)";
+        return;
+      }
+      amountInput.style.borderColor = "";
+
+      submitBtn.disabled = true;
+      statusBox.textContent = "กำลังบันทึกข้อมูล...";
+
+      try {
+        const slipBase64 = await readSlipAsBase64();
+
+        const formData = new URLSearchParams();
+        formData.append("name", name);
+        formData.append("amount", amount);
+        formData.append("money", money);
+        formData.append("file", slipBase64);
+
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          body: formData
+        });
+
+        showThanks(name, amount, money, true);
+        statusBox.textContent = "บันทึกเรียบร้อย";
+      } catch (err) {
+        console.error("Fetch error:", err);
+        // ยังแสดง modal แม้ network error (Apps Script อาจรับข้อมูลไปแล้ว)
+        showThanks(name, amount, money, false);
+        statusBox.textContent = "แสดงป้ายให้แล้ว แต่ยังบันทึกเข้า Google Sheet ไม่สำเร็จ";
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
+
+    function showThanks(name, amount, money, saved) {
+      document.getElementById("thanksStatus").textContent =
+        saved ? "ระบบได้รับข้อมูลการร่วมเติมโรงทานแล้ว" : "แสดงป้ายอนุโมทนาแล้ว แต่ยังบันทึกข้อมูลไม่สำเร็จ";
+
+      document.getElementById("badgeName").textContent = name;
+      document.getElementById("badgeDetail").textContent =
+        "ร่วมอาหาร " + amount.toLocaleString("th-TH") +
+        " ชุด รวม " + money.toLocaleString("th-TH") + " บาท";
+
+      document.getElementById("thanksModal").classList.add("show");
+    }
+
+    function closeThanks() {
+      document.getElementById("thanksModal").classList.remove("show");
+    }
+
+    updateSummary();
+  </script>
+</body>
+</html>
