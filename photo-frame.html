@@ -45,13 +45,16 @@ input[type=file]{width:100%;padding:9px 12px;border:1px solid rgba(212,168,67,.2
 <div class="topbar">
   <span class="topbar-title">📸 กรอบภาพศาลเจ้า • สมาคมปึงเถ่ากงม่า</span>
 </div>
+
 <video id="video" playsinline autoplay muted></video>
+
 <div class="page">
   <div class="stage" id="stage">
     <canvas id="photoCanvas"></canvas>
     <canvas id="frameCanvas"></canvas>
     <canvas id="textCanvas"></canvas>
   </div>
+
   <div class="controls">
     <div class="card">
       <div class="card-title">แนวภาพ</div>
@@ -60,10 +63,12 @@ input[type=file]{width:100%;padding:9px 12px;border:1px solid rgba(212,168,67,.2
         <button class="obtn" id="btnL" onclick="setOri('landscape')">🖼 แนวนอน</button>
       </div>
     </div>
+
     <div class="card">
       <div class="card-title">เลือกกรอบ</div>
       <div class="frame-grid" id="frameGrid"></div>
     </div>
+
     <div class="card">
       <div class="card-title">รูปถ่าย</div>
       <div class="row2" style="margin-bottom:10px">
@@ -73,6 +78,7 @@ input[type=file]{width:100%;padding:9px 12px;border:1px solid rgba(212,168,67,.2
       <label class="flabel">หรืออัปโหลดรูปจากเครื่อง</label>
       <input type="file" id="photoUpload" accept="image/*">
     </div>
+
     <div class="card">
       <div class="card-title">บันทึก</div>
       <div class="row2">
@@ -82,6 +88,7 @@ input[type=file]{width:100%;padding:9px 12px;border:1px solid rgba(212,168,67,.2
     </div>
   </div>
 </div>
+
 <script>
 // ══ Firebase ══════════════════════════════════════════
 const firebaseConfig = {
@@ -92,57 +99,131 @@ const firebaseConfig = {
   messagingSenderId: "4647661737",
   appId: "1:4647661737:web:5729d78923c3b5b53739b8"
 };
+
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ══ CONFIG — เพิ่มกรอบตรงนี้ ════════════════════════
-const FRAMES = {
-  portrait: [
-    { id:'p1', label:'กรอบที่ 1', src:'frame/frame1.png',
-      photo:{ x:88, y:195, w:904, h:1048 },
-      textBot:{ y1:1320, y2:1360, y3:1395 }
-    },
-     { id:'p2', label:'กรอบที่ 2', src:'frame/frame2.png', photo:{x:88,y:195,w:904,h:1048}, textBot:{y1:1320,y2:1360,y3:1395} },
-  ],
-  landscape: [
-    // { id:'l1', label:'กรอบที่ 1', src:'frame/frame1_land.png', photo:{x:130,y:130,w:1180,h:760}, textBot:{y1:990,y2:1025,y3:1055} },
-  ],
-};
-const SIZES = { portrait:{w:1080,h:1440}, landscape:{w:1440,h:1080} };
-// ════════════════════════════════════════════════════
+// ══ PHOTO FRAME API จาก Apps Script ═══════════════════
+const PHOTO_FRAME_API =
+  'https://script.google.com/macros/s/AKfycbz2p5dCTM8hByL4JXeUZVppKCOD9gXUT_CgeU6MZzmVBer3qmb12LnosQNGdsCyTD8tSQ/exec';
 
-// ข้อความ default (จะถูก Firestore override อัตโนมัติ)
+// ══ CONFIG — โหลดกรอบจาก Apps Script แทนโฟลเดอร์ frame ══
+let FRAMES = {
+  portrait: [],
+  landscape: []
+};
+
+const SIZES = {
+  portrait:{w:1080,h:1440},
+  landscape:{w:1440,h:1080}
+};
+
+// ข้อความ default
 let BOT1 = 'ศาลเจ้า • ความทรงจำแห่งศรัทธา';
 let BOT2 = 'สมาคมปึงเถ่ากงม่า ขอนแก่น';
 let BOT3 = '';
 
-// โหลดข้อความจาก Firestore
+// โหลดข้อความจาก Firestore เดิม
 db.collection('settings').doc('photoFrame').get().then(snap => {
   if (snap.exists) {
     const d = snap.data();
     BOT1 = d.bot1 || BOT1;
     BOT2 = d.bot2 || BOT2;
     BOT3 = d.bot3 || BOT3;
-    drawText(); // อัปเดตข้อความหลังโหลดค่าได้
+    drawText();
   }
-}).catch(() => {}); // ถ้าโหลดไม่ได้ใช้ค่า default
+}).catch(() => {});
 
 // ══ State ════════════════════════════════════════════
-let ori='portrait', selId='p1', srcImg=null, camStream=null, camOn=false, imgCache={};
+let ori='portrait';
+let selId='';
+let srcImg=null;
+let camStream=null;
+let camOn=false;
+let imgCache={};
 
 const photoCanvas = document.getElementById('photoCanvas');
 const frameCanvas = document.getElementById('frameCanvas');
 const textCanvas  = document.getElementById('textCanvas');
+
 const pCtx = photoCanvas.getContext('2d');
 const fCtx = frameCanvas.getContext('2d');
 const tCtx = textCanvas.getContext('2d');
+
 const video = document.getElementById('video');
 
-function getFrame(){ const l=FRAMES[ori]||[]; return l.find(f=>f.id===selId)||l[0]||null; }
+function getFrame(){
+  const l = FRAMES[ori] || [];
+  return l.find(f => f.id === selId) || l[0] || null;
+}
+
+function normalizeFrame(frame, orientation, index){
+  const size = SIZES[orientation];
+
+  return {
+    id: frame.id || (orientation + '_' + index),
+    label: frame.label || frame.name || ('กรอบที่ ' + (index + 1)),
+    src: frame.url || frame.src || '',
+    photo: frame.photo || defaultPhotoZone(orientation),
+    textBot: frame.textBot || defaultTextBot(orientation)
+  };
+}
+
+function defaultPhotoZone(orientation){
+  if(orientation === 'landscape'){
+    return {x:130,y:130,w:1180,h:760};
+  }
+
+  return {x:88,y:195,w:904,h:1048};
+}
+
+function defaultTextBot(orientation){
+  if(orientation === 'landscape'){
+    return {y1:990,y2:1025,y3:1055};
+  }
+
+  return {y1:1320,y2:1360,y3:1395};
+}
+
+async function loadActiveFrames(){
+  try{
+    const res = await fetch(PHOTO_FRAME_API + '?action=active');
+    const data = await res.json();
+
+    if(data.status !== 'success'){
+      throw new Error('โหลดข้อมูลกรอบไม่สำเร็จ');
+    }
+
+    FRAMES.portrait = (data.portrait || [])
+      .slice(0,3)
+      .map((f,i) => normalizeFrame(f,'portrait',i));
+
+    FRAMES.landscape = (data.landscape || [])
+      .slice(0,3)
+      .map((f,i) => normalizeFrame(f,'landscape',i));
+
+    selId = (FRAMES[ori] || [])[0]?.id || '';
+
+  }catch(e){
+    console.error(e);
+
+    FRAMES = {
+      portrait: [],
+      landscape: []
+    };
+
+    selId = '';
+  }
+}
 
 function setSize(){
   const {w,h}=SIZES[ori];
-  [photoCanvas,frameCanvas,textCanvas].forEach(c=>{ c.width=w; c.height=h; });
+
+  [photoCanvas,frameCanvas,textCanvas].forEach(c=>{
+    c.width=w;
+    c.height=h;
+  });
+
   photoCanvas.style.aspectRatio=w+'/'+h;
   frameCanvas.style.aspectRatio=w+'/'+h;
   textCanvas.style.aspectRatio=w+'/'+h;
@@ -150,25 +231,44 @@ function setSize(){
 
 function loadImg(src){
   if(imgCache[src]) return Promise.resolve(imgCache[src]);
+
   return new Promise(res=>{
-    const img=new Image();
-    img.onload=()=>{ imgCache[src]=img; res(img); };
-    img.onerror=()=>res(null);
-    img.src=src;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+
+    img.onload = ()=>{
+      imgCache[src]=img;
+      res(img);
+    };
+
+    img.onerror = ()=>{
+      console.warn('โหลดกรอบไม่สำเร็จ:', src);
+      res(null);
+    };
+
+    img.src = src;
   });
 }
 
 function drawPhoto(){
-  const {w,h}=SIZES[ori]; const fr=getFrame();
+  const {w,h}=SIZES[ori];
+  const fr=getFrame();
+
   pCtx.clearRect(0,0,w,h);
-  pCtx.fillStyle='#fffef8'; pCtx.fillRect(0,0,w,h);
+  pCtx.fillStyle='#fffef8';
+  pCtx.fillRect(0,0,w,h);
+
   const src=srcImg||(camStream&&video.readyState>=2?video:null);
+
   if(src && fr){
     const pz=fr.photo;
+
     pCtx.save();
+
     const r=22;
     pCtx.beginPath();
-    pCtx.moveTo(pz.x+r,pz.y); pCtx.lineTo(pz.x+pz.w-r,pz.y);
+    pCtx.moveTo(pz.x+r,pz.y);
+    pCtx.lineTo(pz.x+pz.w-r,pz.y);
     pCtx.quadraticCurveTo(pz.x+pz.w,pz.y,pz.x+pz.w,pz.y+r);
     pCtx.lineTo(pz.x+pz.w,pz.y+pz.h-r);
     pCtx.quadraticCurveTo(pz.x+pz.w,pz.y+pz.h,pz.x+pz.w-r,pz.y+pz.h);
@@ -176,38 +276,67 @@ function drawPhoto(){
     pCtx.quadraticCurveTo(pz.x,pz.y+pz.h,pz.x,pz.y+pz.h-r);
     pCtx.lineTo(pz.x,pz.y+r);
     pCtx.quadraticCurveTo(pz.x,pz.y,pz.x+r,pz.y);
-    pCtx.closePath(); pCtx.clip();
-    const sw=src.naturalWidth||src.videoWidth||pz.w, sh=src.naturalHeight||src.videoHeight||pz.h;
-    const sc=Math.max(pz.w/sw,pz.h/sh), nw=sw*sc, nh=sh*sc;
+    pCtx.closePath();
+    pCtx.clip();
+
+    const sw=src.naturalWidth||src.videoWidth||pz.w;
+    const sh=src.naturalHeight||src.videoHeight||pz.h;
+    const sc=Math.max(pz.w/sw,pz.h/sh);
+    const nw=sw*sc;
+    const nh=sh*sc;
+
     pCtx.drawImage(src,pz.x+(pz.w-nw)/2,pz.y+(pz.h-nh)/2,nw,nh);
     pCtx.restore();
-  } else if(src){
-    const sw=src.naturalWidth||src.videoWidth||w, sh=src.naturalHeight||src.videoHeight||h;
-    const sc=Math.max(w/sw,h/sh), nw=sw*sc, nh=sh*sc;
+
+  }else if(src){
+    const sw=src.naturalWidth||src.videoWidth||w;
+    const sh=src.naturalHeight||src.videoHeight||h;
+    const sc=Math.max(w/sw,h/sh);
+    const nw=sw*sc;
+    const nh=sh*sc;
+
     pCtx.drawImage(src,(w-nw)/2,(h-nh)/2,nw,nh);
-  } else {
-    pCtx.fillStyle='#f0e8d8'; pCtx.fillRect(0,0,w,h);
+
+  }else{
+    pCtx.fillStyle='#f0e8d8';
+    pCtx.fillRect(0,0,w,h);
+
     pCtx.fillStyle='rgba(180,140,80,.5)';
     pCtx.font=`400 ${w*0.022}px Kanit`;
-    pCtx.textAlign='center'; pCtx.textBaseline='middle';
+    pCtx.textAlign='center';
+    pCtx.textBaseline='middle';
     pCtx.fillText('เปิดกล้องหรืออัปโหลดรูป',w/2,h/2);
   }
 }
 
 async function drawFrame(){
-  const {w,h}=SIZES[ori]; const fr=getFrame();
+  const {w,h}=SIZES[ori];
+  const fr=getFrame();
+
   fCtx.clearRect(0,0,w,h);
-  if(!fr) return;
+
+  if(!fr || !fr.src) return;
+
   const img=await loadImg(fr.src);
-  if(img) fCtx.drawImage(img,0,0,w,h);
+
+  if(img){
+    fCtx.drawImage(img,0,0,w,h);
+  }
 }
 
 function drawText(){
-  const {w,h}=SIZES[ori]; const fr=getFrame();
+  const {w,h}=SIZES[ori];
+  const fr=getFrame();
+
   tCtx.clearRect(0,0,w,h);
+
   if(!fr) return;
+
   const tb=fr.textBot;
-  tCtx.textAlign='center'; tCtx.textBaseline='middle';
+
+  tCtx.textAlign='center';
+  tCtx.textBaseline='middle';
+
   [BOT1,BOT2,BOT3].filter(Boolean).forEach((l,i)=>{
     tCtx.font=`${i===0?600:400} ${Math.round(w*(i===0?.022:.019))}px Kanit`;
     tCtx.fillStyle=i===0?'#7a1010':'#5a3010';
@@ -215,17 +344,44 @@ function drawText(){
   });
 }
 
-function render(){ drawPhoto(); drawFrame(); drawText(); }
+function render(){
+  drawPhoto();
+  drawFrame();
+  drawText();
+}
 
 function buildGrid(){
-  const grid=document.getElementById('frameGrid'); grid.innerHTML='';
+  const grid=document.getElementById('frameGrid');
+  grid.innerHTML='';
+
   const list=FRAMES[ori]||[];
-  if(!list.length){ grid.innerHTML='<p style="color:rgba(255,248,232,.4);font-size:12px;padding:4px;grid-column:1/-1">ยังไม่มีกรอบสำหรับแนวนี้</p>'; return; }
+
+  if(!list.length){
+    grid.innerHTML='<p style="color:rgba(255,248,232,.4);font-size:12px;padding:4px;grid-column:1/-1">ยังไม่มีกรอบสำหรับแนวนี้</p>';
+    return;
+  }
+
   list.forEach(f=>{
-    const d=document.createElement('div'); d.className='fbtn'+(f.id===selId?' active':'');
+    const d=document.createElement('div');
+    d.className='fbtn'+(f.id===selId?' active':'');
+
     if(ori==='landscape') d.classList.add('land');
-    d.innerHTML=`<img src="${f.src}" alt="${f.label}" loading="lazy"><span>${f.label}</span>`;
-    d.onclick=()=>{ selId=f.id; document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active')); d.classList.add('active'); drawFrame(); drawText(); };
+
+    d.innerHTML=`
+      <img src="${f.src}" alt="${f.label}" loading="lazy">
+      <span>${f.label}</span>
+    `;
+
+    d.onclick=()=>{
+      selId=f.id;
+
+      document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+      d.classList.add('active');
+
+      drawFrame();
+      drawText();
+    };
+
     grid.appendChild(d);
   });
 }
@@ -233,49 +389,151 @@ function buildGrid(){
 async function startCam(){
   try{
     stopCam();
-    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
-    video.srcObject=camStream; srcImg=null; camOn=true;
-    (function loop(){ if(camOn){drawPhoto();requestAnimationFrame(loop);} })();
+
+    camStream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:'environment'},
+      audio:false
+    });
+
+    video.srcObject=camStream;
+    srcImg=null;
+    camOn=true;
+
+    (function loop(){
+      if(camOn){
+        drawPhoto();
+        requestAnimationFrame(loop);
+      }
+    })();
+
   }catch(e){
     try{
-      camStream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
-      video.srcObject=camStream; srcImg=null; camOn=true;
-      (function loop(){ if(camOn){drawPhoto();requestAnimationFrame(loop);} })();
-    }catch(e2){ alert('เปิดกล้องไม่ได้: '+e2.message); }
+      camStream=await navigator.mediaDevices.getUserMedia({
+        video:true,
+        audio:false
+      });
+
+      video.srcObject=camStream;
+      srcImg=null;
+      camOn=true;
+
+      (function loop(){
+        if(camOn){
+          drawPhoto();
+          requestAnimationFrame(loop);
+        }
+      })();
+
+    }catch(e2){
+      alert('เปิดกล้องไม่ได้: '+e2.message);
+    }
   }
 }
-function stopCam(){ camOn=false; if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;} video.srcObject=null; }
+
+function stopCam(){
+  camOn=false;
+
+  if(camStream){
+    camStream.getTracks().forEach(t=>t.stop());
+    camStream=null;
+  }
+
+  video.srcObject=null;
+}
+
 function capPhoto(){
   if(!camStream) return;
-  srcImg=new Image(); srcImg.onload=()=>{stopCam();drawPhoto();}; srcImg.src=photoCanvas.toDataURL('image/jpeg',.92);
+
+  srcImg=new Image();
+
+  srcImg.onload=()=>{
+    stopCam();
+    drawPhoto();
+  };
+
+  srcImg.src=photoCanvas.toDataURL('image/jpeg',.92);
 }
 
 document.getElementById('photoUpload').addEventListener('change',e=>{
-  const file=e.target.files?.[0]; if(!file)return;
-  const r=new FileReader(); r.onload=()=>{ srcImg=new Image(); srcImg.onload=()=>{stopCam();drawPhoto();}; srcImg.src=r.result; }; r.readAsDataURL(file);
+  const file=e.target.files?.[0];
+  if(!file)return;
+
+  const r=new FileReader();
+
+  r.onload=()=>{
+    srcImg=new Image();
+
+    srcImg.onload=()=>{
+      stopCam();
+      drawPhoto();
+    };
+
+    srcImg.src=r.result;
+  };
+
+  r.readAsDataURL(file);
 });
 
 function dlPhoto(){
-  const {w,h}=SIZES[ori];
-  const off=document.createElement('canvas'); off.width=w; off.height=h;
-  const ox=off.getContext('2d');
-  ox.drawImage(photoCanvas,0,0);
-  const fr=getFrame();
-  if(fr && imgCache[fr.src]) ox.drawImage(imgCache[fr.src],0,0,w,h);
-  ox.drawImage(textCanvas,0,0);
-  const a=document.createElement('a'); a.download='shrine-frame-'+Date.now()+'.png'; a.href=off.toDataURL('image/png'); a.click();
+  try{
+    const {w,h}=SIZES[ori];
+
+    const off=document.createElement('canvas');
+    off.width=w;
+    off.height=h;
+
+    const ox=off.getContext('2d');
+
+    ox.drawImage(photoCanvas,0,0);
+
+    const fr=getFrame();
+
+    if(fr && imgCache[fr.src]){
+      ox.drawImage(imgCache[fr.src],0,0,w,h);
+    }
+
+    ox.drawImage(textCanvas,0,0);
+
+    const a=document.createElement('a');
+    a.download='shrine-frame-'+Date.now()+'.png';
+    a.href=off.toDataURL('image/png');
+    a.click();
+
+  }catch(e){
+    console.error(e);
+    alert('ดาวน์โหลดไม่ได้ อาจเกิดจากสิทธิ์รูปภาพใน Google Drive หรือ CORS');
+  }
 }
 
-function resetAll(){ stopCam(); srcImg=null; document.getElementById('photoUpload').value=''; drawPhoto(); }
+function resetAll(){
+  stopCam();
+  srcImg=null;
+  document.getElementById('photoUpload').value='';
+  drawPhoto();
+}
 
 function setOri(o){
-  ori=o; selId=(FRAMES[o]||[])[0]?.id||'';
+  ori=o;
+  selId=(FRAMES[o]||[])[0]?.id||'';
+
   document.getElementById('btnP').classList.toggle('active',o==='portrait');
   document.getElementById('btnL').classList.toggle('active',o==='landscape');
-  setSize(); buildGrid(); render();
+
+  setSize();
+  buildGrid();
+  render();
 }
 
-setSize(); buildGrid(); render();
+async function initPhotoFrame(){
+  setSize();
+
+  await loadActiveFrames();
+
+  buildGrid();
+  render();
+}
+
+initPhotoFrame();
 </script>
 </body>
 </html>
