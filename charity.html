@@ -614,6 +614,7 @@
   </main>
 
   <div class="modal" id="thanksModal">
+    <video id="thankVideo" src="Thank.mp4" style="width:100%;border-radius:16px;margin-bottom:14px;max-height:220px;object-fit:cover" muted playsinline></video>
     <div class="thanks-card">
       <h2>ขออนุโมทนาบุญ 🙏</h2>
       <p id="thanksStatus">ระบบได้รับข้อมูลการร่วมเติมโรงทานแล้ว</p>
@@ -783,6 +784,8 @@
     }
 
     function showThanks(name, amount, money, saved) {
+      const tv = document.getElementById("thankVideo");
+  if (tv) { tv.currentTime = 0; tv.play(); }
       document.getElementById("thanksStatus").textContent =
         saved ? "ระบบได้รับข้อมูลการร่วมเติมโรงทานแล้ว" : "แสดงป้ายอนุโมทนาแล้ว แต่ยังบันทึกข้อมูลไม่สำเร็จ";
 
