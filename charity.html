@@ -552,16 +552,16 @@
 
         <div class="field">
           <label for="name">ชื่อที่ต้องการแสดงบนป้ายบุญ</label>
-          <input id="name" type="text" placeholder="เช่น ครอบครัวเตชะเรืองอัมพร">
+          <input id="name" type="text" placeholder="เช่น คุณใจดี จิตกุศล">
         </div>
 
         <div class="field">
-          <label for="amount">จำนวนชุดอาหาร</label>
-          <input id="amount" type="number" min="1" inputmode="numeric" placeholder="ใส่จำนวนชุดตามต้องการ">
+          <label for="amount">จำนวนชุดอาหารที่จะร่วมบริจาค</label>
+          <input id="amount" type="number" min="1" inputmode="numeric" placeholder="ใส่จำนวนชุดต้องการที่ต้องการร่วมบริจาค">
           <div class="quick">
+            <button type="button" onclick="setAmount(5)">5 ชุด</button>
             <button type="button" onclick="setAmount(10)">10 ชุด</button>
-            <button type="button" onclick="setAmount(30)">30 ชุด</button>
-            <button type="button" onclick="setAmount(50)">50 ชุด</button>
+            <button type="button" onclick="setAmount(20)">20 ชุด</button>
           </div>
         </div>
 
