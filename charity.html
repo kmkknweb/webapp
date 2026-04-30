@@ -477,13 +477,16 @@
       transition: opacity 0.8s, filter 0.8s;
     }
     .candle.lit { opacity: 1; filter: none; }
-    .candle-flame {
-      width: 5px; height: 8px;
-      background: radial-gradient(ellipse at 50% 85%, #fff5a0, #ffb300 55%, transparent 100%);
-      border-radius: 50% 50% 30% 30% / 60% 60% 40% 40%;
-      box-shadow: 0 0 5px 2px rgba(255,170,0,.6), 0 0 10px 3px rgba(255,120,0,.25);
-    }
-    .candle.lit .candle-flame { animation: flicker 1.6s ease-in-out infinite alternate; }
+.candle-flame {
+  width: 5px; height: 8px;
+  background: transparent;
+  border-radius: 50% 50% 30% 30% / 60% 60% 40% 40%;
+}
+    .candle.lit .candle-flame {
+  background: radial-gradient(ellipse at 50% 85%, #fff5a0, #ffb300 55%, transparent 100%);
+  box-shadow: 0 0 5px 2px rgba(255,170,0,.6), 0 0 10px 3px rgba(255,120,0,.25);
+  animation: flicker 1.6s ease-in-out infinite alternate;
+}
     @keyframes flicker {
       0%   { transform: scaleX(1)    scaleY(1)    translateY(0);    opacity:.92; }
       25%  { transform: scaleX(.88)  scaleY(1.08) translateY(-1px); opacity:1;   }
