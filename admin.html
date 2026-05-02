@@ -622,7 +622,59 @@ button {
 </div>
       </section>
 !-- ════ END OF CHARITY SETTINGS ════ -->
+<!-- ════ เซียมซีชิงรางวัล ════ -->
+<section class="card full" style="margin-top:14px">
+  <h2>9) เซียมซีชิงรางวัล — จัดการรายการรางวัล</h2>
+  <p class="hint">
+    เพิ่ม / แก้ไข / ลบรางวัลที่จะสุ่มในเกมเซียมซี ข้อมูลเก็บใน Google Sheet<br>
+    คอลัมน์: <b>id</b> | <b>rewards</b> | <b>percent</b> (ยิ่งมากยิ่งออกบ่อย ไม่ต้องรวม 100)
+  </p>
 
+  <div class="btn-row">
+    <button type="button" onclick="xiamsiLoadRewards()">🔄 โหลดรางวัลปัจจุบัน</button>
+    <button type="button" class="secondary" onclick="xiamsiClearForm()">🧹 ล้างฟอร์ม</button>
+  </div>
+
+  <p class="status" id="xiamsiStatus">กด "โหลดรางวัลปัจจุบัน" เพื่อดูรายการ</p>
+
+  <!-- ตารางรายการรางวัล -->
+  <div class="table-wrap" style="margin-top:12px">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>ชื่อรางวัล</th>
+          <th>เปอร์เซ็นต์ (น้ำหนัก)</th>
+          <th>จัดการ</th>
+        </tr>
+      </thead>
+      <tbody id="xiamsiTableBody">
+        <tr><td colspan="4" style="color:rgba(255,255,255,.4)">ยังไม่ได้โหลดข้อมูล</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ฟอร์มเพิ่ม / แก้ไข -->
+  <div class="preview" style="margin-top:14px">
+    <div class="preview-title" id="xiamsiFormTitle">➕ เพิ่มรางวัลใหม่</div>
+    <input type="hidden" id="xiamsiEditRow">
+    <div class="grid">
+      <div>
+        <label>ชื่อรางวัล</label>
+        <input id="xiamsiRewardName" type="text" placeholder="เช่น บัตรของขวัญ 500 บาท">
+      </div>
+      <div>
+        <label>เปอร์เซ็นต์ (น้ำหนัก)</label>
+        <input id="xiamsiPercent" type="number" min="1" placeholder="เช่น 20">
+      </div>
+    </div>
+    <div class="btn-row" style="margin-top:10px">
+      <button type="button" onclick="xiamsiSaveReward()">💾 บันทึกรางวัล</button>
+      <button type="button" class="danger" onclick="xiamsiCancelEdit()">ยกเลิก</button>
+    </div>
+  </div>
+</section>
+<!-- ════ END เซียมซีชิงรางวัล ════ -->
 
         
       
@@ -1324,6 +1376,134 @@ async function saveRotanConfig() {
         copiedMessage.textContent = ""; // ลบข้อความหลังจาก 2 วินาที
       }, 2000);
         }
+
+    /* ════ เซียมซีชิงรางวัล ════ */
+const XIAMSI_API = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'; // ← ใส่ URL เดียวกับที่ใช้ในไฟล์เซียมซี
+
+let xiamsiRewards = [];
+let xiamsiEditingRow = null; // null = เพิ่มใหม่, number = แก้ไขแถวนั้น
+
+function xiamsiSetStatus(msg) {
+  const el = document.getElementById('xiamsiStatus');
+  if (el) el.textContent = msg;
+}
+
+async function xiamsiLoadRewards() {
+  xiamsiSetStatus('กำลังโหลด...');
+  try {
+    const res  = await fetch(XIAMSI_API);
+    const json = await res.json();
+    if (json.status !== 'ok') throw new Error('ข้อมูลผิดพลาด');
+    xiamsiRewards = json.rewards;
+    xiamsiRenderTable();
+    xiamsiSetStatus('โหลดสำเร็จ พบ ' + xiamsiRewards.length + ' รายการ');
+  } catch(e) {
+    xiamsiSetStatus('โหลดไม่สำเร็จ: ' + e.message);
+  }
+}
+
+function xiamsiRenderTable() {
+  const tbody = document.getElementById('xiamsiTableBody');
+  if (!xiamsiRewards.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="color:rgba(255,255,255,.4)">ไม่มีรางวัล</td></tr>';
+    return;
+  }
+  tbody.innerHTML = xiamsiRewards.map((r, i) => `
+    <tr>
+      <td><span class="pill">${r.id}</span></td>
+      <td>${r.reward}</td>
+      <td>${r.percent}%</td>
+      <td>
+        <button onclick="xiamsiStartEdit(${i})"
+          style="width:auto;padding:6px 14px;font-size:12px;margin-right:6px">
+          แก้ไข
+        </button>
+        <button onclick="xiamsiDeleteReward(${i})"
+          style="width:auto;padding:6px 14px;font-size:12px;background:linear-gradient(135deg,#7a1b2a,#c91f3d);color:#fff">
+          ลบ
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function xiamsiStartEdit(index) {
+  const r = xiamsiRewards[index];
+  xiamsiEditingRow = index;
+  document.getElementById('xiamsiEditRow').value     = index;
+  document.getElementById('xiamsiRewardName').value  = r.reward;
+  document.getElementById('xiamsiPercent').value     = r.percent;
+  document.getElementById('xiamsiFormTitle').textContent = '✏️ แก้ไขรางวัล: ' + r.reward;
+  document.getElementById('xiamsiRewardName').focus();
+}
+
+function xiamsiCancelEdit() {
+  xiamsiEditingRow = null;
+  document.getElementById('xiamsiRewardName').value = '';
+  document.getElementById('xiamsiPercent').value    = '';
+  document.getElementById('xiamsiFormTitle').textContent = '➕ เพิ่มรางวัลใหม่';
+}
+
+function xiamsiClearForm() {
+  xiamsiCancelEdit();
+  xiamsiSetStatus('ล้างฟอร์มแล้ว');
+}
+
+async function xiamsiSaveReward() {
+  const name    = document.getElementById('xiamsiRewardName').value.trim();
+  const percent = parseFloat(document.getElementById('xiamsiPercent').value);
+
+  if (!name) { xiamsiSetStatus('⚠️ กรุณาใส่ชื่อรางวัล'); return; }
+  if (isNaN(percent) || percent <= 0) { xiamsiSetStatus('⚠️ กรุณาใส่เปอร์เซ็นต์ที่ถูกต้อง'); return; }
+
+  if (xiamsiEditingRow !== null) {
+    // แก้ไขรายการเดิม
+    xiamsiRewards[xiamsiEditingRow].reward  = name;
+    xiamsiRewards[xiamsiEditingRow].percent = percent;
+  } else {
+    // เพิ่มรายการใหม่
+    const maxId = xiamsiRewards.reduce((m, r) => Math.max(m, Number(r.id) || 0), 0);
+    xiamsiRewards.push({ id: maxId + 1, reward: name, percent: percent });
+  }
+
+  xiamsiSetStatus('กำลังบันทึกไปยัง Google Sheet...');
+  const ok = await xiamsiSyncToSheet();
+  if (ok) {
+    xiamsiCancelEdit();
+    xiamsiRenderTable();
+    xiamsiSetStatus('✅ บันทึกสำเร็จ');
+  }
+}
+
+async function xiamsiDeleteReward(index) {
+  const r = xiamsiRewards[index];
+  if (!confirm('ลบรางวัล "' + r.reward + '" ใช่ไหม?')) return;
+  xiamsiRewards.splice(index, 1);
+  // re-number id
+  xiamsiRewards.forEach((item, i) => item.id = i + 1);
+  xiamsiSetStatus('กำลังบันทึก...');
+  const ok = await xiamsiSyncToSheet();
+  if (ok) {
+    xiamsiRenderTable();
+    xiamsiSetStatus('✅ ลบและบันทึกสำเร็จ');
+  }
+}
+
+async function xiamsiSyncToSheet() {
+  try {
+    await fetch(XIAMSI_API, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'saveRewards', rewards: xiamsiRewards })
+    });
+    return true;
+  } catch(e) {
+    xiamsiSetStatus('❌ บันทึกไม่สำเร็จ: ' + e.message);
+    return false;
+  }
+}
+/* ════ END เซียมซีชิงรางวัล ════ */
     </script>
 
   
