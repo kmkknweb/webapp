@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>เสี่ยงเซียมซีชิงรางวัล</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+Thai:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #C0392B;
+  --red-dark: #7B1010;
+  --red-glow: rgba(192,57,43,0.4);
+  --gold: #D4AC0D;
+  --gold-light: #F4D03F;
+  --gold-glow: rgba(212,172,13,0.35);
+  --bg: #0A0A0A;
+  --bg2: #161616;
+  --bg3: #1F1F1F;
+  --text: #F0EAD6;
+  --text-muted: #7A6E5A;
+  --border: rgba(212,172,13,0.15);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans Thai', sans-serif;
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Background texture */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(192,57,43,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 80% 80%, rgba(212,172,13,0.06) 0%, transparent 60%);
+  pointer-events: none; z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(212,172,13,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212,172,13,0.025) 1px, transparent 1px);
+  background-size: 36px 36px;
+  pointer-events: none; z-index: 0;
+}
+
+/* ===== SCREENS ===== */
+.screen {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 1;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+.screen.active { opacity: 1; pointer-events: all; }
+
+/* ===== LOADING SCREEN ===== */
+#screen-loading {
+  gap: 20px;
+}
+.loading-icon {
+  font-size: 52px;
+  animation: float 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px var(--gold-glow));
+}
+.loading-text {
+  font-size: 14px; color: var(--text-muted);
+  letter-spacing: 3px;
+}
+.loading-dots span {
+  display: inline-block;
+  animation: dot-pulse 1.2s ease-in-out infinite;
+  color: var(--gold);
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dot-pulse {
+  0%,80%,100% { opacity: 0.2; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-4px); }
+}
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* ===== ERROR SCREEN ===== */
+#screen-error { gap: 16px; padding: 32px; text-align: center; }
+.error-icon { font-size: 48px; }
+.error-title { font-size: 18px; font-weight: 500; color: #E74C3C; }
+.error-msg { font-size: 13px; color: var(--text-muted); line-height: 1.7; max-width: 300px; }
+.btn-retry {
+  margin-top: 8px;
+  padding: 12px 28px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--gold);
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size: 14px; cursor: pointer;
+}
+
+/* ===== SHAKE SCREEN ===== */
+#screen-shake { justify-content: space-between; padding: 50px 24px 48px; }
+
+.top-bar {
+  width: 100%; display: flex;
+  align-items: center; justify-content: space-between;
+}
+.app-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 18px; font-weight: 900;
+  color: var(--gold);
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px var(--gold-glow);
+}
+.reward-count {
+  font-size: 12px; color: var(--text-muted);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px; padding: 6px 12px;
+  letter-spacing: 1px;
+}
+
+/* Center scene */
+.shake-center { display: flex; flex-direction: column; align-items: center; gap: 0; flex: 1; justify-content: center; }
+
+.shake-hint {
+  font-size: 13px; color: var(--text-muted);
+  letter-spacing: 2px; margin-bottom: 44px;
+  text-align: center;
+}
+.shake-hint.active { color: var(--gold); }
+
+/* Cup scene */
+.cup-scene {
+  position: relative;
+  width: 200px; height: 300px;
+  margin-bottom: 44px;
+}
+
+/* Flying stick */
+.flying-stick {
+  position: absolute;
+  left: 50%; top: 20px;
+  transform: translateX(-50%);
+  width: 10px; height: 110px;
+  border-radius: 5px 5px 3px 3px;
+  background: linear-gradient(to bottom, #E8D080, #B08040, #8B5E2A);
+  opacity: 0;
+  z-index: 20;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 0 var(--gold-glow);
+  transition: box-shadow 0.3s;
+}
+.flying-stick.clickable {
+  box-shadow: 0 0 20px 6px var(--gold-glow);
+  animation: stick-pulse 1s ease-in-out infinite;
+}
+.flying-stick::after {
+  content: '籤';
+  font-family: 'Noto Serif TC', serif;
+  font-size: 11px; font-weight: 700;
+  color: rgba(139,30,30,0.8);
+  writing-mode: vertical-rl;
+}
+
+@keyframes stick-pulse {
+  0%,100% { box-shadow: 0 0 16px 4px var(--gold-glow); }
+  50% { box-shadow: 0 0 28px 10px var(--gold-glow); }
+}
+
+/* Sticks in cup */
+.sticks-wrap {
+  position: absolute;
+  bottom: 108px; left: 50%;
+  transform: translateX(-50%);
+  width: 100px; height: 130px;
+  display: flex; align-items: flex-end;
+  justify-content: center; gap: 4px;
+}
+.stick-in {
+  width: 8px; border-radius: 4px 4px 2px 2px;
+  background: linear-gradient(to bottom, #D4B483, #9A6B38);
+  transform-origin: bottom center;
+}
+.stick-in::before {
+  content: '';
+  display: block; width: 3px;
+  height: 35%; margin: 2px auto 0;
+  background: rgba(255,255,255,0.18);
+  border-radius: 2px;
+}
+
+/* Cup SVG */
+.cup-svg-wrap {
+  position: absolute; bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 150px;
+}
+
+/* Shake animation on cup wrapper */
+.cup-svg-wrap.shaking {
+  animation: cup-shake 0.25s ease-in-out infinite;
+}
+@keyframes cup-shake {
+  0%,100% { transform: translateX(-50%) rotate(0deg); }
+  20% { transform: translateX(-44%) rotate(-9deg); }
+  50% { transform: translateX(-56%) rotate(9deg); }
+  70% { transform: translateX(-44%) rotate(-6deg); }
+}
+
+.sticks-wrap.shaking .stick-in {
+  animation: stk-wobble 0.2s ease-in-out infinite;
+}
+@keyframes stk-wobble {
+  0%,100% { transform: rotate(0deg); }
+  30% { transform: rotate(-18deg); }
+  70% { transform: rotate(18deg); }
+}
+
+/* Progress ring */
+.ring-wrap {
+  position: relative; width: 88px; height: 88px;
+}
+.ring-svg { transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: rgba(255,255,255,0.04); stroke-width: 5; }
+.ring-fill {
+  fill: none; stroke: var(--gold); stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 245; stroke-dashoffset: 245;
+  transition: stroke-dashoffset 0.08s linear;
+  filter: drop-shadow(0 0 5px var(--gold-glow));
+}
+.ring-inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.ring-pct {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 22px; font-weight: 700; color: var(--gold);
+}
+.ring-label { font-size: 9px; color: var(--text-muted); letter-spacing: 2px; }
+
+/* Desktop / iOS fallback */
+.btn-manual {
+  margin-top: 24px;
+  padding: 14px 36px;
+  background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+  color: white; border: none; border-radius: 50px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; letter-spacing: 2px;
+  box-shadow: 0 4px 24px var(--red-glow);
+  display: none;
+}
+.btn-manual:active { transform: scale(0.96); }
+
+.btn-ios-perm {
+  margin-top: 16px; padding: 12px 24px;
+  background: rgba(212,172,13,0.1);
+  border: 1px solid rgba(212,172,13,0.35);
+  border-radius: 12px; color: var(--gold);
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size: 14px; cursor: pointer; display: none;
+}
+
+/* ===== REVEAL SCREEN ===== */
+#screen-reveal {
+  padding: 40px 24px;
+  gap: 0;
+  justify-content: center;
+}
+
+.reveal-stick-wrap {
+  position: relative;
+  width: 80px; height: 220px;
+  margin-bottom: 32px;
+  cursor: pointer;
+}
+.reveal-stick-body {
+  width: 100%; height: 100%;
+  background: linear-gradient(to bottom, #F0D878, #C8943A, #8B5E20);
+  border-radius: 10px 10px 6px 6px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow:
+    4px 4px 0 rgba(0,0,0,0.4),
+    0 0 30px var(--gold-glow);
+  position: relative; overflow: hidden;
+}
+.reveal-stick-body::before {
+  content: '';
+  position: absolute; top: 0; left: 8px; right: 8px;
+  height: 40%;
+  background: rgba(255,255,255,0.12);
+  border-radius: 6px 6px 0 0;
+}
+.reveal-stick-char {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 22px; font-weight: 900;
+  color: var(--red-dark);
+  writing-mode: vertical-rl;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+  z-index: 1;
+}
+.reveal-tap-hint {
+  position: absolute; bottom: -28px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px; color: var(--gold);
+  white-space: nowrap; letter-spacing: 2px;
+  animation: blink 1.2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+/* Prize card */
+.prize-card {
+  width: 100%; max-width: 340px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 28px 24px;
+  text-align: center;
+  position: relative; overflow: hidden;
+  display: none;
+}
+.prize-card::before {
+  content: '🎉';
+  position: absolute; top: -20px; right: -10px;
+  font-size: 90px; opacity: 0.06;
+}
+.prize-label {
+  font-size: 11px; color: var(--text-muted);
+  letter-spacing: 4px; margin-bottom: 16px;
+}
+.prize-name {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 30px; font-weight: 900;
+  color: var(--gold);
+  text-shadow: 0 0 30px var(--gold-glow);
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+.prize-congrats {
+  font-size: 13px; color: var(--text-muted);
+  margin-bottom: 24px;
+}
+.btn-play-again {
+  width: 100%; padding: 15px;
+  background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+  color: white; border: none; border-radius: 14px;
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; letter-spacing: 2px;
+  box-shadow: 0 4px 20px var(--red-glow);
+}
+.btn-play-again:active { transform: scale(0.97); }
+
+/* ===== CONFETTI ===== */
+.confetti-piece {
+  position: fixed;
+  width: 8px; height: 8px;
+  pointer-events: none; z-index: 999;
+  border-radius: 2px;
+  animation: confetti-drop 1.6s ease-out forwards;
+}
+@keyframes confetti-drop {
+  0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fly-stick-out {
+  0%   { transform: translateX(-50%) translateY(0) rotate(0deg); opacity: 1; }
+  25%  { transform: translateX(-40%) translateY(-80px) rotate(12deg); opacity: 1; }
+  55%  { transform: translateX(-35%) translateY(-160px) rotate(22deg); opacity: 1; }
+  75%  { transform: translateX(-30%) translateY(-110px) rotate(32deg); opacity: 1; }
+  100% { transform: translateX(-25%) translateY(-50px) rotate(42deg); opacity: 0; }
+}
+@keyframes reveal-drop {
+  0%   { transform: translateY(-60px) rotate(-8deg); opacity: 0; }
+  60%  { transform: translateY(8px) rotate(2deg); opacity: 1; }
+  80%  { transform: translateY(-4px) rotate(-1deg); opacity: 1; }
+  100% { transform: translateY(0) rotate(0deg); opacity: 1; }
+}
+@keyframes card-rise {
+  0%   { transform: translateY(30px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes pop-scale {
+  0%   { transform: scale(0.7); opacity: 0; }
+  70%  { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== LOADING ===== -->
+<div id="screen-loading" class="screen active">
+  <div class="loading-icon">🏮</div>
+  <div class="loading-text">กำลังโหลดรางวัล</div>
+  <div class="loading-dots">
+    <span>●</span><span>●</span><span>●</span>
+  </div>
+</div>
+
+<!-- ===== ERROR ===== -->
+<div id="screen-error" class="screen">
+  <div class="error-icon">⚠️</div>
+  <div class="error-title">โหลดข้อมูลไม่สำเร็จ</div>
+  <div class="error-msg" id="error-msg">ไม่สามารถเชื่อมต่อกับ Google Sheet ได้ กรุณาตรวจสอบ Apps Script URL</div>
+  <button class="btn-retry" onclick="loadRewards()">ลองใหม่อีกครั้ง</button>
+</div>
+
+<!-- ===== SHAKE ===== -->
+<div id="screen-shake" class="screen">
+  <div class="top-bar">
+    <div class="app-title">籤 เซียมซี</div>
+    <div class="reward-count" id="reward-count">— รางวัล</div>
+  </div>
+
+  <div class="shake-center">
+    <div class="shake-hint" id="shake-hint">เขย่ามือถือเพื่อเสี่ยงไม้</div>
+
+    <div class="cup-scene">
+      <!-- Flying stick -->
+      <div class="flying-stick" id="flying-stick"></div>
+
+      <!-- Sticks in cup -->
+      <div class="sticks-wrap" id="sticks-wrap">
+        <div class="stick-in" style="height:88px;transform:rotate(-9deg)"></div>
+        <div class="stick-in" style="height:100px;transform:rotate(-3deg)"></div>
+        <div class="stick-in" style="height:94px;transform:rotate(2deg)"></div>
+        <div class="stick-in" style="height:86px;transform:rotate(8deg)"></div>
+        <div class="stick-in" style="height:97px;transform:rotate(-5deg)"></div>
+        <div class="stick-in" style="height:84px;transform:rotate(11deg)"></div>
+        <div class="stick-in" style="height:91px;transform:rotate(-1deg)"></div>
+        <div class="stick-in" style="height:95px;transform:rotate(5deg)"></div>
+      </div>
+
+      <!-- Cup -->
+      <div class="cup-svg-wrap" id="cup-svg-wrap">
+        <svg viewBox="0 0 150 138" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="cg" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#7B1010"/>
+              <stop offset="35%" stop-color="#C0392B"/>
+              <stop offset="100%" stop-color="#6B0E0E"/>
+            </linearGradient>
+            <linearGradient id="rg" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#F4D03F"/>
+              <stop offset="100%" stop-color="#9A7A0A"/>
+            </linearGradient>
+          </defs>
+          <!-- Body -->
+          <path d="M12 22 L138 22 L124 128 L26 128 Z" fill="url(#cg)"/>
+          <!-- Rim -->
+          <rect x="7" y="14" width="136" height="16" rx="5" fill="url(#rg)"/>
+          <!-- Base -->
+          <rect x="26" y="124" width="98" height="10" rx="3" fill="#5A0C0C"/>
+          <!-- Decorative lines -->
+          <path d="M22 58 Q75 46 128 58" fill="none" stroke="rgba(212,172,13,0.25)" stroke-width="1.5"/>
+          <path d="M19 78 Q75 66 131 78" fill="none" stroke="rgba(212,172,13,0.15)" stroke-width="1"/>
+          <!-- Character -->
+          <text x="75" y="112" text-anchor="middle"
+            font-family="Noto Serif TC, serif"
+            font-size="30" font-weight="900"
+            fill="rgba(212,172,13,0.45)">籤</text>
+          <!-- Rim shine -->
+          <rect x="7" y="14" width="136" height="7" rx="5" fill="rgba(255,255,255,0.12)"/>
+        </svg>
+      </div>
+    </div><!-- end cup-scene -->
+
+    <!-- Progress ring -->
+    <div class="ring-wrap" id="ring-wrap">
+      <svg class="ring-svg" width="88" height="88" viewBox="0 0 88 88">
+        <circle class="ring-bg" cx="44" cy="44" r="39"/>
+        <circle class="ring-fill" id="ring-fill" cx="44" cy="44" r="39"/>
+      </svg>
+      <div class="ring-inner">
+        <span class="ring-pct" id="ring-pct">0%</span>
+        <span class="ring-label">SHAKE</span>
+      </div>
+    </div>
+
+    <button class="btn-ios-perm" id="btn-ios-perm" onclick="requestIOSPermission()">
+      🔓 อนุญาตใช้เซ็นเซอร์
+    </button>
+    <button class="btn-manual" id="btn-manual" onclick="addShakePower(35)">
+      เขย่า!
+    </button>
+  </div>
+</div>
+
+<!-- ===== REVEAL ===== -->
+<div id="screen-reveal" class="screen">
+  <div class="reveal-stick-wrap" id="reveal-stick-wrap" onclick="revealPrize()">
+    <div class="reveal-stick-body">
+      <div class="reveal-stick-char">籤</div>
+    </div>
+    <div class="reveal-tap-hint">แตะเพื่อเปิดรางวัล ✨</div>
+  </div>
+
+  <div class="prize-card" id="prize-card">
+    <div class="prize-label">🎊 คุณได้รับ 🎊</div>
+    <div class="prize-name" id="prize-name">—</div>
+    <div class="prize-congrats">ยินดีด้วย! 🎉</div>
+    <button class="btn-play-again" onclick="playAgain()">🔄 เสี่ยงอีกครั้ง</button>
+  </div>
+</div>
+
+<script>
+// ==========================================
+// CONFIG — แทน URL ด้วย Apps Script Web App URL ของคุณ
+// ==========================================
+const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+
+// ==========================================
+// STATE
+// ==========================================
+let rewards = [];
+let shakePower = 0;
+let isShaking = false;
+let shakeInterval = null;
+let motionEnabled = false;
+let chosenReward = null;
+let revealed = false;
+
+// ==========================================
+// LOAD REWARDS
+// ==========================================
+async function loadRewards() {
+  showScreen('loading');
+  try {
+    const res = await fetch(APPS_SCRIPT_URL);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    if (json.status !== 'ok' || !json.rewards.length) throw new Error('ไม่พบข้อมูลรางวัลใน Sheet');
+    rewards = json.rewards;
+    document.getElementById('reward-count').textContent = rewards.length + ' รางวัล';
+    showScreen('shake');
+    setupMotion();
+  } catch(e) {
+    document.getElementById('error-msg').textContent = e.message || 'เกิดข้อผิดพลาด';
+    showScreen('error');
+  }
+}
+
+// ==========================================
+// WEIGHTED RANDOM
+// ==========================================
+function pickReward() {
+  const total = rewards.reduce((s, r) => s + r.percent, 0);
+  let rand = Math.random() * total;
+  for (const r of rewards) {
+    rand -= r.percent;
+    if (rand <= 0) return r;
+  }
+  return rewards[rewards.length - 1];
+}
+
+// ==========================================
+// SHAKE DETECTION
+// ==========================================
+function setupMotion() {
+  // iOS 13+ requires permission
+  if (typeof DeviceMotionEvent !== 'undefined' &&
+      typeof DeviceMotionEvent.requestPermission === 'function') {
+    document.getElementById('btn-ios-perm').style.display = 'block';
+    return;
+  }
+  // Android / desktop with motion
+  if (typeof DeviceMotionEvent !== 'undefined') {
+    window.addEventListener('devicemotion', onMotion);
+    motionEnabled = true;
+  } else {
+    // No motion API — show manual button
+    document.getElementById('btn-manual').style.display = 'block';
+  }
+}
+
+function requestIOSPermission() {
+  DeviceMotionEvent.requestPermission().then(state => {
+    if (state === 'granted') {
+      window.addEventListener('devicemotion', onMotion);
+      motionEnabled = true;
+      document.getElementById('btn-ios-perm').style.display = 'none';
+    }
+  }).catch(() => {
+    document.getElementById('btn-manual').style.display = 'block';
+    document.getElementById('btn-ios-perm').style.display = 'none';
+  });
+}
+
+let lastAcc = { x: 0, y: 0, z: 0 };
+function onMotion(e) {
+  const acc = e.accelerationIncludingGravity;
+  if (!acc) return;
+  const dx = Math.abs(acc.x - lastAcc.x);
+  const dy = Math.abs(acc.y - lastAcc.y);
+  const dz = Math.abs(acc.z - lastAcc.z);
+  lastAcc = { x: acc.x, y: acc.y, z: acc.z };
+  const force = dx + dy + dz;
+  if (force > 12) addShakePower(force * 0.9);
+}
+
+function addShakePower(force) {
+  if (shakePower >= 100) return;
+  shakePower = Math.min(100, shakePower + force);
+  updateRing();
+  triggerShakeVFX();
+  if (shakePower >= 100) triggerStickOut();
+}
+
+// ==========================================
+// RING UPDATE
+// ==========================================
+function updateRing() {
+  const pct = Math.round(shakePower);
+  const offset = 245 - (245 * shakePower / 100);
+  document.getElementById('ring-fill').style.strokeDashoffset = offset;
+  document.getElementById('ring-pct').textContent = pct + '%';
+  document.getElementById('shake-hint').textContent =
+    shakePower >= 80 ? 'เกือบแล้ว! เขย่าต่อ!' :
+    shakePower >= 40 ? 'ดีมาก! เขย่าต่อไป!' : 'เขย่ามือถือเพื่อเสี่ยงไม้';
+  document.getElementById('shake-hint').classList.toggle('active', shakePower > 20);
+}
+
+// ==========================================
+// SHAKE VFX
+// ==========================================
+let shakeVFXTimeout = null;
+function triggerShakeVFX() {
+  const cup = document.getElementById('cup-svg-wrap');
+  const sticks = document.getElementById('sticks-wrap');
+  cup.classList.add('shaking');
+  sticks.classList.add('shaking');
+  clearTimeout(shakeVFXTimeout);
+  shakeVFXTimeout = setTimeout(() => {
+    cup.classList.remove('shaking');
+    sticks.classList.remove('shaking');
+  }, 300);
+}
+
+// ==========================================
+// STICK FLIES OUT
+// ==========================================
+function triggerStickOut() {
+  const flyStick = document.getElementById('flying-stick');
+  flyStick.style.opacity = '1';
+  flyStick.style.animation = 'fly-stick-out 1s ease-out forwards';
+
+  // After animation → go to reveal screen
+  setTimeout(() => {
+    chosenReward = pickReward();
+    revealed = false;
+    showRevealScreen();
+  }, 1000);
+}
+
+// ==========================================
+// REVEAL SCREEN
+// ==========================================
+function showRevealScreen() {
+  showScreen('reveal');
+  // Reset prize card
+  const card = document.getElementById('prize-card');
+  card.style.display = 'none';
+  card.style.animation = '';
+  document.getElementById('reveal-stick-wrap').style.animation = 'reveal-drop 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards';
+}
+
+function revealPrize() {
+  if (revealed) return;
+  revealed = true;
+  // Hide tap hint
+  document.querySelector('.reveal-tap-hint').style.display = 'none';
+  // Show prize card
+  const card = document.getElementById('prize-card');
+  document.getElementById('prize-name').textContent = chosenReward.reward;
+  card.style.display = 'block';
+  card.style.animation = 'card-rise 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards';
+  // Confetti!
+  launchConfetti();
+}
+
+// ==========================================
+// CONFETTI
+// ==========================================
+const CONFETTI_COLORS = ['#C0392B','#D4AC0D','#F4D03F','#E74C3C','#F0E68C','#FFD700'];
+function launchConfetti() {
+  for (let i = 0; i < 48; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.top = '-10px';
+      el.style.background = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+      el.style.animationDuration = (1.2 + Math.random() * 0.8) + 's';
+      el.style.animationDelay = (Math.random() * 0.4) + 's';
+      el.style.transform = 'rotate(' + Math.random() * 360 + 'deg)';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2500);
+    }, i * 30);
+  }
+}
+
+// ==========================================
+// PLAY AGAIN
+// ==========================================
+function playAgain() {
+  shakePower = 0;
+  chosenReward = null;
+  revealed = false;
+  // Reset flying stick
+  const flyStick = document.getElementById('flying-stick');
+  flyStick.style.opacity = '0';
+  flyStick.style.animation = '';
+  // Reset ring
+  document.getElementById('ring-fill').style.strokeDashoffset = '245';
+  document.getElementById('ring-pct').textContent = '0%';
+  document.getElementById('shake-hint').textContent = 'เขย่ามือถือเพื่อเสี่ยงไม้';
+  document.getElementById('shake-hint').classList.remove('active');
+  showScreen('shake');
+}
+
+// ==========================================
+// SCREEN SWITCHER
+// ==========================================
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+}
+
+// ==========================================
+// INIT
+// ==========================================
+loadRewards();
+</script>
+</body>
+</html>
