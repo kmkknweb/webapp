@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>เสี่ยงเซียมซีชิงรางวัล</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+Thai:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#D4A017;--gold2:#F5C842;--gold-dim:rgba(212,160,23,0.25);
+  --red:#B91C1C;--red2:#EF4444;
+  --bg:#080608;--bg2:#120E18;--bg3:#1C1626;
+  --text:#F5EDD8;--muted:#8C7E6A;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sans-serif}
+.bg-amb{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 50% -10%,rgba(185,28,28,.18) 0%,transparent 65%),
+             radial-gradient(ellipse 50% 40% at 10% 90%,rgba(212,160,23,.07) 0%,transparent 55%),
+             radial-gradient(ellipse 40% 35% at 90% 80%,rgba(107,154,32,.06) 0%,transparent 50%)}
+.stars{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.star{position:absolute;width:1.5px;height:1.5px;background:rgba(245,200,66,.5);border-radius:50%;animation:twinkle var(--d,3s) ease-in-out infinite var(--delay,0s)}
+@keyframes twinkle{0%,100%{opacity:.1;transform:scale(1)}50%{opacity:.8;transform:scale(1.4)}}
+.screen{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s ease}
+.screen.active{opacity:1;pointer-events:all}
+
+/* LOADING */
+#screen-loading{gap:18px}
+.ll{font-size:56px;animation:sway 2.4s ease-in-out infinite;filter:drop-shadow(0 0 24px rgba(212,160,23,.5))}
+@keyframes sway{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+.lt{font-size:13px;letter-spacing:4px;color:var(--muted)}
+.ld{display:flex;gap:6px}
+.ld span{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:bd 1.1s ease-in-out infinite}
+.ld span:nth-child(2){animation-delay:.18s}.ld span:nth-child(3){animation-delay:.36s}
+@keyframes bd{0%,80%,100%{transform:translateY(0);opacity:.3}40%{transform:translateY(-7px);opacity:1}}
+
+/* ERROR */
+#screen-error{gap:14px;padding:32px;text-align:center}
+.ei{font-size:46px}.et{font-size:17px;color:var(--red2);font-weight:600}
+.em{font-size:13px;color:var(--muted);line-height:1.75;max-width:300px}
+.btn-retry{padding:12px 28px;border-radius:12px;cursor:pointer;background:var(--bg3);border:1px solid var(--gold-dim);color:var(--gold);font-family:inherit;font-size:14px}
+
+/* SHAKE */
+#screen-shake{justify-content:space-between;padding:44px 20px 44px}
+.top-bar{width:100%;display:flex;align-items:center;justify-content:space-between}
+.app-title{font-family:'Noto Serif TC',serif;font-size:20px;font-weight:900;color:var(--gold);letter-spacing:5px;text-shadow:0 0 24px rgba(212,160,23,.55)}
+.rbadge{font-size:11px;color:var(--muted);background:var(--bg3);border:1px solid rgba(212,160,23,.18);border-radius:20px;padding:5px 12px;letter-spacing:1px}
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;position:relative;width:100%}
+.shake-hint{font-size:12px;color:var(--muted);letter-spacing:3px;margin-bottom:36px;text-align:center;transition:color .3s}
+.shake-hint.lit{color:var(--gold2)}
+
+/* Cup scene — all-in-one SVG */
+.cup-scene{position:relative;width:240px;height:335px;margin-bottom:34px;display:flex;align-items:flex-end;justify-content:center}
+.cup-scene::before{content:'';position:absolute;left:50%;bottom:12px;width:210px;height:42px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse at center,rgba(245,200,66,.22),rgba(185,28,28,.12) 42%,transparent 72%);filter:blur(6px);opacity:.9}
+.cup-svg-main{width:220px;height:335px;overflow:visible;filter:drop-shadow(0 18px 38px rgba(0,0,0,.82)) drop-shadow(0 0 22px rgba(212,160,23,.16))}
+.cup-svg-main.shaking{animation:cr .22s ease-in-out infinite;transform-origin:50% 88%}
+@keyframes cr{0%,100%{transform:rotate(0deg)}20%{transform:rotate(-8deg) translateX(-4px)}50%{transform:rotate(8deg) translateX(4px)}75%{transform:rotate(-5deg) translateX(-2px)}}
+/* flying stick (outside svg, overlaid) */
+.fly-stick{position:absolute;left:50%;top:3px;transform:translateX(-50%);width:13px;height:128px;border-radius:7px 7px 4px 4px;opacity:0;z-index:30;cursor:pointer;
+  background:linear-gradient(to right,#4B2600 0%,#8B5412 14%,#D79E37 32%,#FFE08A 50%,#D49A32 68%,#81500E 86%,#3D2100 100%);
+  box-shadow:inset -2px 0 4px rgba(0,0,0,.42),inset 2px 0 4px rgba(255,255,255,.28),0 0 18px rgba(245,200,66,.38)}
+.fly-stick::before{content:'';position:absolute;left:1px;right:1px;top:34%;height:3px;background:rgba(70,26,0,.38);box-shadow:0 42px 0 rgba(70,26,0,.26)}
+.fly-stick::after{content:'籤';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif TC',serif;font-size:12px;font-weight:900;color:rgba(95,30,4,.78);writing-mode:vertical-rl;text-shadow:0 1px 0 rgba(255,220,120,.36)}
+
+/* Ring */
+.ring-wrap{position:relative;width:90px;height:90px}
+.ring-svg{transform:rotate(-90deg);overflow:visible}
+.ring-bg{fill:none;stroke:rgba(255,255,255,.04);stroke-width:5}
+.ring-track{fill:none;stroke:var(--gold);stroke-width:5;stroke-linecap:round;stroke-dasharray:251;stroke-dashoffset:251;transition:stroke-dashoffset .07s linear;filter:drop-shadow(0 0 6px rgba(212,160,23,.7))}
+.ring-core{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-pct{font-family:'Noto Serif TC',serif;font-size:22px;font-weight:900;color:var(--gold)}
+.ring-lbl{font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:1px}
+.btn-perm{margin-top:18px;padding:12px 26px;background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.35);border-radius:12px;color:var(--gold);font-family:inherit;font-size:14px;cursor:pointer;display:none}
+.btn-tap{margin-top:20px;width:96px;height:96px;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.15),rgba(0,0,0,0) 60%),linear-gradient(135deg,var(--red) 0%,#7A0A0A 100%);border:2px solid rgba(212,160,23,.4);color:white;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px;box-shadow:0 6px 28px rgba(185,28,28,.5),inset 0 1px 0 rgba(255,255,255,.2);display:none;transition:transform .12s}
+.btn-tap:active{transform:scale(.93)}
+
+/* REVEAL */
+#screen-reveal{gap:0;padding:40px 24px 36px;justify-content:center}
+.reveal-wrap{position:relative;display:flex;flex-direction:column;align-items:center;margin-bottom:28px}
+.big-stick{width:68px;height:200px;border-radius:10px 10px 6px 6px;cursor:pointer;position:relative;
+  background:linear-gradient(to right,#3A2000 0%,#7A5010 10%,#B88030 25%,#E0B858 40%,#F8D870 50%,#E0B858 60%,#B88030 75%,#7A5010 90%,#3A2000 100%);
+  box-shadow:4px 6px 0 rgba(0,0,0,.5),-1px 0 0 rgba(255,255,255,.08),0 0 40px rgba(212,160,23,.3);overflow:hidden;transition:transform .15s}
+.big-stick:active{transform:scale(.96)}
+.big-stick::before{content:'';position:absolute;left:8px;right:8px;top:0;height:45%;background:linear-gradient(to bottom,rgba(255,255,255,.18),transparent);border-radius:6px 6px 0 0}
+.bsn{position:absolute;left:0;right:0;height:4px;background:rgba(0,0,0,.35);box-shadow:0 2px 0 rgba(255,255,255,.1)}
+.bsc{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.bsc span{font-family:'Noto Serif TC',serif;font-size:20px;font-weight:900;color:rgba(80,20,5,.8);writing-mode:vertical-rl;text-shadow:0 1px 0 rgba(255,200,80,.3);z-index:1}
+.tap-lbl{margin-top:14px;font-size:11px;color:var(--gold);letter-spacing:3px;animation:pl 1.3s ease-in-out infinite}
+@keyframes pl{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* Prize card */
+.prize-card{width:100%;max-width:340px;background:linear-gradient(160deg,#1A1020 0%,#0E0A18 100%);border:1px solid rgba(212,160,23,.28);border-radius:24px;padding:28px 22px;text-align:center;position:relative;overflow:hidden;display:none;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px rgba(212,160,23,.08)}
+.prize-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(212,160,23,.08) 0%,transparent 60%);pointer-events:none}
+.prize-card::after{content:'🎊';position:absolute;top:-15px;right:-5px;font-size:80px;opacity:.05;pointer-events:none}
+.plbl{font-size:11px;letter-spacing:5px;color:var(--muted);margin-bottom:14px}
+.pname{font-family:'Noto Serif TC',serif;font-size:28px;font-weight:900;color:var(--gold2);text-shadow:0 0 30px rgba(245,200,66,.45);margin-bottom:6px;line-height:1.35}
+.psub{font-size:13px;color:var(--muted);margin-bottom:22px}
+.btn-again{width:100%;padding:14px;background:linear-gradient(135deg,var(--red) 0%,#7A0A0A 100%);border:none;border-radius:14px;color:white;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:2px;box-shadow:0 4px 20px rgba(185,28,28,.45);transition:transform .12s}
+.btn-again:active{transform:scale(.97)}
+
+/* Anims */
+@keyframes fly-out{0%{opacity:1;transform:translateX(-50%) translateY(0) rotate(0deg)}20%{opacity:1;transform:translateX(-44%) translateY(-70px) rotate(10deg)}50%{opacity:1;transform:translateX(-38%) translateY(-160px) rotate(24deg)}75%{opacity:.9;transform:translateX(-32%) translateY(-110px) rotate(38deg)}100%{opacity:0;transform:translateX(-24%) translateY(-40px) rotate(55deg)}}
+@keyframes stick-land{0%{opacity:0;transform:translateY(-80px) rotate(-6deg)}55%{opacity:1;transform:translateY(6px) rotate(1deg)}75%{transform:translateY(-3px) rotate(-.5deg)}100%{opacity:1;transform:translateY(0) rotate(0deg)}}
+@keyframes card-up{0%{opacity:0;transform:translateY(28px) scale(.95)}100%{opacity:1;transform:translateY(0) scale(1)}}
+
+/* Confetti */
+.cf{position:fixed;pointer-events:none;z-index:999;animation:cf-fall var(--dur,1.6s) ease-out forwards var(--del,0s)}
+@keyframes cf-fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+</style>
+</head>
+<body>
+<div class="bg-amb"></div>
+<div class="stars" id="stars"></div>
+
+<!-- LOADING -->
+<div id="screen-loading" class="screen active">
+  <div class="ll">🏮</div>
+  <div class="lt">กำลังโหลดรางวัล</div>
+  <div class="ld"><span></span><span></span><span></span></div>
+</div>
+
+<!-- ERROR -->
+<div id="screen-error" class="screen">
+  <div class="ei">⚠️</div>
+  <div class="et">โหลดข้อมูลไม่สำเร็จ</div>
+  <div class="em" id="errMsg">ไม่สามารถเชื่อมต่อ Apps Script ได้</div>
+  <button class="btn-retry" onclick="boot()">ลองใหม่</button>
+</div>
+
+<!-- SHAKE -->
+<div id="screen-shake" class="screen">
+  <div class="top-bar">
+    <div class="app-title">籤 เซียมซี</div>
+    <div class="rbadge" id="rewardBadge">— รางวัล</div>
+  </div>
+  <div class="stage">
+    <div class="shake-hint" id="shakeHint">เขย่ามือถือเพื่อเสี่ยงไม้</div>
+    <div class="cup-scene">
+      <!-- flying stick overlaid on top -->
+      <div class="fly-stick" id="flyStick"></div>
+
+      <!-- ALL-IN-ONE SVG: premium app-style cup + natural sticks -->
+      <svg class="cup-svg-main" id="cupSvgMain" viewBox="0 0 220 335" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="insideCup">
+            <!-- wider/taller clip so the sticks visibly emerge from the cup mouth -->
+            <path d="M34 18 C55 4,165 4,186 18 L174 282 L46 282 Z"/>
+          </clipPath>
+
+          <linearGradient id="jadeBody" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#071507"/>
+            <stop offset="10%" stop-color="#14310E"/>
+            <stop offset="24%" stop-color="#2A6A21"/>
+            <stop offset="42%" stop-color="#68B53A"/>
+            <stop offset="52%" stop-color="#9BE45A"/>
+            <stop offset="62%" stop-color="#4FA130"/>
+            <stop offset="80%" stop-color="#17420F"/>
+            <stop offset="100%" stop-color="#061006"/>
+          </linearGradient>
+
+          <linearGradient id="jadeRim" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#E8FF90"/>
+            <stop offset="35%" stop-color="#9FE24B"/>
+            <stop offset="100%" stop-color="#315B16"/>
+          </linearGradient>
+
+          <linearGradient id="goldLine" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#593500"/>
+            <stop offset="20%" stop-color="#D69A22"/>
+            <stop offset="50%" stop-color="#FFE38A"/>
+            <stop offset="80%" stop-color="#C47A10"/>
+            <stop offset="100%" stop-color="#4A2B00"/>
+          </linearGradient>
+
+          <linearGradient id="redRibbon" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#4E0707"/>
+            <stop offset="28%" stop-color="#B51216"/>
+            <stop offset="50%" stop-color="#FF5151"/>
+            <stop offset="72%" stop-color="#B51216"/>
+            <stop offset="100%" stop-color="#420606"/>
+          </linearGradient>
+
+          <linearGradient id="stickPremium" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#3A1D00"/>
+            <stop offset="13%" stop-color="#7C4A0D"/>
+            <stop offset="33%" stop-color="#C58A28"/>
+            <stop offset="50%" stop-color="#FFE08A"/>
+            <stop offset="68%" stop-color="#C28425"/>
+            <stop offset="86%" stop-color="#704208"/>
+            <stop offset="100%" stop-color="#2C1700"/>
+          </linearGradient>
+
+          <radialGradient id="innerDepth" cx="50%" cy="50%" r="55%">
+            <stop offset="0%" stop-color="#010401"/>
+            <stop offset="58%" stop-color="#071505"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+          </radialGradient>
+
+          <radialGradient id="appGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="rgba(245,200,66,.62)"/>
+            <stop offset="45%" stop-color="rgba(185,28,28,.2)"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+          </radialGradient>
+
+          <filter id="softBlur" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4"/>
+          </filter>
+
+          <style>
+            @keyframes wob {
+              0%,100%{ transform: rotate(0deg) translateY(0) scale(1); }
+              30%    { transform: rotate(-10deg) translateY(-2px) scale(1.015); }
+              70%    { transform: rotate(10deg) translateY(-1px) scale(1.015); }
+            }
+            .wob-grp.wobbling > g { animation: wob .18s ease-in-out infinite; transform-box:fill-box; transform-origin:bottom center; }
+          </style>
+        </defs>
+
+        <!-- premium halo -->
+        <ellipse cx="110" cy="309" rx="82" ry="18" fill="url(#appGlow)" opacity=".75"/>
+        <ellipse cx="110" cy="293" rx="70" ry="10" fill="rgba(0,0,0,.45)" filter="url(#softBlur)"/>
+
+        <!-- sticks behind the front rim/body -->
+        <g clip-path="url(#insideCup)" class="wob-grp" id="sticksBunch">
+          <!-- denser sticks, taller tips, varied angles for a fuller app-style bundle -->
+          <g transform="rotate(-22 48 282)"><rect x="44" y="54" width="7" height="228" rx="4" fill="url(#stickPremium)"/><rect x="44" y="107" width="7" height="2" fill="rgba(60,20,0,.32)"/><rect x="44" y="188" width="7" height="2" fill="rgba(60,20,0,.25)"/></g>
+          <g transform="rotate(-18 56 282)"><rect x="52" y="38" width="8" height="244" rx="4" fill="url(#stickPremium)"/><rect x="52" y="96" width="8" height="2" fill="rgba(60,20,0,.32)"/><rect x="52" y="184" width="8" height="2" fill="rgba(60,20,0,.25)"/></g>
+          <g transform="rotate(-14 64 282)"><rect x="60" y="62" width="7" height="220" rx="4" fill="url(#stickPremium)"/><rect x="60" y="113" width="7" height="2" fill="rgba(60,20,0,.32)"/><rect x="60" y="193" width="7" height="2" fill="rgba(60,20,0,.25)"/></g>
+          <g transform="rotate(-10 72 282)"><rect x="68" y="30" width="8" height="252" rx="4" fill="url(#stickPremium)"/><rect x="68" y="90" width="8" height="2" fill="rgba(60,20,0,.34)"/><rect x="68" y="181" width="8" height="2" fill="rgba(60,20,0,.25)"/></g>
+          <g transform="rotate(-7 80 282)"><rect x="76" y="48" width="7" height="234" rx="4" fill="url(#stickPremium)"/><rect x="76" y="102" width="7" height="2" fill="rgba(60,20,0,.32)"/><rect x="76" y="187" width="7" height="2" fill="rgba(60,20,0,.25)"/></g>
+          <g transform="rotate(-4 88 282)"><rect x="84" y="24" width="8" height="258" rx="4" fill="url(#stickPremium)"/><rect x="84" y="84" width="8" height="2" fill="rgba(60,20,0,.34)"/><rect x="84" y="176" width="8" height="2" fill="rgba(60,20,0,.25)"/></g>
+          <g transform="rotate(-1 96 282)"><rect x="92" y="58" width="7" height="224" rx="4" fill="url(#stickPremium)"/><rect x="92" y="110" width="7" height="2" fill="rgba(60,20,0,.32)"/><rect x="92" y="191" width="7" height="2" fill="rgba(60,20,0,.25)"/></g>
+          <g transform="rotate(2 104 282)"><rect x="100" y="18" width="8" height="264" rx="4" fill="url(#stickPremium)"/><rect x="100" y="80" width="8" height="2" fill="rgba(60,20,0,.34)"/><rect x="100" y="174" width="8" height="2" fill="rgba(60,20,0,.25)"/></g>
+          <g transform="rotate(0 112 282)"><rect x="108" y="40" width="8" height="242" rx="4" fill="url(#stickPremium)"/><rect x="108" y="97" width="8" height="2" fill="rgba(60,20,0,.32)"/><rect x="108" y="185" width="8" height="2" fill="rgba(60,20,0,.25)"/></g>
+          <g transform="rotate(5 120 282)"><rect x="116" y="26" width="8" height="256" rx="4" fill="url(#stickPremium)"/><rect x="116" y="86" width="8" height="2" fill="rgba(60,20,0,.34)"/><rect x="116" y="178" width="8" height="2" fill="rgba(60,20,0,.25)"/></g>
+          <g transform="rotate(8 128 282)"><rect x="124" y="56" width="7" height="226" rx="4" fill="url(#stickPremium)"/><rect x="124" y="109" width="7" height="2" fill="rgba(60,20,0,.32)"/><rect x="124" y="190" width="7" height="2" fill="rgba(60,20,0,.25)"/></g>
+          <g transform="rotate(12 136 282)"><rect x="132" y="34" width="8" height="248" rx="4" fill="url(#stickPremium)"/><rect x="132" y="92" width="8" height="2" fill="rgba(60,20,0,.34)"/><rect x="132" y="182" width="8" height="2" fill="rgba(60,20,0,.25)"/></g>
+          <g transform="rotate(15 144 282)"><rect x="140" y="64" width="7" height="218" rx="4" fill="url(#stickPremium)"/><rect x="140" y="114" width="7" height="2" fill="rgba(60,20,0,.32)"/><rect x="140" y="194" width="7" height="2" fill="rgba(60,20,0,.25)"/></g>
+          <g transform="rotate(19 152 282)"><rect x="148" y="44" width="8" height="238" rx="4" fill="url(#stickPremium)"/><rect x="148" y="100" width="8" height="2" fill="rgba(60,20,0,.32)"/><rect x="148" y="187" width="8" height="2" fill="rgba(60,20,0,.25)"/></g>
+          <g transform="rotate(23 160 282)"><rect x="156" y="52" width="7" height="230" rx="4" fill="url(#stickPremium)"/><rect x="156" y="106" width="7" height="2" fill="rgba(60,20,0,.32)"/><rect x="156" y="189" width="7" height="2" fill="rgba(60,20,0,.25)"/></g>
+          <g transform="rotate(27 168 282)"><rect x="164" y="70" width="7" height="212" rx="4" fill="url(#stickPremium)"/><rect x="164" y="121" width="7" height="2" fill="rgba(60,20,0,.32)"/><rect x="164" y="199" width="7" height="2" fill="rgba(60,20,0,.25)"/></g>
+        </g>
+
+        <!-- dark opening behind sticks -->
+        <ellipse cx="110" cy="113" rx="69" ry="19" fill="#051006" opacity=".98"/>
+        <ellipse cx="110" cy="116" rx="59" ry="13" fill="url(#innerDepth)" opacity=".95"/>
+
+        <!-- cup body -->
+        <path d="M41 114 C48 126,172 126,179 114 L166 281 C163 294,57 294,54 281 Z" fill="url(#jadeBody)"/>
+        <path d="M41 114 C48 126,172 126,179 114 L166 281 C163 294,57 294,54 281 Z" fill="rgba(255,255,255,.03)"/>
+        <path d="M51 122 L58 279 C60 288,77 291,92 291 L80 122 Z" fill="rgba(0,0,0,.34)"/>
+        <path d="M154 122 L163 279 C161 288,146 291,128 291 L140 122 Z" fill="rgba(0,0,0,.42)"/>
+        <path d="M101 124 L111 126 L111 284 L98 284 Z" fill="rgba(255,255,255,.12)"/>
+        <path d="M116 126 L122 126 L121 283 L115 284 Z" fill="rgba(255,255,255,.05)"/>
+
+        <!-- ornamental bands -->
+        <path d="M44 145 C58 154,162 154,176 145 L176 163 C162 172,58 172,44 163 Z" fill="url(#redRibbon)"/>
+        <path d="M44 145 C58 154,162 154,176 145" stroke="url(#goldLine)" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M44 164 C58 173,162 173,176 164" stroke="url(#goldLine)" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M49 207 C63 215,157 215,171 207" stroke="rgba(0,0,0,.45)" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <path d="M50 209 C64 216,156 216,170 209" stroke="rgba(255,255,255,.08)" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M52 250 C66 257,154 257,168 250" stroke="rgba(0,0,0,.34)" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+        <!-- body emblem -->
+        <circle cx="110" cy="232" r="29" fill="rgba(0,0,0,.18)" stroke="url(#goldLine)" stroke-width="2.5"/>
+        <text x="110" y="244" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="36" font-weight="900" fill="rgba(255,225,118,.78)" style="text-shadow:0 0 10px rgba(245,200,66,.5)">籤</text>
+
+        <!-- front rim drawn last so sticks appear inside -->
+        <ellipse cx="110" cy="115" rx="72" ry="21" fill="#1C3F12"/>
+        <ellipse cx="110" cy="108" rx="73" ry="22" fill="url(#jadeRim)"/>
+        <ellipse cx="110" cy="105" rx="63" ry="13" fill="rgba(238,255,155,.42)"/>
+        <ellipse cx="110" cy="110" rx="58" ry="13" fill="#071405"/>
+        <ellipse cx="110" cy="113" rx="51" ry="9" fill="rgba(0,0,0,.72)"/>
+        <path d="M47 110 C64 128,156 128,173 110" stroke="url(#goldLine)" stroke-width="4" fill="none" stroke-linecap="round" opacity=".92"/>
+        <path d="M61 101 C80 94,140 94,159 101" stroke="rgba(255,255,255,.45)" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+        <!-- base -->
+        <ellipse cx="110" cy="285" rx="58" ry="13" fill="#19350E"/>
+        <ellipse cx="110" cy="281" rx="66" ry="14" fill="url(#jadeRim)" opacity=".92"/>
+        <ellipse cx="110" cy="279" rx="49" ry="7" fill="rgba(255,255,255,.12)"/>
+        <ellipse cx="110" cy="292" rx="62" ry="8" fill="rgba(0,0,0,.42)" filter="url(#softBlur)"/>
+      </svg>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring-svg" width="90" height="90" viewBox="0 0 90 90">
+        <circle class="ring-bg" cx="45" cy="45" r="40"/>
+        <circle class="ring-track" id="ringTrack" cx="45" cy="45" r="40"/>
+      </svg>
+      <div class="ring-core">
+        <span class="ring-pct" id="ringPct">0%</span>
+        <span class="ring-lbl">SHAKE</span>
+      </div>
+    </div>
+    <button class="btn-perm" id="btnPerm" onclick="reqPerm()">🔓 อนุญาตเซ็นเซอร์</button>
+    <button class="btn-tap" id="btnTap" onclick="addPower(38)">เขย่า!</button>
+  </div>
+</div>
+
+<!-- REVEAL -->
+<div id="screen-reveal" class="screen">
+  <div class="reveal-wrap" id="revealWrap" onclick="openPrize()">
+    <div class="big-stick" id="bigStick">
+      <div class="bsn" style="top:30%"></div>
+      <div class="bsn" style="top:62%"></div>
+      <div class="bsc"><span>籤</span></div>
+    </div>
+    <div class="tap-lbl" id="tapLbl">✨ แตะเพื่อเปิดรางวัล ✨</div>
+  </div>
+  <div class="prize-card" id="prizeCard">
+    <div class="plbl">🎊 คุณได้รับรางวัล 🎊</div>
+    <div class="pname" id="prizeName">—</div>
+    <div class="psub">ยินดีด้วยนะครับ!</div>
+    <button class="btn-again" onclick="playAgain()">🔄 เสี่ยงอีกครั้ง</button>
+  </div>
+</div>
+
+<script>
+const API='https://script.google.com/macros/s/AKfycbw6yuCH7_BlNnATWgHNUyVmo8YiD12br97HZammIoRzmlidAK97S7l93Xs9PJ6pUTVpFg/exec';
+
+// Stars
+(function(){
+  const c=document.getElementById('stars');
+  for(let i=0;i<55;i++){
+    const s=document.createElement('div');s.className='star';
+    s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*4}s;--delay:${Math.random()*4}s`;
+    c.appendChild(s);
+  }
+})();
+
+let rewards=[],power=0,chosen=null,revealed=false;
+
+async function boot(){
+  show('loading');
+  try{
+    const r=await fetch(API);
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const j=await r.json();
+    if(j.status!=='ok'||!j.rewards.length)throw new Error('ไม่พบรางวัลใน Sheet');
+    rewards=j.rewards;
+    document.getElementById('rewardBadge').textContent=rewards.length+' รางวัล';
+    show('shake');initMotion();
+  }catch(e){
+    document.getElementById('errMsg').textContent=e.message;show('error');
+  }
+}
+
+function pick(){
+  const t=rewards.reduce((s,r)=>s+r.percent,0);
+  let rnd=Math.random()*t;
+  for(const r of rewards){rnd-=r.percent;if(rnd<=0)return r;}
+  return rewards[rewards.length-1];
+}
+
+function initMotion(){
+  if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){
+    document.getElementById('btnPerm').style.display='block';return;
+  }
+  if(typeof DeviceMotionEvent!=='undefined'){window.addEventListener('devicemotion',onMotion);}
+  else{document.getElementById('btnTap').style.display='block';}
+}
+function reqPerm(){
+  DeviceMotionEvent.requestPermission().then(s=>{
+    if(s==='granted'){window.addEventListener('devicemotion',onMotion);document.getElementById('btnPerm').style.display='none';}
+  }).catch(()=>{document.getElementById('btnTap').style.display='block';document.getElementById('btnPerm').style.display='none';});
+}
+let lastA={x:0,y:0,z:0};
+function onMotion(e){
+  const a=e.accelerationIncludingGravity;if(!a)return;
+  const f=Math.abs(a.x-lastA.x)+Math.abs(a.y-lastA.y)+Math.abs(a.z-lastA.z);
+  lastA={x:a.x,y:a.y,z:a.z};
+  if(f>15)addPower(f*0.3);
+}
+
+let vfxTO=null;
+function addPower(f){
+  if(power>=100)return;
+  power=Math.min(100,power+f);
+  updateRing();doVFX();soundHit();
+  if(power>=100)setTimeout(flyOut,60);
+}
+
+function updateRing(){
+  const p=Math.round(power);
+  document.getElementById('ringTrack').style.strokeDashoffset=251-251*power/100;
+  document.getElementById('ringPct').textContent=p+'%';
+  const h=document.getElementById('shakeHint');
+  if(power>=85){h.textContent='เกือบแล้ว!!';h.classList.add('lit');}
+  else if(power>=45){h.textContent='ดีมาก! เขย่าต่อ!';h.classList.add('lit');}
+  else{h.textContent='เขย่ามือถือเพื่อเสี่ยงไม้';h.classList.toggle('lit',power>15);}
+}
+
+function doVFX(){
+  document.getElementById('cupSvgMain').classList.add('shaking');
+  document.getElementById('sticksBunch').classList.add('wobbling');
+  clearTimeout(vfxTO);
+  vfxTO=setTimeout(()=>{
+    document.getElementById('cupSvgMain').classList.remove('shaking');
+    document.getElementById('sticksBunch').classList.remove('wobbling');
+  },280);
+}
+
+function flyOut(){
+  const fs=document.getElementById('flyStick');
+  fs.style.opacity='1';fs.style.animation='fly-out .95s ease-out forwards';
+  soundFly();
+  setTimeout(()=>{chosen=pick();revealed=false;showReveal();},960);
+}
+
+function showReveal(){
+  show('reveal');
+  const pc=document.getElementById('prizeCard');
+  pc.style.display='none';pc.style.animation='';
+  document.getElementById('tapLbl').style.display='block';
+  document.getElementById('revealWrap').style.animation='stick-land .65s cubic-bezier(.34,1.56,.64,1) forwards';
+}
+
+function openPrize(){
+  if(revealed)return;revealed=true;
+  document.getElementById('tapLbl').style.display='none';
+  const pc=document.getElementById('prizeCard');
+  document.getElementById('prizeName').textContent=chosen.reward;
+  pc.style.display='block';pc.style.animation='card-up .5s cubic-bezier(.34,1.56,.64,1) forwards';
+  soundReveal();confetti();
+}
+
+function playAgain(){
+  power=0;chosen=null;revealed=false;
+  const fs=document.getElementById('flyStick');fs.style.opacity='0';fs.style.animation='';
+  document.getElementById('ringTrack').style.strokeDashoffset='251';
+  document.getElementById('ringPct').textContent='0%';
+  const h=document.getElementById('shakeHint');h.textContent='เขย่ามือถือเพื่อเสี่ยงไม้';h.classList.remove('lit');
+  show('shake');
+}
+
+function show(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+n).classList.add('active');
+}
+
+const CF_C=['#D4A017','#F5C842','#B91C1C','#EF4444','#FFD700','#FFFACD','#FF6B35'];
+function confetti(){
+  for(let i=0;i<60;i++){
+    setTimeout(()=>{
+      const el=document.createElement('div');el.className='cf';
+      const sz=6+Math.random()*8;
+      el.style.cssText=`left:${Math.random()*100}vw;top:-12px;width:${sz}px;height:${sz}px;background:${CF_C[Math.floor(Math.random()*CF_C.length)]};border-radius:${Math.random()>.5?'50%':'2px'};--dur:${1.3+Math.random()}s;--del:${Math.random()*.5}s;`;
+      document.body.appendChild(el);setTimeout(()=>el.remove(),3000);
+    },i*22);
+  }
+}
+
+// ── SOUND ENGINE ──
+let AC=null;
+function getAC(){
+  if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();
+  if(AC.state==='suspended')AC.resume();
+  return AC;
+}
+
+function makeReverb(ctx,sec=0.4,decay=2.5){
+  const sr=ctx.sampleRate,len=sr*sec;
+  const buf=ctx.createBuffer(2,len,sr);
+  for(let c=0;c<2;c++){const d=buf.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay);}
+  const conv=ctx.createConvolver();conv.buffer=buf;return conv;
+}
+
+let revNode=null,lastHit=0;
+function soundHit(){
+  try{
+    const ctx=getAC(),now=ctx.currentTime;
+    if(now-lastHit<0.08)return;lastHit=now;
+    if(!revNode){revNode=makeReverb(ctx,0.35,3);revNode.connect(ctx.destination);}
+    const mg=ctx.createGain();mg.gain.setValueAtTime(0.7,now);
+    mg.connect(ctx.destination);mg.connect(revNode);
+
+    // noise click
+    const blen=Math.floor(ctx.sampleRate*0.018);
+    const nb=ctx.createBuffer(1,blen,ctx.sampleRate);
+    const nd=nb.getChannelData(0);
+    for(let i=0;i<blen;i++)nd[i]=(Math.random()*2-1)*(1-i/blen);
+    const ns=ctx.createBufferSource();ns.buffer=nb;
+    const bpf=ctx.createBiquadFilter();bpf.type='bandpass';bpf.frequency.value=900+Math.random()*300;bpf.Q.value=3;
+    const ng=ctx.createGain();ng.gain.setValueAtTime(0.55,now);ng.gain.exponentialRampToValueAtTime(0.001,now+0.022);
+    ns.connect(bpf);bpf.connect(ng);ng.connect(mg);ns.start(now);ns.stop(now+0.025);
+
+    // pitched tone
+    const freq=800+Math.random()*400;
+    const osc=ctx.createOscillator();osc.type='triangle';
+    osc.frequency.setValueAtTime(freq,now);osc.frequency.exponentialRampToValueAtTime(freq*0.42,now+0.18);
+    const og=ctx.createGain();og.gain.setValueAtTime(0.22,now);og.gain.exponentialRampToValueAtTime(0.001,now+0.2);
+    osc.connect(og);og.connect(mg);osc.start(now);osc.stop(now+0.22);
+
+    // thud
+    const th=ctx.createOscillator();th.type='sine';
+    th.frequency.setValueAtTime(180,now);th.frequency.exponentialRampToValueAtTime(55,now+0.12);
+    const tg=ctx.createGain();tg.gain.setValueAtTime(0.3,now);tg.gain.exponentialRampToValueAtTime(0.001,now+0.14);
+    th.connect(tg);tg.connect(mg);th.start(now);th.stop(now+0.16);
+  }catch(e){}
+}
+
+function soundFly(){
+  try{
+    const ctx=getAC(),now=ctx.currentTime;
+    const m=ctx.createGain();m.gain.setValueAtTime(0.8,now);m.connect(ctx.destination);
+    // swoosh
+    const swl=Math.floor(ctx.sampleRate*0.3);
+    const sb=ctx.createBuffer(1,swl,ctx.sampleRate);
+    const sd=sb.getChannelData(0);for(let i=0;i<swl;i++)sd[i]=Math.random()*2-1;
+    const ss=ctx.createBufferSource();ss.buffer=sb;
+    const lp=ctx.createBiquadFilter();lp.type='lowpass';
+    lp.frequency.setValueAtTime(3000,now);lp.frequency.exponentialRampToValueAtTime(400,now+0.28);
+    const sg=ctx.createGain();sg.gain.setValueAtTime(0.18,now);sg.gain.exponentialRampToValueAtTime(0.001,now+0.3);
+    ss.connect(lp);lp.connect(sg);sg.connect(m);ss.start(now);ss.stop(now+0.32);
+    // impact
+    const imp=ctx.createOscillator();imp.type='sine';
+    imp.frequency.setValueAtTime(200,now+0.18);imp.frequency.exponentialRampToValueAtTime(50,now+0.48);
+    const ig=ctx.createGain();ig.gain.setValueAtTime(0,now);ig.gain.linearRampToValueAtTime(0.5,now+0.2);ig.gain.exponentialRampToValueAtTime(0.001,now+0.55);
+    imp.connect(ig);ig.connect(m);imp.start(now+0.18);imp.stop(now+0.6);
+    // crack
+    const cr=ctx.createOscillator();cr.type='square';
+    cr.frequency.setValueAtTime(1800,now+0.18);cr.frequency.exponentialRampToValueAtTime(600,now+0.26);
+    const cg=ctx.createGain();cg.gain.setValueAtTime(0.08,now+0.18);cg.gain.exponentialRampToValueAtTime(0.001,now+0.28);
+    cr.connect(cg);cg.connect(m);cr.start(now+0.18);cr.stop(now+0.3);
+  }catch(e){}
+}
+
+function soundReveal(){
+  try{
+    const ctx=getAC(),now=ctx.currentTime;
+    const rev=makeReverb(ctx,1.2,2);rev.connect(ctx.destination);
+    [0,.12,.24,.38,.54].forEach((delay,i)=>{
+      const freqs=[523,659,784,1047,1319];
+      const osc=ctx.createOscillator();osc.type='sine';osc.frequency.value=freqs[i];
+      const lfo=ctx.createOscillator();lfo.type='sine';lfo.frequency.value=5;
+      const lg=ctx.createGain();lg.gain.value=3;lfo.connect(lg);lg.connect(osc.frequency);lfo.start(now+delay);
+      const g=ctx.createGain();g.gain.setValueAtTime(0,now+delay);g.gain.linearRampToValueAtTime(0.18,now+delay+0.02);g.gain.exponentialRampToValueAtTime(0.001,now+delay+0.9);
+      osc.connect(g);g.connect(rev);g.connect(ctx.destination);
+      osc.start(now+delay);osc.stop(now+delay+1);lfo.stop(now+delay+1);
+    });
+  }catch(e){}
+}
+
+boot();
+</script>
+</body>
+</html>
