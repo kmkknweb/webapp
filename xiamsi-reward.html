@@ -91,32 +91,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 /* Ring */
 .ring-wrap{position:relative;width:90px;height:90px}
-.ring-svg{transform:rotate(-90deg);overflow:visible}
-.ring-bg{fill:none;stroke:rgba(255,255,255,.04);stroke-width:5}
-.ring-track{fill:none;stroke:var(--gold);stroke-width:5;stroke-linecap:round;stroke-dasharray:251;stroke-dashoffset:251;transition:stroke-dashoffset .07s linear;filter:drop-shadow(0 0 6px rgba(212,160,23,.7))}
-.ring-core{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.ring-pct{font-family:'Noto Serif TC',serif;font-size:22px;font-weight:900;color:var(--gold)}
-.ring-lbl{font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:1px}
-.btn-perm{margin-top:18px;padding:12px 26px;background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.35);border-radius:12px;color:var(--gold);font-family:inherit;font-size:14px;cursor:pointer;display:none}
-.btn-tap{margin-top:20px;width:96px;height:96px;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.15),rgba(0,0,0,0) 60%),linear-gradient(135deg,var(--red) 0%,#7A0A0A 100%);border:2px solid rgba(212,160,23,.4);color:white;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px;box-shadow:0 6px 28px rgba(185,28,28,.5),inset 0 1px 0 rgba(255,255,255,.2);display:none;transition:transform .12s}
-.btn-tap:active{transform:scale(.93)}
-
-/* REVEAL */
-#screen-reveal{gap:0;padding:40px 24px 36px;justify-content:center}
-.reveal-wrap{position:relative;display:flex;flex-direction:column;align-items:center;margin-bottom:28px}
-.big-stick{width:68px;height:200px;border-radius:10px 10px 6px 6px;cursor:pointer;position:relative;
-  background:linear-gradient(to right,#3A2000 0%,#7A5010 10%,#B88030 25%,#E0B858 40%,#F8D870 50%,#E0B858 60%,#B88030 75%,#7A5010 90%,#3A2000 100%);
-  box-shadow:4px 6px 0 rgba(0,0,0,.5),-1px 0 0 rgba(255,255,255,.08),0 0 40px rgba(212,160,23,.3);overflow:hidden;transition:transform .15s}
-.big-stick:active{transform:scale(.96)}
-.big-stick::before{content:'';position:absolute;left:8px;right:8px;top:0;height:45%;background:linear-gradient(to bottom,rgba(255,255,255,.18),transparent);border-radius:6px 6px 0 0}
-.bsn{position:absolute;left:0;right:0;height:4px;background:rgba(0,0,0,.35);box-shadow:0 2px 0 rgba(255,255,255,.1)}
-.bsc{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-.bsc span{font-family:'Noto Serif TC',serif;font-size:20px;font-weight:900;color:rgba(80,20,5,.8);writing-mode:vertical-rl;text-shadow:0 1px 0 rgba(255,200,80,.3);z-index:1}
-.tap-lbl{margin-top:14px;font-size:11px;color:var(--gold);letter-spacing:3px;animation:pl 1.3s ease-in-out infinite}
-@keyframes pl{0%,100%{opacity:.4}50%{opacity:1}}
-
-/* Prize card */
-.prize-card{width:100%;max-width:340px;background:linear-gradient(160deg,#1A1020 0%,#0E0A18 100%);border:1px solid rgba(212,160,23,.28);border-radius:24px;padding:28px 22px;text-align:center;position:relative;overflow:hidden;display:none;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px rgba(212,160,23,.08)}
+.ring-svg{transform:rotate(-90deg);overflow:visible}.prize-card{width:100%;max-width:340px;background:linear-gradient(160deg,#1A1020 0%,#0E0A18 100%);border:1px solid rgba(212,160,23,.28);border-radius:24px;padding:16px 18px;text-align:center;position:relative;overflow:hidden;display:none;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px rgba(212,160,23,.08)}
 .prize-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(212,160,23,.08) 0%,transparent 60%);pointer-events:none}
 .prize-card::after{content:'🎊';position:absolute;top:-15px;right:-5px;font-size:80px;opacity:.05;pointer-events:none}
 .plbl{font-size:11px;letter-spacing:5px;color:var(--muted);margin-bottom:14px}
