@@ -540,7 +540,7 @@ function spinWheel(){
   result.style.display='none';
   chosen=pick();
   playWheelSpin();
-  setTimeout(()=>{ playWheelStop(); },3600);
+  setTimeout(()=>{ playWheelStop(); },6000);
   const extra=1440+Math.floor(Math.random()*720);
   wheelRotation+=extra;
   document.getElementById('wheelDisc').style.transform=`rotate(${wheelRotation}deg)`;
