@@ -343,7 +343,7 @@ function initMotion(){
   if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){
     document.getElementById('btnPerm').style.display='block';return;
   }
-  if(typeof DeviceMotionEvent!=='undefined'){window.addEventListener('devicemotion',onMotion);}
+  if(typeof DeviceMotionEvent!=='undefined'){window.addEventListener('devicemotiยon',onMotion);}
   else{document.getElementById('btnTap').style.display='block';}
 }
 function reqPerm(){
@@ -390,6 +390,9 @@ function onMotion(e){
 
 let vfxTO=null;
 function addPower(f){
+  shakeSound.play().catch(()=>{});
+shakeSound.pause();
+shakeSound.currentTime = 0;
   if(power>=100)return;
   power=Math.min(100,power+f);
   updateRing();doVFX();soundHit();
