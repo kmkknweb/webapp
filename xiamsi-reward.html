@@ -381,8 +381,8 @@ function onMotion(e){
   const f=Math.abs(cur.x-lastA.x)+Math.abs(cur.y-lastA.y)+Math.abs(cur.z-lastA.z);
   lastA=cur;
 
-  if(f>24){
-    const gain=Math.min(6,(f-24)*0.08);
+  if(f>20){
+    const gain=Math.min(6,(f-20)*0.09);
     addPower(gain);
     lastShakeTime=now;
   }
