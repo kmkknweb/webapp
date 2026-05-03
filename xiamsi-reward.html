@@ -412,7 +412,7 @@ function onMotion(e){
   lastA=cur;
 
   if(f>20){
-    const gain=Math.min(6,(f-20)*0.09);
+    const gain=Math.min(6,(f-20)*0.15);
     addPower(gain);
     lastShakeTime=now;
   }
