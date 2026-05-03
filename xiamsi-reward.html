@@ -53,7 +53,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .btn-game:active{transform:scale(.96)}
 
 /* WHEEL */
-#screen-wheel{justify-content:space-between;padding:44px 20px 38px;text-align:center}
+#screen-wheel{justify-content:flex-start;padding:24px 20px 16px;text-align:center;overflow-y:auto}
 .wheel-stage{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px}
 .wheel-title{font-family:'Noto Serif TC',serif;font-size:21px;font-weight:900;color:var(--gold);letter-spacing:3px;text-shadow:0 0 24px rgba(212,160,23,.45)}
 .wheel-wrap{position:relative;width:min(82vw,310px);height:min(82vw,310px);display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 18px 36px rgba(0,0,0,.65))}
@@ -64,7 +64,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .btn-spin{width:min(82vw,310px);padding:15px;background:linear-gradient(135deg,var(--red) 0%,#7A0A0A 100%);border:1px solid rgba(212,160,23,.45);border-radius:18px;color:white;font-family:inherit;font-size:16px;font-weight:900;letter-spacing:2px;cursor:pointer;box-shadow:0 8px 32px rgba(185,28,28,.45),inset 0 1px 0 rgba(255,255,255,.18);transition:transform .12s}
 .btn-spin:active{transform:scale(.96)}
 .btn-back{margin-top:4px;background:transparent;border:none;color:var(--muted);font-family:inherit;font-size:12px;letter-spacing:1px;cursor:pointer}
-.wheel-result{width:100%;max-width:340px;background:linear-gradient(160deg,#1A1020 0%,#0E0A18 100%);border:1px solid rgba(212,160,23,.28);border-radius:22px;padding:22px 18px;text-align:center;display:none;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+.wheel-result{width:100%;max-width:340px;background:linear-gradient(160deg,#1A1020 0%,#0E0A18 100%);border:1px solid rgba(212,160,23,.28);border-radius:22px;padding:14px 16px;text-align:center;display:none;box-shadow:0 20px 60px rgba(0,0,0,.55)}
 .wheel-result .pname{font-size:24px}
 
 /* SHAKE */
@@ -99,6 +99,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .psub{font-size:13px;color:var(--muted);margin-bottom:22px}
 .btn-again{width:100%;padding:14px;background:linear-gradient(135deg,var(--red) 0%,#7A0A0A 100%);border:none;border-radius:14px;color:white;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:2px;box-shadow:0 4px 20px rgba(185,28,28,.45);transition:transform .12s}
 .btn-again:active{transform:scale(.97)}
+  .btn-perm{margin-top:18px;padding:12px 26px;background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.35);border-radius:12px;color:var(--gold);font-family:inherit;font-size:16px;cursor:pointer;display:none;position:relative;z-index:50;-webkit-appearance:none}
+.btn-tap{margin-top:20px;padding:16px 36px;border-radius:50px;background:linear-gradient(135deg,var(--red) 0%,#7A0A0A 100%);border:2px solid rgba(212,160,23,.4);color:white;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;display:none;position:relative;z-index:50}ม
 
 /* Anims */
 @keyframes fly-out{0%{opacity:1;transform:translateX(-50%) translateY(0) rotate(0deg)}20%{opacity:1;transform:translateX(-44%) translateY(-70px) rotate(10deg)}50%{opacity:1;transform:translateX(-38%) translateY(-160px) rotate(24deg)}75%{opacity:.9;transform:translateX(-32%) translateY(-110px) rotate(38deg)}100%{opacity:0;transform:translateX(-24%) translateY(-40px) rotate(55deg)}}
