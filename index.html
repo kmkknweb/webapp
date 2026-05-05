@@ -678,6 +678,135 @@ function switchTab(tab){
     </div>
   </div>
 
+<!-- ===== Map Footer Wrapper START ===== -->
+<div class="ptkm-map-footer-wrapper">
+
+  <a class="ptkm-map-footer-strip"
+     href="https://kmkknweb.github.io/webpage/map.html"
+     target="_self"
+     aria-label="เปิดแผนที่และการเดินทางมาศาลเจ้า">
+
+    <div class="ptkm-map-footer-inner">
+      
+      <div class="ptkm-map-footer-icon">📍</div>
+
+      <div class="ptkm-map-footer-text">
+        <div class="ptkm-map-footer-title">
+          แผนที่และการเดินทางมาศาลเจ้า
+        </div>
+        <div class="ptkm-map-footer-subtitle">
+          สมาคมปึงเถ่ากงม่า ขอนแก่น
+        </div>
+      </div>
+
+      <div class="ptkm-map-footer-action">
+        ดูแผนที่ →
+      </div>
+
+    </div>
+
+  </a>
+
+</div>
+
+<style>
+.ptkm-map-footer-wrapper {
+  width: 100%;
+  display: block;
+  margin-top: 32px;
+}
+
+.ptkm-map-footer-strip {
+  width: min(960px, calc(100% - 28px));
+  margin: 0 auto 18px;
+  text-decoration: none;
+  display: block;
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(90, 8, 8, 0.92), rgba(46, 4, 4, 0.92));
+  border: 1px solid rgba(244, 196, 95, 0.42);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+}
+
+.ptkm-map-footer-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+}
+
+.ptkm-map-footer-icon {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffe4a3, #d89b31);
+  color: #3b1005;
+  font-size: 23px;
+  box-shadow: 0 0 22px rgba(244, 196, 95, 0.42);
+}
+
+.ptkm-map-footer-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.ptkm-map-footer-title {
+  color: #fff4d2;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.ptkm-map-footer-subtitle {
+  color: rgba(255, 244, 210, 0.72);
+  font-size: 13px;
+  margin-top: 3px;
+}
+
+.ptkm-map-footer-action {
+  color: #f4c45f;
+  font-size: 14px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.ptkm-map-footer-strip:active {
+  transform: scale(0.985);
+}
+
+@media (max-width: 520px) {
+  .ptkm-map-footer-inner {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .ptkm-map-footer-icon {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+    font-size: 21px;
+  }
+
+  .ptkm-map-footer-title {
+    font-size: 15px;
+  }
+
+  .ptkm-map-footer-subtitle {
+    font-size: 12px;
+  }
+
+  .ptkm-map-footer-action {
+    font-size: 13px;
+  }
+}
+</style>
+<!-- ===== Map Footer Wrapper END ===== -->
+
+  
 <script>
 
 const firebaseConfig = {
