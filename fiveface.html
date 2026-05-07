@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>อาจารย์ตี๋ — อ่านโหงวเฮ้งมงคล AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Noto+Sans+Thai:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --gold:#b8860b;--gold2:#d4a017;--gold3:#f0c040;
+  --red:#8b1a10;--brown:#4a2c0a;--brown2:#6b3d12;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  min-height:100vh;font-family:"Noto Sans Thai",sans-serif;
+  color:var(--brown);overflow-x:hidden;
+  background:
+    radial-gradient(ellipse 90% 50% at 50% 0%,rgba(210,160,20,.18),transparent 55%),
+    linear-gradient(170deg,#e8d08a 0%,#d4b86a 25%,#c9a84c 50%,#d6b86e 75%,#e2c87a 100%);
+}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:url("data:image/svg+xml,%3Csvg width='52' height='52' viewBox='0 0 52 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23a07010' fill-opacity='0.055'%3E%3Cpath d='M26 0l3 10h10l-8 6 3 10-8-6-8 6 3-10-8-6h10z'/%3E%3C/g%3E%3C/svg%3E");}
+.wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:24px 15px 80px;}
+
+.header{text-align:center;padding:32px 0 24px;}
+.hero-row{display:flex;justify-content:center;align-items:flex-end;gap:18px;margin-bottom:20px;}
+.ln-small{font-size:38px;filter:drop-shadow(0 0 12px rgba(200,130,0,.65));animation:sway 3s ease-in-out infinite;}
+.ln-small:nth-child(3){animation-delay:.7s;}
+@keyframes sway{0%,100%{transform:rotate(-5deg) translateY(0)}50%{transform:rotate(5deg) translateY(-8px)}}
+.ajarn-hero{width:90px;height:90px;border-radius:50%;object-fit:cover;filter:drop-shadow(0 0 14px rgba(240,192,64,.7));animation:sway 3s ease-in-out infinite;animation-delay:.35s;border:2px solid rgba(240,192,64,.4);}
+.eyebrow{font-family:"Cinzel",serif;font-size:9.5px;letter-spacing:.55em;text-transform:uppercase;color:var(--brown2);opacity:.7;margin-bottom:8px;}
+h1{font-family:"Cinzel",serif;font-size:clamp(20px,5vw,30px);font-weight:900;line-height:1.18;color:var(--red);text-shadow:0 1px 0 rgba(255,220,100,.5);margin-bottom:6px;}
+.subtitle{color:var(--brown2);font-size:13px;line-height:1.75;opacity:.8;}
+.hr-gold{width:130px;height:1px;margin:16px auto;background:linear-gradient(90deg,transparent,var(--gold2),transparent);}
+
+.card{background:rgba(255,248,220,.75);border:1px solid rgba(180,130,10,.25);border-radius:20px;padding:22px 18px;margin-bottom:14px;backdrop-filter:blur(8px);box-shadow:0 8px 32px rgba(100,60,0,.12);position:relative;overflow:hidden;}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(200,160,20,.5),transparent);}
+.section-label{font-size:10px;letter-spacing:.38em;text-transform:uppercase;color:var(--brown2);opacity:.6;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.section-label::before,.section-label::after{content:"";flex:1;height:1px;background:rgba(160,110,10,.2);}
+
+.notice{background:rgba(200,150,10,.08);border:1px solid rgba(180,130,10,.2);border-radius:13px;padding:11px 15px;font-size:12.5px;line-height:1.75;color:var(--brown2);text-align:center;margin-bottom:16px;}
+
+.upload-zone{border:1.5px dashed rgba(160,110,10,.35);border-radius:14px;padding:28px 18px;text-align:center;cursor:pointer;background:rgba(255,245,200,.4);transition:all .22s;display:block;}
+.upload-zone:hover{border-color:rgba(180,120,10,.6);background:rgba(255,240,170,.5);}
+.upload-zone .uico{font-size:36px;margin-bottom:9px;display:block;}
+.upload-zone .utxt{color:var(--brown);font-size:14.5px;font-weight:600;margin-bottom:3px;}
+.upload-zone .usub{color:var(--brown2);font-size:11.5px;opacity:.65;}
+input[type=file]{display:none;}
+
+.preview-wrap{display:none;position:relative;border-radius:14px;overflow:hidden;border:1.5px solid rgba(160,110,10,.3);background:#1a0d00;margin-top:12px;box-shadow:0 4px 24px rgba(100,60,0,.2);}
+#previewImg{width:100%;display:block;max-height:420px;object-fit:contain;}
+#edgeCanvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity 1s ease;}
+#lineCanvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;opacity:0;}
+.scan-beam{position:absolute;left:0;right:0;height:2px;z-index:10;display:none;background:linear-gradient(90deg,transparent,rgba(240,192,64,.95) 42%,#fffde0 50%,rgba(240,192,64,.95) 58%,transparent);box-shadow:0 0 6px 3px rgba(240,192,64,.55);}
+.scan-halo{position:absolute;left:0;right:0;height:100px;z-index:9;display:none;background:linear-gradient(180deg,rgba(240,192,64,.1),transparent);pointer-events:none;}
+.cb{position:absolute;width:16px;height:16px;z-index:12;opacity:0;transition:.3s;}
+.cb-tl{top:7px;left:7px;border-top:2px solid var(--gold3);border-left:2px solid var(--gold3);}
+.cb-tr{top:7px;right:7px;border-top:2px solid var(--gold3);border-right:2px solid var(--gold3);}
+.cb-bl{bottom:7px;left:7px;border-bottom:2px solid var(--gold3);border-left:2px solid var(--gold3);}
+.cb-br{bottom:7px;right:7px;border-bottom:2px solid var(--gold3);border-right:2px solid var(--gold3);}
+.preview-wrap.scanning .cb{opacity:1;}
+
+.scan-bar{display:none;margin-top:10px;background:rgba(200,150,10,.08);border:1px solid rgba(160,110,10,.18);border-radius:11px;padding:12px 14px;}
+.scan-bar-track{height:2px;background:rgba(100,70,0,.12);border-radius:99px;margin:8px 0 6px;overflow:hidden;}
+.scan-bar-fill{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--gold2),var(--gold3));transition:width .22s;}
+.scan-bar-row{display:flex;justify-content:space-between;align-items:center;}
+.scan-msg{font-size:11.5px;color:var(--brown2);opacity:.75;}
+.scan-pct{font-family:"Cinzel",serif;font-size:11px;color:var(--gold2);}
+.scan-dots{display:flex;gap:4px;}
+.scan-dots span{width:4px;height:4px;border-radius:50%;background:var(--gold2);opacity:.3;animation:blink 1.3s ease infinite;}
+.scan-dots span:nth-child(2){animation-delay:.22s;}.scan-dots span:nth-child(3){animation-delay:.44s;}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1;transform:scale(1.5);}}
+
+.deity-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(20,8,0,.88);backdrop-filter:blur(8px);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;}
+.deity-overlay.show{display:flex;}
+.deity-wrap{position:relative;width:140px;height:140px;margin-bottom:22px;}
+.deity-wrap img{position:absolute;top:0;left:0;width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid rgba(240,192,64,.5);}
+.kj-open{opacity:1;transition:opacity .1s;}.kj-close{opacity:0;transition:opacity .1s;}
+.deity-glow{position:absolute;inset:-18px;border-radius:50%;z-index:-1;background:radial-gradient(circle,rgba(240,192,64,.35),rgba(200,120,0,.2) 45%,transparent 70%);animation:glow-pulse 2s ease-in-out infinite;}
+@keyframes glow-pulse{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.15);opacity:1}}
+.deity-ring{position:absolute;inset:-28px;border-radius:50%;z-index:-1;border:1.5px solid rgba(240,192,64,.25);animation:ring-spin 6s linear infinite;}
+.deity-ring2{position:absolute;inset:-42px;border-radius:50%;z-index:-1;border:1px dashed rgba(240,192,64,.15);animation:ring-spin 10s linear infinite reverse;}
+@keyframes ring-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.deity-title{font-family:"Cinzel",serif;font-size:17px;font-weight:700;color:var(--gold3);margin-bottom:10px;text-shadow:0 0 18px rgba(240,192,64,.6);}
+.deity-msg{font-size:15.5px;line-height:1.9;color:rgba(255,230,160,.9);min-height:56px;transition:opacity .35s;}
+.deity-progress{width:180px;height:2px;border-radius:99px;background:rgba(255,255,255,.1);margin:18px auto 0;overflow:hidden;}
+.deity-fill-bar{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--gold2),var(--gold3));box-shadow:0 0 6px var(--gold3);}
+
+.btn-main{width:100%;border:0;border-radius:15px;padding:18px 16px;font-size:16px;font-weight:700;font-family:"Noto Sans Thai",sans-serif;cursor:pointer;display:block;text-align:center;margin-top:4px;background:linear-gradient(135deg,#7a1208,#a82010 35%,#c8960c 70%,#e0b018);color:#fff8e0;letter-spacing:.05em;box-shadow:0 6px 24px rgba(120,40,0,.35);transition:all .22s;}
+.btn-main:hover:not(:disabled){transform:translateY(-2px);}
+.btn-main:disabled{opacity:.45;cursor:not-allowed;}
+
+.guide{font-size:12px;line-height:1.75;color:var(--brown2);opacity:.65;border:1px solid rgba(160,110,10,.15);border-radius:11px;padding:11px 13px;margin-top:6px;background:rgba(255,245,200,.3);}
+.guide b{color:var(--brown);opacity:.85;}
+
+.result-wrap{display:none;background:rgba(255,248,220,.82);border:1px solid rgba(180,130,10,.22);border-radius:20px;overflow:hidden;margin-top:16px;box-shadow:0 10px 40px rgba(100,60,0,.14);animation:fadeUp .5s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.res-head{padding:24px 20px 18px;text-align:center;border-bottom:1px solid rgba(160,110,10,.15);background:rgba(255,240,180,.4);}
+.res-title{font-family:"Cinzel",serif;font-size:clamp(17px,4vw,23px);font-weight:700;color:var(--red);line-height:1.3;margin-bottom:9px;}
+.res-tag{display:inline-block;border:1px solid rgba(160,100,10,.3);border-radius:99px;padding:3px 14px;font-size:11.5px;color:var(--brown2);}
+.res-body{padding:18px 20px 26px;}
+.overview{border-left:3px solid var(--gold2);border-radius:0 11px 11px 0;padding:13px 16px;background:rgba(200,150,10,.07);font-size:14px;line-height:1.9;color:var(--brown);}
+
+.feature-grid{display:flex;flex-direction:column;gap:12px;margin-top:4px;}
+.feature-item{background:rgba(255,245,200,.5);border:1px solid rgba(160,110,10,.14);border-radius:14px;padding:14px 15px;position:relative;overflow:hidden;}
+.feature-item::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--gold2),var(--gold3));}
+.feature-label{font-size:12px;font-weight:700;color:var(--red);margin-bottom:6px;padding-left:6px;}
+.feature-reading{font-size:13.5px;line-height:1.75;color:var(--brown);margin-bottom:8px;padding-left:6px;}
+.feature-points{list-style:none;padding-left:6px;}
+.feature-points li{font-size:13px;line-height:1.65;color:var(--brown2);padding-left:14px;position:relative;margin-bottom:3px;}
+.feature-points li::before{content:"✦";position:absolute;left:0;font-size:8px;color:var(--gold2);top:4px;}
+
+.rblock{margin-top:20px;}
+.rblock-head{font-size:10px;letter-spacing:.38em;text-transform:uppercase;color:var(--brown2);opacity:.65;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.rblock-head::after{content:"";flex:1;height:1px;background:rgba(160,110,10,.18);}
+.rlist{list-style:none;display:flex;flex-direction:column;gap:7px;}
+.rlist li{padding:10px 13px 10px 26px;background:rgba(255,245,200,.5);border:1px solid rgba(160,110,10,.12);border-radius:10px;font-size:13.5px;line-height:1.7;color:var(--brown);position:relative;}
+.rlist li::before{content:"✦";position:absolute;left:9px;top:11px;font-size:8px;color:var(--gold2);}
+
+.element-box{background:rgba(200,150,10,.08);border:1px solid rgba(160,110,10,.2);border-radius:12px;padding:13px 15px;font-size:14px;line-height:1.75;color:var(--brown);}
+
+.forecast-grid{display:flex;flex-direction:column;gap:8px;}
+.fitem{display:grid;grid-template-columns:68px 1fr;gap:11px;align-items:start;padding:11px 13px;background:rgba(255,245,200,.5);border:1px solid rgba(160,110,10,.12);border-radius:10px;}
+.fperiod{font-size:10px;color:var(--gold2);text-align:center;border-right:1px solid rgba(160,110,10,.15);padding-right:11px;line-height:1.5;}
+.ftext{font-size:13.5px;line-height:1.7;color:var(--brown);}
+
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;}
+.chip{padding:5px 13px;border-radius:99px;font-size:12.5px;border:1px solid rgba(160,110,10,.22);color:var(--brown2);background:rgba(200,150,10,.07);}
+.chip.num{border-color:rgba(139,26,16,.3);background:rgba(139,26,16,.07);color:var(--red);font-weight:700;font-family:"Cinzel",serif;}
+
+.mantra{margin-top:20px;background:linear-gradient(135deg,rgba(139,26,16,.1),rgba(180,130,10,.1));border:1px solid rgba(160,100,10,.25);border-radius:16px;padding:20px;text-align:center;}
+.mantra-lbl{font-size:9px;letter-spacing:.5em;color:var(--brown2);opacity:.55;margin-bottom:7px;}
+.mantra-txt{font-size:15px;line-height:1.75;color:var(--brown);font-weight:500;}
+
+.final{margin-top:20px;background:rgba(200,150,10,.06);border:1px solid rgba(160,110,10,.2);border-radius:16px;padding:20px;text-align:center;position:relative;overflow:hidden;}
+.final::before{content:"🏮";position:absolute;font-size:80px;opacity:.04;top:50%;left:50%;transform:translate(-50%,-50%);}
+.final-txt{font-size:14px;line-height:1.9;color:var(--brown);position:relative;z-index:1;}
+.disclaimer{text-align:center;font-size:11px;color:var(--brown2);opacity:.4;margin-top:14px;line-height:1.6;}
+.footer{text-align:center;padding-top:28px;font-family:"Cinzel",serif;font-size:11px;letter-spacing:.25em;color:var(--brown2);opacity:.5;}
+@media(max-width:420px){h1{font-size:18px;}.card{padding:16px 13px;}.res-body{padding:14px 14px 22px;}}
+</style>
+</head>
+<body>
+
+<div class="deity-overlay" id="deityOverlay">
+  <div class="deity-wrap">
+    <div class="deity-glow"></div><div class="deity-ring"></div><div class="deity-ring2"></div>
+    <img class="kj-open"  id="teeOpen"  src="images/tee-open-eye.png"  alt="อาจารย์ตี๋"/>
+    <img class="kj-close" id="teeClose" src="images/tee-close-eye.png" alt="อาจารย์ตี๋"/>
+  </div>
+  <div class="deity-title">อาจารย์ตี๋กำลังอ่านโหงวเฮ้ง...</div>
+  <div class="deity-msg" id="deityMsg">อาจารย์ตี๋กำลังพินิจพิจารณาใบหน้า</div>
+  <div class="deity-progress"><div class="deity-fill-bar" id="deityFill"></div></div>
+</div>
+
+<main class="wrap">
+  <header class="header">
+    <div class="hero-row">
+      <div class="ln-small">🏮</div>
+      <img class="ajarn-hero" src="images/tee-open-eye.png" alt="อาจารย์ตี๋"/>
+      <div class="ln-small">🏮</div>
+    </div>
+    <div class="eyebrow">Ajarn Tee · Face Oracle · Powered by Claude AI</div>
+    <h1>อาจารย์ตี๋<br>อ่านโหงวเฮ้งมงคล</h1>
+    <div class="hr-gold"></div>
+    <div class="subtitle">ตี๋เทพนักพยากรณ์ ผู้อ่านใบหน้าทะลุชะตา<br>สแกนใบหน้าด้วย AI · รับคำทำนายโหงวเฮ้งมงคลสไตล์จีนร่วมสมัย</div>
+  </header>
+
+  <div class="notice">🌸 จัดทำเพื่อ<strong>ความบันเทิง กำลังใจ และสิริมงคล</strong>เท่านั้น ไม่ใช่การวินิจฉัยสุขภาพ ไม่รับประกันผลในอนาคต</div>
+
+  <div class="card">
+    <div class="section-label">ถ่ายหรืออัปโหลดรูปใบหน้า</div>
+    <label class="upload-zone" for="faceInput">
+      <span class="uico">🤳</span>
+      <div class="utxt">กดเพื่อเลือกรูป หรือถ่ายเซลฟี่</div>
+      <div class="usub">JPG · PNG · ควรเห็นใบหน้าชัดเจน</div>
+    </label>
+    <input id="faceInput" type="file" accept="image/*" capture="user"/>
+    <div class="preview-wrap" id="previewWrap">
+      <img id="previewImg" alt="ใบหน้า"/>
+      <canvas id="edgeCanvas"></canvas><canvas id="lineCanvas"></canvas>
+      <div class="scan-beam" id="scanBeam"></div><div class="scan-halo" id="scanHalo"></div>
+      <div class="cb cb-tl"></div><div class="cb cb-tr"></div>
+      <div class="cb cb-bl"></div><div class="cb cb-br"></div>
+    </div>
+    <div class="scan-bar" id="scanBar">
+      <div class="scan-bar-row">
+        <div class="scan-dots"><span></span><span></span><span></span></div>
+        <div class="scan-msg" id="scanMsg">กำลังสแกนใบหน้า...</div>
+        <div class="scan-pct" id="scanPct">0%</div>
+      </div>
+      <div class="scan-bar-track"><div class="scan-bar-fill" id="scanFill"></div></div>
+    </div>
+  </div>
+
+  <button class="btn-main" id="readBtn" onclick="analyzeFace()">✨ ให้อาจารย์ตี๋อ่านโหงวเฮ้งด้วย AI</button>
+
+  <div class="guide"><b>💡 แนวทางถ่ายภาพ:</b> ถ่ายใบหน้าตรง แสงสว่างเพียงพอ เห็นหน้าผาก ตา จมูก ปาก และคางชัดเจน</div>
+
+  <div class="result-wrap" id="resultWrap"><div id="resultInner"></div></div>
+
+  <div class="footer">🏮 ศาลเจ้าปึงเถ่ากงม่า · ขอนแก่น · อาจารย์ตี๋ AI 🏮</div>
+</main>
+
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbze6Nw2u_pNUY59qOjkPN7koQn-PaVksf3tOf8srDv_qaE6X-FVPcKsuCxdRGh-fQ1g/exec"; // ← ใส่ URL ใหม่ที่ได้จาก deploy
+
+const SCAN_DUR=7000;
+const SCAN_MSGS=["กำลังสแกนใบหน้า...","วิเคราะห์โครงหน้า...","อ่านดวงตาและหน้าผาก...","ถอดรหัสโหงวเฮ้ง...","อาจารย์ตี๋กำลังอ่าน..."];
+const DEITY_MSGS=["อาจารย์ตี๋กำลังพินิจพิจารณาใบหน้า...","วิเคราะห์หน้าผากแห่งปัญญา...","อ่านดวงตากระจกแห่งจิตใจ...","พิจารณาจมูกดาวแห่งทรัพย์...","ถอดรหัสปากวาจาสิทธิ์...","อ่านคางรากฐานชีวิต...","เรียบเรียงคำทำนายโหงวเฮ้ง...","อีกสักครู่ คำทำนายจะมาถึง..."];
+
+let imageDataUrl="",scanRAF=null,scanT0=null,deityInterval=null,blinkInterval=null;
+
+const $ = id => document.getElementById(id);
+const previewWrap=$("previewWrap"),previewImg=$("previewImg");
+const edgeCanvas=$("edgeCanvas"),lineCanvas=$("lineCanvas");
+const scanBeam=$("scanBeam"),scanHalo=$("scanHalo");
+const scanBar=$("scanBar"),scanMsg=$("scanMsg"),scanPct=$("scanPct"),scanFill=$("scanFill");
+const readBtn=$("readBtn"),resultWrap=$("resultWrap"),resultInner=$("resultInner");
+const deityOverlay=$("deityOverlay"),deityMsgEl=$("deityMsg");
+const teeOpen=$("teeOpen"),teeClose=$("teeClose"),deityFillEl=$("deityFill");
+
+function resizeImage(file,max,q){return new Promise((res,rej)=>{const reader=new FileReader();reader.onerror=rej;reader.onload=()=>{const img=new Image();img.onerror=rej;img.onload=()=>{const s=Math.min(1,max/Math.max(img.width,img.height));const w=Math.round(img.width*s),h=Math.round(img.height*s);const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);res(c.toDataURL("image/jpeg",q));};img.src=reader.result;};reader.readAsDataURL(file);});}
+
+function computeEdges(imgEl){const sw=imgEl.naturalWidth||imgEl.width,sh=imgEl.naturalHeight||imgEl.height,cap=500,sc=Math.min(1,cap/Math.max(sw,sh)),ow=Math.round(sw*sc),oh=Math.round(sh*sc);const off=document.createElement("canvas");off.width=ow;off.height=oh;const octx=off.getContext("2d");octx.drawImage(imgEl,0,0,ow,oh);const src=octx.getImageData(0,0,ow,oh).data;const gray=new Float32Array(ow*oh);for(let i=0;i<ow*oh;i++)gray[i]=0.299*src[i*4]+0.587*src[i*4+1]+0.114*src[i*4+2];const edge=new Float32Array(ow*oh);let mx=0;for(let y=1;y<oh-1;y++)for(let x=1;x<ow-1;x++){const p=y*ow+x;const gx=-gray[p-ow-1]+gray[p-ow+1]-2*gray[p-1]+2*gray[p+1]-gray[p+ow-1]+gray[p+ow+1];const gy=-gray[p-ow-1]-2*gray[p-ow]-gray[p-ow+1]+gray[p+ow-1]+2*gray[p+ow]+gray[p+ow+1];edge[p]=Math.sqrt(gx*gx+gy*gy);if(edge[p]>mx)mx=edge[p];}return{edge,ow,oh,mx};}
+
+function drawEdgeOverlay(){try{const dw=previewImg.clientWidth,dh=previewImg.clientHeight;if(!dw||!dh)return;edgeCanvas.width=dw;edgeCanvas.height=dh;const{edge,ow,oh,mx}=computeEdges(previewImg);const ctx=edgeCanvas.getContext("2d");const out=ctx.createImageData(dw,dh);const rx=dw/ow,ry=dh/oh;for(let cy=0;cy<dh;cy++)for(let cx=0;cx<dw;cx++){const ox=Math.min(ow-1,Math.floor(cx/rx)),oy=Math.min(oh-1,Math.floor(cy/ry)),v=mx>0?edge[oy*ow+ox]/mx:0;if(v>0.2){const t=Math.min(1,(v-0.2)/0.5),oi=(cy*dw+cx)*4;out.data[oi]=200+Math.round(55*t);out.data[oi+1]=130+Math.round(80*t);out.data[oi+2]=10;out.data[oi+3]=Math.round(210*t);}}ctx.putImageData(out,0,0);edgeCanvas.style.opacity="0.78";}catch(e){}}
+
+function animateLines(){try{const dw=previewImg.clientWidth,dh=previewImg.clientHeight;if(!dw||!dh)return;lineCanvas.width=dw;lineCanvas.height=dh;const{edge,ow,oh,mx}=computeEdges(previewImg);const rx=dw/ow,ry=dh/oh;const pts=[];for(let y=1;y<oh-1;y+=2)for(let x=1;x<ow-1;x+=2){const v=mx>0?edge[y*ow+x]/mx:0;if(v>0.28)pts.push({x:Math.round(x*rx),y:Math.round(y*ry),v});}lineCanvas.style.opacity="1";const ctx=lineCanvas.getContext("2d");let idx=0;const timer=setInterval(()=>{for(let b=0;b<12&&idx<pts.length;b++,idx++){const p=pts[idx],t=Math.min(1,(p.v-0.28)/0.45),r=1+t*1.2;const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,r*3)
