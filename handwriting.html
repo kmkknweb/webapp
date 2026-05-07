@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>โคมจิ๋ว — อ่านลายมือมงคล AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Noto+Sans+Thai:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --red:#8b1a10;--red2:#c0392b;--gold:#c8960c;--gold2:#f0c040;--gold3:#fff3a0;
+  --cream:#fdf6e3;--brown:#4a2c0a;--brown2:#7a4820;
+  --ink:#1a0a00;--smoke:#fff8ee;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+
+body{
+  min-height:100vh;
+  font-family:"Noto Sans Thai",sans-serif;
+  color:#e8d5a0;
+  background:#0d0600;
+  overflow-x:hidden;
+}
+
+/* ── BG ── */
+.bg-layer{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%,rgba(180,100,0,.28),transparent),
+    radial-gradient(ellipse 60% 80% at 80% 110%,rgba(120,30,0,.22),transparent),
+    linear-gradient(160deg,#1a0800 0%,#0d0400 50%,#160800 100%);
+}
+.bg-pattern{
+  position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.04;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 30px,rgba(200,150,12,1) 30px,rgba(200,150,12,1) 31px),
+    repeating-linear-gradient(90deg,transparent,transparent 30px,rgba(200,150,12,1) 30px,rgba(200,150,12,1) 31px);
+}
+
+/* ── WRAP ── */
+.wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:28px 16px 80px;}
+
+/* ── HEADER ── */
+.header{text-align:center;padding:44px 0 34px;}
+.lantern-row{display:flex;justify-content:center;align-items:flex-end;gap:22px;margin-bottom:24px;}
+.ln{
+  font-size:44px;
+  filter:drop-shadow(0 0 16px rgba(240,192,64,.8)) drop-shadow(0 0 40px rgba(200,100,0,.6));
+  animation:sway 3s ease-in-out infinite;
+}
+.ln:nth-child(1){animation-delay:0s;font-size:38px;}
+.ln:nth-child(2){animation-delay:.35s;font-size:58px;}
+.ln:nth-child(3){animation-delay:.7s;font-size:38px;}
+@keyframes sway{0%,100%{transform:rotate(-5deg) translateY(0)}50%{transform:rotate(5deg) translateY(-10px)}}
+
+.eyebrow{
+  font-family:"Cinzel",serif;
+  font-size:10px;letter-spacing:.55em;text-transform:uppercase;
+  color:var(--gold);opacity:.55;margin-bottom:10px;
+}
+h1{
+  font-family:"Cinzel",serif;
+  font-size:clamp(24px,6vw,36px);font-weight:900;line-height:1.15;
+  background:linear-gradient(160deg,#ffe070 0%,#fff5b0 40%,#f0c030 70%,#c89010 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 2px 18px rgba(240,192,64,.35));
+  margin-bottom:8px;
+}
+.subtitle{color:rgba(255,215,130,.5);font-size:13.5px;line-height:1.75;font-weight:300;}
+.hr-gold{
+  width:140px;height:1px;margin:22px auto;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+
+/* ── CARD ── */
+.card{
+  background:rgba(18,8,2,.82);
+  border:1px solid rgba(200,150,12,.2);
+  border-radius:22px;padding:24px 20px;
+  margin-bottom:16px;
+  backdrop-filter:blur(14px);
+  box-shadow:0 20px 60px rgba(0,0,0,.65),inset 0 1px 0 rgba(240,192,64,.08);
+  position:relative;overflow:hidden;
+}
+.card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(240,192,64,.45),transparent);
+}
+.section-label{
+  font-size:10px;letter-spacing:.4em;text-transform:uppercase;
+  color:var(--gold);opacity:.55;margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+}
+.section-label::before,.section-label::after{
+  content:"";flex:1;height:1px;background:rgba(200,150,12,.2);
+}
+
+/* ── NOTICE ── */
+.notice{
+  background:rgba(200,150,12,.06);border:1px solid rgba(200,150,12,.15);
+  border-radius:14px;padding:12px 16px;font-size:12.5px;line-height:1.75;
+  color:rgba(255,215,130,.45);text-align:center;margin-bottom:18px;
+}
+
+/* ── HAND CARDS ── */
+.hand-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.hcard{
+  border:1px solid rgba(200,150,12,.18);background:rgba(255,255,255,.025);
+  border-radius:16px;padding:20px 12px;text-align:center;cursor:pointer;
+  transition:all .22s;position:relative;overflow:hidden;
+}
+.hcard::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(240,192,64,.1),transparent 65%);
+  opacity:0;transition:.22s;
+}
+.hcard:hover::after,.hcard.active::after{opacity:1;}
+.hcard.active{border-color:rgba(240,192,64,.5);box-shadow:0 0 28px rgba(200,150,12,.18);}
+.hcard .dot{
+  position:absolute;top:10px;right:10px;width:7px;height:7px;border-radius:50%;
+  background:var(--gold2);box-shadow:0 0 8px var(--gold2);opacity:0;transition:.22s;
+}
+.hcard.active .dot{opacity:1;}
+.hcard .emoji{font-size:34px;display:block;margin-bottom:10px;
+  filter:drop-shadow(0 0 10px rgba(240,192,64,.45));}
+.hcard b{
+  display:block;font-size:15.5px;font-weight:700;
+  background:linear-gradient(135deg,var(--gold2),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:7px;
+}
+.hcard small{font-size:11.5px;color:rgba(255,200,120,.4);line-height:1.55;}
+
+/* ── UPLOAD ── */
+.upload-zone{
+  border:1.5px dashed rgba(200,150,12,.28);border-radius:16px;
+  padding:32px 20px;text-align:center;cursor:pointer;
+  background:rgba(255,255,255,.015);transition:all .22s;display:block;
+  position:relative;overflow:hidden;
+}
+.upload-zone:hover{border-color:rgba(240,192,64,.5);background:rgba(200,150,12,.05);}
+.upload-zone .uico{font-size:38px;margin-bottom:10px;display:block;
+  filter:drop-shadow(0 0 10px rgba(240,192,64,.4));}
+.upload-zone .utxt{color:var(--gold);font-size:15px;font-weight:600;margin-bottom:4px;}
+.upload-zone .usub{color:rgba(255,200,130,.35);font-size:12px;}
+input[type=file]{display:none;}
+
+/* ── PREVIEW SCANNER ── */
+.preview-wrap{
+  display:none;position:relative;border-radius:16px;overflow:hidden;
+  border:1px solid rgba(200,150,12,.28);background:#000;margin-top:14px;
+  box-shadow:0 0 50px rgba(200,150,12,.12);
+}
+#previewImg{width:100%;display:block;max-height:430px;object-fit:contain;}
+#edgeCanvas{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;opacity:0;transition:opacity .8s ease;
+}
+
+/* Scan beam */
+.scan-beam{
+  position:absolute;left:0;right:0;height:2px;z-index:10;display:none;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(240,192,64,.2) 10%,
+    rgba(240,192,64,.9) 42%,
+    #fffde0 50%,
+    rgba(240,192,64,.9) 58%,
+    rgba(240,192,64,.2) 90%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 6px 3px rgba(240,192,64,.6),
+    0 0 20px 6px rgba(200,120,0,.35),
+    0 0 50px 15px rgba(180,80,0,.15);
+}
+.scan-halo{
+  position:absolute;left:0;right:0;height:120px;z-index:9;display:none;
+  background:linear-gradient(180deg,rgba(240,192,64,.09),transparent);
+  pointer-events:none;
+}
+
+/* Corner brackets */
+.cb{position:absolute;width:18px;height:18px;z-index:12;opacity:0;transition:opacity .3s;}
+.cb-tl{top:8px;left:8px;border-top:2px solid var(--gold2);border-left:2px solid var(--gold2);}
+.cb-tr{top:8px;right:8px;border-top:2px solid var(--gold2);border-right:2px solid var(--gold2);}
+.cb-bl{bottom:8px;left:8px;border-bottom:2px solid var(--gold2);border-left:2px solid var(--gold2);}
+.cb-br{bottom:8px;right:8px;border-bottom:2px solid var(--gold2);border-right:2px solid var(--gold2);}
+.preview-wrap.scanning .cb{opacity:1;}
+
+/* Scan status bar */
+.scan-bar{
+  display:none;margin-top:12px;
+  background:rgba(200,150,12,.06);border:1px solid rgba(200,150,12,.14);
+  border-radius:12px;padding:14px 16px;
+}
+.scan-bar-track{height:2px;background:rgba(255,255,255,.07);border-radius:99px;margin:10px 0 8px;overflow:hidden;}
+.scan-bar-fill{height:100%;width:0%;border-radius:99px;
+  background:linear-gradient(90deg,var(--gold),var(--gold2));
+  box-shadow:0 0 8px var(--gold2);transition:width .25s;}
+.scan-bar-row{display:flex;justify-content:space-between;align-items:center;}
+.scan-msg{font-size:12px;letter-spacing:.12em;color:var(--gold);opacity:.75;}
+.scan-pct{font-family:"Cinzel",serif;font-size:12px;color:var(--gold2);opacity:.8;}
+.scan-dots{display:flex;gap:5px;}
+.scan-dots span{
+  width:5px;height:5px;border-radius:50%;background:var(--gold2);opacity:.3;
+  animation:blink 1.3s ease infinite;
+}
+.scan-dots span:nth-child(2){animation-delay:.22s;}
+.scan-dots span:nth-child(3){animation-delay:.44s;}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1;transform:scale(1.5);box-shadow:0 0 6px var(--gold2);}}
+
+/* ── BUTTON ── */
+.btn-main{
+  width:100%;border:0;border-radius:16px;padding:19px 16px;
+  font-size:16.5px;font-weight:700;font-family:"Noto Sans Thai",sans-serif;
+  cursor:pointer;display:block;text-align:center;margin-top:4px;
+  background:linear-gradient(135deg,#6e1008 0%,#a82010 30%,#c8960c 70%,#e8b820 100%);
+  color:#fff8e0;letter-spacing:.06em;
+  box-shadow:0 8px 30px rgba(160,50,0,.5),0 0 0 1px rgba(240,192,64,.18);
+  transition:all .22s;position:relative;overflow:hidden;
+}
+.btn-main::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 50%);
+  pointer-events:none;
+}
+.btn-main:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 14px 40px rgba(160,50,0,.6),0 0 0 1px rgba(240,192,64,.3);
+}
+.btn-main:active:not(:disabled){transform:translateY(0);}
+.btn-main:disabled{opacity:.38;cursor:not-allowed;}
+
+/* ── GUIDE ── */
+.guide{
+  font-size:12.5px;line-height:1.75;color:rgba(255,200,120,.35);
+  border:1px solid rgba(200,150,12,.1);border-radius:12px;
+  padding:12px 14px;margin-top:6px;
+  background:rgba(255,255,255,.015);
+}
+.guide b{color:rgba(240,192,64,.55);}
+
+/* ── RESULT ── */
+.result-wrap{
+  display:none;
+  background:rgba(18,8,2,.85);border:1px solid rgba(200,150,12,.2);
+  border-radius:22px;overflow:hidden;margin-top:18px;
+  box-shadow:0 24px 70px rgba(0,0,0,.7),inset 0 1px 0 rgba(240,192,64,.08);
+  animation:fadeUp .5s ease;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+
+.res-head{
+  padding:28px 22px 22px;text-align:center;
+  border-bottom:1px solid rgba(200,150,12,.12);
+  background:radial-gradient(ellipse 80% 120% at 50% 0%,rgba(200,150,12,.08),transparent);
+}
+.res-title{
+  font-family:"Cinzel",serif;
+  font-size:clamp(18px,4.5vw,26px);font-weight:700;
+  background:linear-gradient(135deg,var(--gold2),#fff8c0,var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1.3;margin-bottom:10px;
+}
+.res-hand-tag{
+  display:inline-block;
+  border:1px solid rgba(240,192,64,.35);border-radius:99px;
+  padding:4px 16px;font-size:11.5px;color:var(--gold);letter-spacing:.1em;
+}
+.res-body{padding:20px 22px 28px;}
+
+.overview{
+  border-left:2px solid var(--gold);
+  border-radius:0 12px 12px 0;
+  padding:15px 18px;margin-bottom:0;
+  background:rgba(200,150,12,.055);
+  font-size:14px;line-height:1.9;
+  color:rgba(255,228,158,.82);
+}
+
+.rblock{margin-top:22px;}
+.rblock-head{
+  font-size:10px;letter-spacing:.4em;text-transform:uppercase;
+  color:var(--gold);opacity:.6;margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.rblock-head::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(200,150,12,.25),transparent);}
+
+.rlist{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.rlist li{
+  padding:11px 14px 11px 28px;
+  background:rgba(255,255,255,.028);
+  border:1px solid rgba(200,150,12,.09);
+  border-radius:11px;
+  font-size:13.5px;line-height:1.7;
+  color:rgba(255,222,148,.78);
+  position:relative;
+}
+.rlist li::before{
+  content:"✦";position:absolute;left:10px;top:12px;
+  font-size:8px;color:var(--gold);opacity:.6;
+}
+
+.forecast-grid{display:flex;flex-direction:column;gap:9px;}
+.fitem{
+  display:grid;grid-template-columns:76px 1fr;gap:12px;align-items:start;
+  padding:12px 14px;
+  background:rgba(255,255,255,.028);border:1px solid rgba(200,150,12,.09);
+  border-radius:11px;
+}
+.fperiod{
+  font-size:10px;letter-spacing:.06em;color:var(--gold);opacity:.65;
+  text-align:center;border-right:1px solid rgba(200,150,12,.18);
+  padding-right:12px;padding-top:2px;line-height:1.5;
+}
+.ftext{font-size:13.5px;line-height:1.7;color:rgba(255,222,148,.78);}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+.chip{
+  padding:5px 14px;border-radius:99px;font-size:13px;
+  border:1px solid rgba(200,150,12,.22);color:rgba(255,215,138,.75);
+  background:rgba(200,150,12,.07);
+}
+.chip.num{
+  border-color:rgba(200,60,30,.35);background:rgba(140,20,10,.14);
+  color:rgba(255,155,135,.9);font-weight:700;font-family:"Cinzel",serif;
+  font-size:14px;
+}
+
+.mantra{
+  margin-top:22px;
+  background:linear-gradient(135deg,rgba(110,16,8,.6),rgba(90,55,0,.55));
+  border:1px solid rgba(240,192,64,.25);border-radius:18px;
+  padding:22px;text-align:center;
+  box-shadow:inset 0 0 30px rgba(200,100,0,.08);
+}
+.mantra-lbl{font-size:9px;letter-spacing:.5em;color:var(--gold);opacity:.5;margin-bottom:8px;}
+.mantra-txt{font-size:15.5px;line-height:1.75;color:rgba(255,235,168,.9);font-weight:500;}
+
+.final{
+  margin-top:22px;
+  background:radial-gradient(ellipse at 50% 0%,rgba(200,150,12,.1),transparent 70%),
+             rgba(14,6,1,.55);
+  border:1px solid rgba(240,192,64,.2);border-radius:18px;
+  padding:24px;text-align:center;position:relative;overflow:hidden;
+}
+.final::before{
+  content:"🏮";position:absolute;font-size:90px;opacity:.04;
+  top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;
+}
+.final-txt{font-size:14.5px;line-height:1.9;color:rgba(255,228,158,.82);position:relative;z-index:1;}
+.disclaimer{text-align:center;font-size:11px;color:rgba(255,190,90,.25);margin-top:18px;line-height:1.65;}
+
+/* ── FOOTER ── */
+.footer{
+  text-align:center;padding-top:36px;
+  font-family:"Cinzel",serif;font-size:11.5px;letter-spacing:.25em;
+  color:rgba(200,150,12,.32);
+}
+
+@media(max-width:420px){
+  h1{font-size:22px;}
+  .hand-grid{grid-template-columns:1fr;}
+  .card{padding:18px 14px;}
+  .res-body{padding:16px 14px 22px;}
+  .fitem{grid-template-columns:60px 1fr;}
+}
+</style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="bg-pattern"></div>
+
+<main class="wrap">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="lantern-row">
+      <div class="ln">🏮</div>
+      <div class="ln">🏮</div>
+      <div class="ln">🏮</div>
+    </div>
+    <div class="eyebrow">Khom Jiu · Palm Oracle · Powered by Claude AI</div>
+    <h1>โคมจิ๋ว<br>อ่านลายมือมงคล</h1>
+    <div class="hr-gold"></div>
+    <div class="subtitle">สแกนฝ่ามือด้วย AI · รับคำทำนายมงคลและกำลังใจสไตล์จีนร่วมสมัย</div>
+  </header>
+
+  <div class="notice">
+    🌸 จัดทำเพื่อ<strong style="color:rgba(240,192,64,.7)">ความบันเทิง กำลังใจ และสิริมงคล</strong>เท่านั้น
+    ไม่ใช่การวินิจฉัยสุขภาพ ไม่รับประกันผลในอนาคต
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="card">
+    <div class="section-label">เลือกมือที่ต้องการอ่าน</div>
+    <div class="hand-grid">
+      <div class="hcard active" id="leftCard" onclick="selectHand('left')">
+        <div class="dot"></div>
+        <span class="emoji">🤚</span>
+        <b>มือซ้าย</b>
+        <small>อารมณ์ · ความรู้สึก<br>ความสัมพันธ์ · พลังใจ<br>ความฝัน · สัญชาตญาณ</small>
+      </div>
+      <div class="hcard" id="rightCard" onclick="selectHand('right')">
+        <div class="dot"></div>
+        <span class="emoji">✋</span>
+        <b>มือขวา</b>
+        <small>กายภาพ · ลงมือทำ<br>การงาน · ความขยัน<br>สุขภาพทั่วไป · ความมั่นคง</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="card">
+    <div class="section-label">ถ่ายหรืออัปโหลดฝ่ามือ</div>
+    <label class="upload-zone" for="palmInput">
+      <span class="uico">📷</span>
+      <div class="utxt">กดเพื่อเลือกรูป หรือถ่ายภาพ</div>
+      <div class="usub">JPG · PNG · ควรเห็นฝ่ามือทั้งหมด</div>
+    </label>
+    <input id="palmInput" type="file" accept="image/*" capture="environment"/>
+
+    <!-- Preview + Scanner -->
+    <div class="preview-wrap" id="previewWrap">
+      <img id="previewImg" alt="ฝ่ามือ"/>
+      <canvas id="edgeCanvas"></canvas>
+      <div class="scan-beam" id="scanBeam"></div>
+      <div class="scan-halo" id="scanHalo"></div>
+      <div class="cb cb-tl"></div>
+      <div class="cb cb-tr"></div>
+      <div class="cb cb-bl"></div>
+      <div class="cb cb-br"></div>
+    </div>
+
+    <!-- Status bar -->
+    <div class="scan-bar" id="scanBar">
+      <div class="scan-bar-row">
+        <div class="scan-dots"><span></span><span></span><span></span></div>
+        <div class="scan-msg" id="scanMsg">กำลังสแกนลายมือ...</div>
+        <div class="scan-pct" id="scanPct">0%</div>
+      </div>
+      <div class="scan-bar-track"><div class="scan-bar-fill" id="scanFill"></div></div>
+    </div>
+  </div>
+
+  <!-- BUTTON -->
+  <button class="btn-main" id="readBtn" onclick="analyzePalm()">
+    ✨ ให้โคมจิ๋วอ่านลายมือด้วย AI
+  </button>
+
+  <div class="guide">
+    <b>💡 แนวทางถ่ายภาพ:</b> ถ่ายฝ่ามือให้ชัด เห็นทั้งฝ่ามือและนิ้ว
+    แสงสว่างเพียงพอ ไม่เบลอ ไม่ต้องถ่ายใบหน้า
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-wrap" id="resultWrap">
+    <div id="resultInner"></div>
+  </div>
+
+  <div class="footer">🏮 ศาลเจ้าปึงเถ่ากงม่า · ขอนแก่น · โคมจิ๋ว AI 🏮</div>
+</main>
+
+<script>
+// ══════════════════════════════════
+// ▶ ใส่ URL Web App หลัง Deploy
+const APPS_SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+// ══════════════════════════════════
+
+let selectedHand = "left";
+let imageDataUrl = "";
+
+const palmInput  = document.getElementById("palmInput");
+const previewWrap= document.getElementById("previewWrap");
+const previewImg = document.getElementById("previewImg");
+const edgeCanvas = document.getElementById("edgeCanvas");
+const scanBeam   = document.getElementById("scanBeam");
+const scanHalo   = document.getElementById("scanHalo");
+const scanBar    = document.getElementById("scanBar");
+const scanMsg    = document.getElementById("scanMsg");
+const scanPct    = document.getElementById("scanPct");
+const scanFill   = document.getElementById("scanFill");
+const readBtn    = document.getElementById("readBtn");
+const resultWrap = document.getElementById("resultWrap");
+const resultInner= document.getElementById("resultInner");
+
+// ── Hand select ──────────────────
+function selectHand(h) {
+  selectedHand = h;
+  document.getElementById("leftCard").classList.toggle("active",  h==="left");
+  document.getElementById("rightCard").classList.toggle("active", h==="right");
+  resultWrap.style.display = "none";
+}
+
+// ── Resize image ─────────────────
+function resizeImage(file, max, q) {
+  return new Promise((res,rej) => {
+    const reader = new FileReader();
+    reader.onerror = rej;
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = rej;
+      img.onload = () => {
+        const s = Math.min(1, max/Math.max(img.width,img.height));
+        const w = Math.round(img.width*s), h = Math.round(img.height*s);
+        const c = document.createElement("canvas");
+        c.width=w; c.height=h;
+        c.getContext("2d").drawImage(img,0,0,w,h);
+        res(c.toDataURL("image/jpeg",q));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── Sobel edge detection → gold overlay ──────────────
+function drawEdgeOverlay() {
+  try {
+    const img = previewImg;
+    const sw = img.naturalWidth  || img.width;
+    const sh = img.naturalHeight || img.height;
+    const dw = img.clientWidth;
+    const dh = img.clientHeight;
+    if (!sw || !sh || !dw || !dh) return;
+
+    edgeCanvas.width  = dw;
+    edgeCanvas.height = dh;
+
+    // Offscreen draw at natural size (capped for perf)
+    const cap = 600;
+    const sc  = Math.min(1, cap/Math.max(sw,sh));
+    const ow  = Math.round(sw*sc);
+    const oh  = Math.round(sh*sc);
+    const off = document.createElement("canvas");
+    off.width=ow; off.height=oh;
+    const octx = off.getContext("2d");
+    octx.drawImage(img,0,0,ow,oh);
+    const src  = octx.getImageData(0,0,ow,oh).data;
+
+    // Grayscale
+    const gray = new Float32Array(ow*oh);
+    for (let i=0;i<ow*oh;i++) {
+      gray[i] = 0.299*src[i*4] + 0.587*src[i*4+1] + 0.114*src[i*4+2];
+    }
+
+    // Sobel
+    const edge = new Float32Array(ow*oh);
+    let mx = 0;
+    for (let y=1;y<oh-1;y++) for (let x=1;x<ow-1;x++) {
+      const p = y*ow+x;
+      const gx = -gray[p-ow-1]+gray[p-ow+1]-2*gray[p-1]+2*gray[p+1]-gray[p+ow-1]+gray[p+ow+1];
+      const gy = -gray[p-ow-1]-2*gray[p-ow]-gray[p-ow+1]+gray[p+ow-1]+2*gray[p+ow]+gray[p+ow+1];
+      edge[p] = Math.sqrt(gx*gx+gy*gy);
+      if(edge[p]>mx) mx=edge[p];
+    }
+
+    // Draw golden lines on display canvas
+    const ctx = edgeCanvas.getContext("2d");
+    const out = ctx.createImageData(dw,dh);
+    const rxo = dw/ow, ryo = dh/oh;
+    for (let cy=0;cy<dh;cy++) for (let cx=0;cx<dw;cx++) {
+      const ox = Math.min(ow-1,Math.floor(cx/rxo));
+      const oy = Math.min(oh-1,Math.floor(cy/ryo));
+      const v  = mx>0 ? edge[oy*ow+ox]/mx : 0;
+      if (v>0.2) {
+        const t  = Math.min(1,(v-0.2)/0.45);
+        const oi = (cy*dw+cx)*4;
+        out.data[oi]   = 220 + Math.round(35*t);
+        out.data[oi+1] = 140 + Math.round(70*t);
+        out.data[oi+2] = 10  + Math.round(15*t);
+        out.data[oi+3] = Math.round(185*t);
+      }
+    }
+    ctx.putImageData(out,0,0);
+    edgeCanvas.style.opacity = "0.7";
+  } catch(e) { console.warn("edge detect:", e); }
+}
+
+// ── Scan animation ───────────────────────────────────
+let scanRAF = null;
+let scanT0  = null;
+const SCAN_DUR = 4500;
+const MSGS = [
+  "กำลังสแกนลายมือ...",
+  "วิเคราะห์แนวเส้น...",
+  "ถอดรหัสมงคล...",
+  "โคมจิ๋วกำลังอ่าน...",
+  "เรียบเรียงคำทำนาย..."
+];
+
+function startScan(onDone) {
+  stopScan();
+  scanBeam.style.display = "block";
+  scanHalo.style.display = "block";
+  scanBar.style.display  = "block";
+  previewWrap.classList.add("scanning");
+  edgeCanvas.style.opacity = "0";
+  scanT0 = performance.now();
+  let lastMsg = -1;
+  let edgeDone = false;
+
+  function frame(now) {
+    const el  = now - scanT0;
+    const pct = Math.min(el/SCAN_DUR, 1);
+    const h   = previewWrap.clientHeight;
+
+    // Ping-pong 1.5×
+    const phase = (pct * 1.5) % 1;
+    const ping  = phase < .5 ? phase*2 : (1-phase)*2;
+    const y     = Math.round(ping * h);
+
+    scanBeam.style.top = y+"px";
+    scanHalo.style.top = (y-40)+"px";
+    scanFill.style.width = Math.round(pct*100)+"%";
+    scanPct.textContent  = Math.round(pct*100)+"%";
+
+    const mi = Math.min(MSGS.length-1, Math.floor(pct*MSGS.length));
+    if (mi !== lastMsg) { lastMsg=mi; scanMsg.textContent=MSGS[mi]; }
+
+    // Draw edges at 45%
+    if (!edgeDone && pct>=0.45) {
+      edgeDone=true;
+      setTimeout(drawEdgeOverlay, 100);
+    }
+
+    if (pct<1) {
+      scanRAF = requestAnimationFrame(frame);
+    } else {
+      scanBeam.style.display="none";
+      scanHalo.style.display="none";
+      scanBar.style.display ="none";
+      previewWrap.classList.remove("scanning");
+      if (onDone) onDone();
+    }
+  }
+  scanRAF = requestAnimationFrame(frame);
+}
+
+function stopScan() {
+  if (scanRAF) { cancelAnimationFrame(scanRAF); scanRAF=null; }
+  scanBeam.style.display="none";
+  scanHalo.style.display="none";
+  scanBar.style.display ="none";
+  previewWrap.classList.remove("scanning");
+}
+
+// ── File input ───────────────────────────────────────
+palmInput.addEventListener("change", async function() {
+  const file = this.files[0];
+  if (!file) return;
+  if (!file.type.startsWith("image/")) { alert("กรุณาเลือกรูปภาพเท่านั้น"); return; }
+  stopScan();
+  edgeCanvas.style.opacity="0";
+  imageDataUrl = await resizeImage(file, 1200, 0.82);
+  previewImg.src = imageDataUrl;
+  previewWrap.style.display="block";
+  resultWrap.style.display ="none";
+  previewImg.onload = () => setTimeout(()=>startScan(null), 250);
+});
+
+// ── Analyze ──────────────────────────────────────────
+async function analyzePalm() {
+  if (!imageDataUrl) { alert("กรุณาอัปโหลดรูปฝ่ามือก่อนครับ"); return; }
+  if (!APPS_SCRIPT_URL.includes("script.google.com")) {
+    alert("กรุณาใส่ URL Apps Script ในตัวแปร APPS_SCRIPT_URL ก่อนครับ"); return;
+  }
+  stopScan();
+  edgeCanvas.style.opacity="0";
+  readBtn.disabled=true;
+  resultWrap.style.display="none";
+
+  // Scan while waiting
+  setTimeout(()=>{ startScan(null); scanMsg.textContent="โคมจิ๋วกำลังวิเคราะห์..."; },100);
+
+  try {
+    const resp = await fetch(APPS_SCRIPT_URL,{
+      method:"POST",
+      body:JSON.stringify({ hand:selectedHand, image:imageDataUrl, shrineName:"ศาลเจ้าปึงเถ่ากงม่า ขอนแก่น" })
+    });
+    const data = await resp.json();
+    if (!data.ok) throw new Error(data.error||"AI วิเคราะห์ไม่สำเร็จ");
+
+    stopScan();
+    setTimeout(drawEdgeOverlay, 200);
+
+    resultInner.innerHTML = renderResult(data.result);
+    resultWrap.style.display="block";
+    setTimeout(()=>resultWrap.scrollIntoView({behavior:"smooth",block:"start"}),120);
+
+  } catch(err) {
+    stopScan();
+    resultInner.innerHTML=`
+      <div style="padding:28px;text-align:center;">
+        <div style="font-size:36px;margin-bottom:14px;">⚠️</div>
+        <div style="color:rgba(255,160,100,.8);font-size:14px;line-height:1.8;">
+          ${escHtml(err.message)}<br>
+          <small style="opacity:.5;font-size:12px;">ตรวจสอบ URL Apps Script และ API Key</small>
+        </div>
+      </div>`;
+    resultWrap.style.display="block";
+  } finally {
+    readBtn.disabled=false;
+  }
+}
+
+// ── Render result ─────────────────────────────────────
+function renderResult(r) {
+  const isR  = selectedHand==="right";
+  const tag  = isR ? "✋ มือขวา · กายภาพ & การลงมือทำ" : "🤚 มือซ้าย · อารมณ์ & พลังใจ";
+  const hd   = isR ? "💪 ด้านกายภาพและพลังการกระทำ"   : "💙 ด้านอารมณ์และจิตใจ";
+  const li   = a=>(a||[]).map(x=>`<li>${escHtml(x)}</li>`).join("");
+
+  const fc = (r.energy_forecast||[]).map((x,i)=>{
+    const lbl=["📅 1–3 เดือน","🌿 3–6 เดือน","🌟 6–12 เดือน"];
+    return `<div class="fitem"><div class="fperiod">${lbl[i]||""}</div><div class="ftext">${escHtml(x)}</div></div>`;
+  }).join("");
+
+  const cols  = (r.lucky_colors||[]).map(x=>`<span class="chip">${escHtml(x)}</span>`).join("");
+  const nums  = (r.auspicious_numbers||[]).map(x=>`<span class="chip num">${escHtml(x)}</span>`).join("");
+  const elems = (r.lucky_elements||[]).map(x=>`<span class="chip">${escHtml(x)}</span>`).join("");
+
+  return `
+  <div class="res-head">
+    <div class="res-title">${escHtml(r.title||"คำอวยพรจากโคมจิ๋ว")}</div>
+    <div class="res-hand-tag">${tag}</div>
+  </div>
+  <div class="res-body">
+    <div class="overview">${escHtml(r.overview||"")}</div>
+
+    <div class="rblock">
+      <div class="rblock-head">📖 คำอ่านลายมือหลัก</div>
+      <ul class="rlist">${li(r.reading_points)}</ul>
+    </div>
+
+    <div class="rblock">
+      <div class="rblock-head">${hd}</div>
+      <ul class="rlist">${li(r.hand_specific)}</ul>
+    </div>
+
+    <div class="rblock">
+      <div class="rblock-head">🌸 คำแนะนำมงคลจากโคมจิ๋ว</div>
+      <ul class="rlist">${li(r.blessing_advice)}</ul>
+    </div>
+
+    ${fc?`<div class="rblock"><div class="rblock-head">🔮 พยากรณ์พลังงาน</div><div class="forecast-grid">${fc}</div></div>`:""}
+
+    <div class="rblock">
+      <div class="rblock-head">🎨 สีมงคลเสริมพลัง</div>
+      <div class="chips">${cols}</div>
+    </div>
+
+    ${nums?`<div class="rblock"><div class="rblock-head">🔢 เลขมงคล</div><div class="chips">${nums}</div></div>`:""}
+    ${elems?`<div class="rblock"><div class="rblock-head">✨ ธาตุและสัญลักษณ์มงคล</div><div class="chips">${elems}</div></div>`:""}
+
+    ${r.mantra?`
+    <div class="mantra">
+      <div class="mantra-lbl">คาถาประจำใจ · Mantra</div>
+      <div class="mantra-txt">${escHtml(r.mantra)}</div>
+    </div>`:""}
+
+    <div class="final">
+      <div class="final-txt">${escHtml(r.final_blessing||"")}</div>
+    </div>
+    <div class="disclaimer">${escHtml(r.disclaimer||"จัดทำเพื่อความบันเทิงและสิริมงคลเท่านั้น")}</div>
+  </div>`;
+}
+
+function escHtml(t) {
+  return String(t??"").replace(/[&<>"']/g,m=>
+    ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+</script>
+</body>
+</html>
