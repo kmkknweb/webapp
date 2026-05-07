@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>โคมวิ่งรอบบึง</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    touch-action: none;
+    font-family: sans-serif;
+  }
+  #gameCanvas {
+    display: block;
+    background: url('images/bung_outline.png') no-repeat center center;
+    background-size: contain;
+  }
+  #info {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-size: 18px;
+    background: rgba(0,0,0,0.5);
+    padding: 5px 10px;
+    border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+<div id="info">เวลา: <span id="time">0</span> วินาที</div>
+<canvas id="gameCanvas"></canvas>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let width = window.innerWidth;
+let height = window.innerHeight;
+canvas.width = width;
+canvas.height = height;
+
+// เส้นทาง (approximate) รอบบึง
+const path = [
+  {x: width*0.8, y: height*0.2},
+  {x: width*0.6, y: height*0.4},
+  {x: width*0.5, y: height*0.6},
+  {x: width*0.4, y: height*0.7},
+  {x: width*0.3, y: height*0.6},
+  {x: width*0.2, y: height*0.4},
+  {x: width*0.4, y: height*0.2},
+  {x: width*0.8, y: height*0.2}
+];
+
+// โคม
+const lamp = new Image();
+lamp.src = 'images/khomy.png';
+const lampSize = 50;
+let lampX = path[0].x;
+let lampY = path[0].y;
+let dragging = false;
+
+// เวลา
+let startTime = null;
+let maxTime = 20; // 20 วินาที
+let score = 100;
+
+// จบเกม flag
+let gameOver = false;
+
+// วาดเส้นทาง
+function drawPath() {
+  ctx.lineWidth = 40; // กว้างพอให้ลากง่าย
+  ctx.strokeStyle = '#FFD700'; // สีเหลืองทอง
+  ctx.beginPath();
+  ctx.moveTo(path[0].x, path[0].y);
+  for(let i=1;i<path.length;i++){
+    ctx.lineTo(path[i].x, path[i].y);
+  }
+  ctx.stroke();
+}
+
+// วาดโคม
+function drawLamp() {
+  ctx.drawImage(lamp, lampX-lampSize/2, lampY-lampSize/2, lampSize, lampSize);
+}
+
+// ตรวจชนขอบ
+function checkCollision(x, y) {
+  // ตรวจจาก pixel ระยะจากเส้น (approximate)
+  let hit = true;
+  for(let i=0;i<path.length-1;i++){
+    const x1=path[i].x, y1=path[i].y;
+    const x2=path[i+1].x, y2=path[i+1].y;
+    const dx = x2-x1, dy=y2-y1;
+    const len=Math.hypot(dx, dy);
+    const dot = ((x-x1)*dx + (y-y1)*dy)/len;
+    const closestX = x1 + (dot/len)*dx;
+    const closestY = y1 + (dot/len)*dy;
+    const dist = Math.hypot(x-closestX, y-closestY);
+    if(dist < 20){ // 20 px = กว้างเส้น/2
+      hit = false; // อยู่ในเส้น
+      break;
+    }
+  }
+  return hit; // true = ชนขอบ
+}
+
+// อัพเดทเวลา
+function updateTime() {
+  if(gameOver) return;
+  const elapsed = (Date.now() - startTime)/1000;
+  document.getElementById('time').textContent = elapsed.toFixed(1);
+  if(elapsed > maxTime){
+    gameOver = true;
+    alert('หมดเวลา! ไม่ได้รางวัล');
+  } else {
+    requestAnimationFrame(updateTime);
+  }
+}
+
+// ลากโคม
+canvas.addEventListener('pointerdown', e=>{ dragging=true; });
+canvas.addEventListener('pointerup', e=>{ dragging=false; });
+canvas.addEventListener('pointermove', e=>{
+  if(!dragging || gameOver) return;
+  const rect = canvas.getBoundingClientRect();
+  lampX = e.clientX - rect.left;
+  lampY = e.clientY - rect.top;
+  if(checkCollision(lampX, lampY)){
+    score -= 10; // ชนขอบลดคะแนน
+  }
+  if(score <= 0 && !gameOver){
+    gameOver = true;
+    alert('คะแนนต่ำเกินไป! ไม่ได้รางวัล');
+  }
+});
+
+// วาดทุกอย่าง
+function draw(){
+  ctx.clearRect(0,0,width,height);
+  drawPath();
+  drawLamp();
+  if(!gameOver) requestAnimationFrame(draw);
+}
+
+// เริ่มเกม
+lamp.onload = ()=>{
+  startTime = Date.now();
+  draw();
+  updateTime();
+};
+</script>
+</body>
+</html>
