@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ศาลเจ้า - Intro</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@300;400;600;700&family=Noto+Sans+Thai:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0400;
+    min-height: 100vh;
+    overflow: hidden;
+    font-family: 'Noto Sans Thai', sans-serif;
+  }
+
+  /* Particle canvas */
+  #particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Background layers */
+  .bg-radial {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 80%, rgba(180,80,0,0.25) 0%, transparent 70%),
+      radial-gradient(ellipse 80% 40% at 50% 100%, rgba(120,40,0,0.4) 0%, transparent 60%),
+      radial-gradient(ellipse 100% 60% at 50% 50%, rgba(30,10,0,0.8) 0%, transparent 100%);
+    z-index: 0;
+  }
+
+  /* Top decorative border */
+  .top-border {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #c8860a, #f5c842, #c8860a, transparent);
+    z-index: 10;
+  }
+
+  /* Corner ornaments */
+  .corner {
+    position: fixed;
+    width: 80px;
+    height: 80px;
+    z-index: 10;
+    opacity: 0.6;
+  }
+  .corner-tl { top: 8px; left: 8px; }
+  .corner-tr { top: 8px; right: 8px; transform: scaleX(-1); }
+  .corner-bl { bottom: 8px; left: 8px; transform: scaleY(-1); }
+  .corner-br { bottom: 8px; right: 8px; transform: scale(-1); }
+
+  /* Main container */
+  .intro-wrap {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    padding: 0 24px;
+  }
+
+  /* Top text */
+  .shrine-label {
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.35em;
+    color: #c8860a;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.5s;
+  }
+
+  /* Main title */
+  .shrine-name {
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #f5c842;
+    text-align: center;
+    line-height: 1.3;
+    margin-bottom: 4px;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.8s;
+    text-shadow: 0 0 40px rgba(245,200,66,0.4);
+  }
+
+  .shrine-name-en {
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 14px;
+    font-weight: 300;
+    color: rgba(245,200,66,0.6);
+    letter-spacing: 0.2em;
+    text-align: center;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 1s;
+  }
+
+  /* Video container */
+  .deity-wrap {
+    position: relative;
+    width: 260px;
+    height: 280px;
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeIn 1.5s ease forwards 1.2s;
+  }
+
+  .deity-glow {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 40px;
+    background: radial-gradient(ellipse, rgba(200,134,10,0.5) 0%, transparent 70%);
+    filter: blur(8px);
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  .deity-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 30px rgba(200,134,10,0.5));
+  }
+
+  /* Decorative divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeIn 1s ease forwards 2s;
+  }
+  .divider-line {
+    height: 1px;
+    width: 60px;
+    background: linear-gradient(90deg, transparent, rgba(200,134,10,0.6));
+  }
+  .divider-line.right {
+    background: linear-gradient(90deg, rgba(200,134,10,0.6), transparent);
+  }
+  .divider-diamond {
+    width: 6px;
+    height: 6px;
+    background: #c8860a;
+    transform: rotate(45deg);
+  }
+
+  /* Tagline */
+  .tagline {
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 16px;
+    font-weight: 400;
+    color: rgba(245,220,150,0.85);
+    text-align: center;
+    line-height: 1.8;
+    margin-bottom: 36px;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 2.2s;
+  }
+
+  /* Enter button */
+  .btn-enter {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 44px;
+    background: linear-gradient(135deg, #8b1a1a, #b22222);
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 2.5s;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+  }
+
+  .btn-enter::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(245,200,66,0.5);
+    border-radius: 2px;
+  }
+
+  .btn-enter::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: shimmer 3s ease infinite 3s;
+  }
+
+  .btn-enter:hover {
+    transform: scale(1.03);
+  }
+
+  .btn-enter:active {
+    transform: scale(0.97);
+  }
+
+  .btn-enter-text {
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: #f5c842;
+    letter-spacing: 0.1em;
+  }
+
+  .btn-enter-icon {
+    font-size: 20px;
+  }
+
+  /* Gold corner of button */
+  .btn-corner {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-color: #f5c842;
+    border-style: solid;
+    opacity: 0.7;
+  }
+  .btn-corner.tl { top: 3px; left: 3px; border-width: 1px 0 0 1px; }
+  .btn-corner.tr { top: 3px; right: 3px; border-width: 1px 1px 0 0; }
+  .btn-corner.bl { bottom: 3px; left: 3px; border-width: 0 0 1px 1px; }
+  .btn-corner.br { bottom: 3px; right: 3px; border-width: 0 1px 1px 0; }
+
+  /* Skip button */
+  .btn-skip {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 20;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(200,134,10,0.3);
+    color: rgba(200,134,10,0.7);
+    font-family: 'Noto Sans Thai', sans-serif;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    animation: fadeIn 0.8s ease forwards 1.5s;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(4px);
+  }
+  .btn-skip:hover {
+    color: #c8860a;
+    border-color: rgba(200,134,10,0.6);
+  }
+
+  /* Skip countdown */
+  .skip-count {
+    background: rgba(200,134,10,0.2);
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  /* Lucky text at bottom */
+  .lucky-row {
+    position: fixed;
+    bottom: 32px;
+    left: 0; right: 0;
+    text-align: center;
+    opacity: 0;
+    animation: fadeIn 1s ease forwards 3s;
+    z-index: 5;
+  }
+  .lucky-text {
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 13px;
+    color: rgba(200,134,10,0.5);
+    letter-spacing: 0.15em;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.5; transform: translateX(-50%) scaleX(1); }
+    50% { opacity: 1; transform: translateX(-50%) scaleX(1.2); }
+  }
+
+  @keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 200%; }
+  }
+
+  @keyframes float-particle {
+    0% { transform: translateY(0) translateX(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 0.6; }
+    100% { transform: translateY(-100vh) translateX(var(--drift)); opacity: 0; }
+  }
+
+  /* Transition out */
+  .intro-wrap.exit {
+    animation: exitFade 0.8s ease forwards;
+  }
+  @keyframes exitFade {
+    to { opacity: 0; transform: scale(1.05); }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-border"></div>
+<div class="bg-radial"></div>
+<canvas id="particles"></canvas>
+
+<!-- Corner ornaments SVG -->
+<svg class="corner corner-tl" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M4 4 L4 40 M4 4 L40 4" stroke="#c8860a" stroke-width="1.5"/>
+  <path d="M12 12 L12 32 M12 12 L32 12" stroke="#f5c842" stroke-width="0.5" opacity="0.5"/>
+  <circle cx="4" cy="4" r="3" fill="#c8860a"/>
+  <circle cx="4" cy="4" r="1.5" fill="#f5c842"/>
+</svg>
+<svg class="corner corner-tr" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M4 4 L4 40 M4 4 L40 4" stroke="#c8860a" stroke-width="1.5"/>
+  <path d="M12 12 L12 32 M12 12 L32 12" stroke="#f5c842" stroke-width="0.5" opacity="0.5"/>
+  <circle cx="4" cy="4" r="3" fill="#c8860a"/>
+  <circle cx="4" cy="4" r="1.5" fill="#f5c842"/>
+</svg>
+<svg class="corner corner-bl" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M4 4 L4 40 M4 4 L40 4" stroke="#c8860a" stroke-width="1.5"/>
+  <path d="M12 12 L12 32 M12 12 L32 12" stroke="#f5c842" stroke-width="0.5" opacity="0.5"/>
+  <circle cx="4" cy="4" r="3" fill="#c8860a"/>
+  <circle cx="4" cy="4" r="1.5" fill="#f5c842"/>
+</svg>
+<svg class="corner corner-br" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M4 4 L4 40 M4 4 L40 4" stroke="#c8860a" stroke-width="1.5"/>
+  <path d="M12 12 L12 32 M12 12 L32 12" stroke="#f5c842" stroke-width="0.5" opacity="0.5"/>
+  <circle cx="4" cy="4" r="3" fill="#c8860a"/>
+  <circle cx="4" cy="4" r="1.5" fill="#f5c842"/>
+</svg>
+
+<!-- Skip button -->
+<button class="btn-skip" onclick="enterApp()">
+  ข้าม
+  <span class="skip-count" id="skipCount">5</span>
+</button>
+
+<!-- Main intro -->
+<div class="intro-wrap" id="introWrap">
+  <p class="shrine-label">ศักดิ์สิทธิ์ • มงคล • เจริญรุ่งเรือง</p>
+
+  <h1 class="shrine-name">ศาลเจ้าแห่งโชคลาภ</h1>
+  <p class="shrine-name-en">SACRED SHRINE</p>
+
+  <div class="deity-wrap">
+    <div class="deity-glow"></div>
+    <!-- ใส่ไฟล์วิดีโอจริงตรงนี้ -->
+    <!-- <video class="deity-video" autoplay loop muted playsinline src="agong-ama.mp4"></video> -->
+
+    <!-- Placeholder รูปอากงอาม่าจาก asset ที่มี -->
+    <img class="deity-video" src="agong-ama.png" alt="อากงอาม่า" style="object-fit:contain; width:100%; height:100%; filter: drop-shadow(0 0 30px rgba(200,134,10,0.6));">
+  </div>
+
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-diamond"></div>
+    <div class="divider-diamond" style="opacity:0.4; transform: rotate(45deg) scale(0.6);"></div>
+    <div class="divider-diamond"></div>
+    <div class="divider-line right"></div>
+  </div>
+
+  <p class="tagline">
+    ขอพรได้ทุกที่ ทุกเวลา<br>
+    <span style="font-size:13px; opacity:0.6;">อากงอาม่าคุ้มครองท่านเสมอ</span>
+  </p>
+
+  <button class="btn-enter" onclick="enterApp()">
+    <span class="btn-corner tl"></span>
+    <span class="btn-corner tr"></span>
+    <span class="btn-corner bl"></span>
+    <span class="btn-corner br"></span>
+    <span class="btn-enter-icon">🙏</span>
+    <span class="btn-enter-text">ไหว้เจ้า</span>
+  </button>
+</div>
+
+<div class="lucky-row">
+  <p class="lucky-text">🧧 &nbsp; ขอให้มีสุขภาพดี มีโชคลาภ เจริญรุ่งเรือง &nbsp; 🧧</p>
+</div>
+
+<script>
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const particles = [];
+for (let i = 0; i < 50; i++) {
+  particles.push({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight + window.innerHeight,
+    size: Math.random() * 2.5 + 0.5,
+    speed: Math.random() * 0.6 + 0.2,
+    drift: (Math.random() - 0.5) * 0.4,
+    opacity: Math.random() * 0.6 + 0.2,
+    color: Math.random() > 0.5 ? '#f5c842' : '#c8860a'
+  });
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.opacity;
+    ctx.fill();
+    p.y -= p.speed;
+    p.x += p.drift;
+    if (p.y < -10) {
+      p.y = canvas.height + 10;
+      p.x = Math.random() * canvas.width;
+    }
+  });
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// Countdown skip
+let count = 5;
+const skipEl = document.getElementById('skipCount');
+const timer = setInterval(() => {
+  count--;
+  if (skipEl) skipEl.textContent = count;
+  if (count <= 0) {
+    clearInterval(timer);
+    enterApp();
+  }
+}, 1000);
+
+function enterApp() {
+  clearInterval(timer);
+  const wrap = document.getElementById('introWrap');
+  wrap.classList.add('exit');
+  setTimeout(() => {
+    document.body.innerHTML = '<div style="background:#0a0400; height:100vh; display:flex; align-items:center; justify-content:center;"><p style="color:#c8860a; font-family: serif; font-size:18px;">→ เข้าสู่แอปหลัก</p></div>';
+  }, 800);
+}
+</script>
+</body>
+</html>
